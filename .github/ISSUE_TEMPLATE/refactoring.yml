@@ -1,0 +1,28 @@
+name: "♻️ Refactoring"
+description: "리팩토링 작업"
+labels: ["refactoring"]
+projects: ["Team-SoFa/5"]
+body:
+  - type: dropdown
+    id: role
+    attributes:
+      label: 작업 영역 선택
+      description: 이 이슈는 어떤 작업 영역과 관련 있나요?
+      options:
+        - Front
+        - Back
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 📄 설명
+      description: 수정사항에 대한 설명을 작성해 주세요.
+      placeholder: 자세히 적을수록 좋습니다!
+    validations:
+      required: true
+      
+  - type: textarea
+    attributes:
+      label: 🙋🏻 참고 자료
+      description: 참고 자료가 있다면 작성해 주세요.
