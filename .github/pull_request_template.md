@@ -2,4 +2,4 @@
 
 - close #번호
 
-## PR Description
+## PR 설명

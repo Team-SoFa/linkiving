@@ -1,27 +1,25 @@
 name: "✨ Feature"
 description: "새로운 기능 추가"
-labels: ["feature"]
+type: ["Feature"]
+projects: ["Team-SoFa/4"]
 body:
-  - type: dropdown
-    id: role
+  - type: textarea
     attributes:
-      label: 작업 영역 선택
-      description: 이 이슈는 어떤 작업 영역과 관련 있나요?
-      options:
-        - Front
-        - Back
+      label: 이슈 배경
+      description: 새로운 기능을 도입하는 배경을 작성해주세요.
+      placeholder: 자세히 적을수록 좋습니다!
     validations:
       required: true
 
   - type: textarea
     attributes:
-      label: 📄 설명
-      description: 새로운 기능에 대한 설명을 작성해 주세요.
+      label: 이슈 내용
+      description: 새로운 기능에 대한 설명을 작성해 주세요. (구현 방법/ 동작 방식 등)
       placeholder: 자세히 적을수록 좋습니다!
     validations:
       required: true
-      
+
   - type: textarea
     attributes:
-      label: 🙋🏻 참고 자료
+      label: 참고 자료
       description: 참고 자료가 있다면 작성해 주세요.
