@@ -1,0 +1,51 @@
+name: 🚀 Deploy Static to S3
+
+permissions:
+  id-token: write # AWS OIDC 필요
+  contents: read # repo 체크아웃용
+
+on:
+  workflow_dispatch: {}
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    # PR이 merge 되어 closed 됐을 때만 실행
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) 소스 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2) Node.js 설치
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      # 3) 의존성 설치
+      - name: Install dependencies
+        run: npm ci
+
+      # 4) 정적 빌드
+      - name: Build
+        run: npm run build
+
+      # 5) AWS 자격증명 설정
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      # 6) S3에 업로드 (동기화 + 삭제)
+      - name: Sync to S3 Bucket
+        run: |
+          aws s3 sync out/ s3://${{ secrets.BUCKET_NAME }} \
+            --delete

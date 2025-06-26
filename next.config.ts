@@ -1,7 +1,10 @@
+// next.config.ts
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // static‐export mode
+  output: "export",
+  // (you can also customize `distDir` or `outputFileTracingRoot` here if you like)
 };
 
 export default nextConfig;
