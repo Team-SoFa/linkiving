@@ -30,7 +30,7 @@ module.exports = {
         "header-match-team-format": ({ header }) => {
           const match = /^[A-Z][a-zA-Z]*: .+/.test(header);
           return [
-            valid,
+            match,
             `❌ 커밋 메시지는 "타입: 설명" 형식을 따라야 합니다:
             ✅ 예시:
               Feat: Example feature`,

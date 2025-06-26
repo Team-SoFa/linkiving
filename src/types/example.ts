@@ -1,0 +1,1 @@
+// 전역 타입 정의 (User.ts, Bookmark.ts, ...)
