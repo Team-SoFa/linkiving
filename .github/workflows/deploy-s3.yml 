@@ -1,0 +1,48 @@
+name: 🚀 Deploy Static to S3
+
+# 이 워크플로우는 19-cicd-s3 브랜치에 푸시될 때만 실행됩니다.
+on:
+  push:
+    branches:
+      - "chore/#19-cicd-s3"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) 소스 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2) Node.js 설치
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      # 3) 의존성 설치
+      - name: Install dependencies
+        run: npm ci
+
+      # 4) 정적 빌드 (Next.js export)
+      - name: Build and Export
+        run: |
+          npm run build     # next build
+          npm run export    # next export → out/ 폴더 생성
+
+      # 5) AWS 자격증명 설정
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id:     ${{ secrets.FRONT_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.FRONT_AWS_SECRET_ACCESS_KEY }}
+          # region 시크릿으로 관리하시면:
+          aws-region:           ${{ secrets.AWS_REGION || 'ap-northeast-2' }}
+
+      # 6) S3에 업로드 (동기화 + 삭제)
+      - name: Sync to S3 Bucket
+        run: |
+          aws s3 sync out/ s3://${{ secrets.BUCKET_NAME }} \
+            --delete \
+            --acl public-read
