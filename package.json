@@ -12,6 +12,8 @@
     "deploy:export": "npm run build && npm run export"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.75.7",
+    "axios": "^1.9.0",
     "next": "15.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
