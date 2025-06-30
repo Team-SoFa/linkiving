@@ -1,6 +1,6 @@
 name: "🐛 Bug"
 description: "버그 이슈"
-type: ["Bug"]
+type: "Bug"
 projects: ["Team-SoFa/4"]
 body:
   - type: textarea

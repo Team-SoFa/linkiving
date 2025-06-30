@@ -1,6 +1,6 @@
 name: "✨ Task"
 description: "새로운 작업 혹은 논의"
-type: ["Task"]
+type: "Task"
 projects: ["Team-SoFa/4"]
 body:
 
