@@ -1,46 +1,67 @@
 module.exports = {
-  extends: ["@commitlint/config-conventional"],
   rules: {
     "type-enum": [
       2,
       "always",
       [
-        "feat",
-        "fix",
-        "docs",
-        "style",
-        "refactor",
-        "test",
-        "chore",
-        "design",
-        "comment",
-        "rename",
-        "remove",
+        "Feat",
+        "Fix",
+        "Docs",
+        "Style",
+        "Refactor",
+        "Test",
+        "Chore",
+        "Design",
+        "Comment",
+        "Rename",
+        "Remove",
       ],
     ],
-    "type-case": [2, "always", "lower-case"],
-    "subject-empty": [2, "never"], // subject가 비어 있을 수 없음
-    "type-empty": [2, "never"], // type이 비어 있을 수 없음
-    "subject-full-stop": [2, "never", "."], // 서브젝트 끝에 점을 사용하지 않음
-    "header-case": [2, "always", "lower-case"], // header를 소문자로 설정
+    "type-case": [2, "always", "pascal-case"],
+    "type-empty": [2, "never"],
+    "subject-empty": [2, "never"],
+    "subject-full-stop": [2, "never", "."],
+    "header-max-length": [2, "always", 100],
+    "my-custom-header-format": [2, "always"],
+    "body-format-check": [2, "always"],
   },
   plugins: [
     {
       rules: {
-        "header-match-team-format": ({ header }) => {
-          const hasNoSpaceAroundColon = /^[a-z]+:.+/.test(header);
-          const valid = hasNoSpaceAroundColon;
+        "my-custom-header-format": ({ header }) => {
+          const valid = /^([A-Z][a-z]+):\s.+\s\(#[0-9]+\)$/.test(header);
           return [
             valid,
-            `❌ 커밋 메시지는 다음 형식을 따라야 합니다:
-  
-  타입:설명
-  
-  - 콜론(:) 앞뒤에 공백이 없어야 합니다.
-  
-  ✅ 예시:
-  feat:변경 애용 설명`,
+            '❌ 커밋 제목은 "Type: Title (#123)" 형식이어야 합니다.',
           ];
+        },
+        "body-format-check": ({ raw }) => {
+          // raw 전체 커밋 메시지를 사용하여 더 정확한 파싱
+          if (!raw) return [true];
+
+          const lines = raw.split("\n");
+
+          if (lines.length > 1) {
+            const secondLine = lines[1];
+
+            if (secondLine.trim() !== "") {
+              return [false, "❌ 제목과 본문 사이에 빈 줄이 필요합니다."];
+            }
+
+            const bodyLines = lines.slice(2);
+            const invalidLine = bodyLines.find(
+              (line) => line.trim() && !line.trim().startsWith("-")
+            );
+
+            if (invalidLine) {
+              return [
+                false,
+                `❌ 본문의 각 줄은 '-'로 시작해야 합니다. 문제 있는 줄: "${invalidLine.trim()}"`,
+              ];
+            }
+          }
+
+          return [true];
         },
       },
     },
