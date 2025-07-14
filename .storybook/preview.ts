@@ -1,7 +1,7 @@
 // .storybook/preview.ts
 
 // ① 프로젝트 전역에 선언된 Tailwind 디렉티브를 먼저 불러옵니다.
-import "../src/app/globals.css";
+import "../src/styles/globals.css";
 
 import type { Preview } from "@storybook/react";
 
