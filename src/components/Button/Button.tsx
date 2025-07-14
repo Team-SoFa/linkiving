@@ -1,52 +1,72 @@
 "use client";
 
-import { FC, ReactNode, ButtonHTMLAttributes } from "react";
-import clsx from "clsx";
+import React from "react";
+import { clsx } from "clsx";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    /**
-     * 버튼 스타일 종류
-     * - primary: 주요 액션
-     * - secondary: 보조 액션
-     * - danger: 위험·삭제 액션
-     */
-    variant?: "primary" | "secondary" | "danger";
-    /** 버튼 크기 */
+
+interface ButtonProps {
+    children: React.ReactNode;
+    onClick?: React.MouseEventHandler<HTMLButtonElement>;
+    type?: "button" | "submit" | "reset";
+    variant?: "primary" | "outline" | "ghost";
     size?: "sm" | "md" | "lg";
-    children: ReactNode;
+    disabled?: boolean;
+    icon?: React.ReactNode
+    iconPosition?: "left" | "right"
 }
 
-const VARIANT_CLASSES = {
-    primary: "bg-blue-500 hover:bg-blue-600 text-white",
-    secondary: "bg-gray-200 hover:bg-gray-300 text-gray-800",
-    danger: "bg-red-500 hover:bg-red-600 text-white",
-} as const;
-
-const SIZE_CLASSES = {
-    sm: "px-2 py-1 text-sm",
-    md: "px-4 py-2 text-base",
-    lg: "px-6 py-3 text-lg",
-} as const;
-
-const Button: FC<ButtonProps> = ({
-    variant = "primary",
-    size = "md",
-    className,
+export default function Button({
     children,
-    ...rest
-}) => {
+    variant = "primary",
+    onClick,
+    type = "button",
+    size = "md",
+    icon,
+    iconPosition = "left",
+    disabled,
+    ...props
+}: ButtonProps) {
+    const baseStyle = "inline-flex items-center outline-none rounded font-medium transition"
+    const variants = {
+        primary: "bg-blue-500 text-white hover:bg-gray-800 cursor-pointer",
+        outline: "border border-gray-300 text-gray-700 hover:bg-gray-100 cursor-pointer",
+        ghost: "text-gray-700 hover:bg-gray-100 cursor-pointer"
+    }
+    const sizes = {
+        sm: "px-3 py-1.5 text-sm",
+        md: "px-4 py-2 text-base",
+        lg: "px-5 py-3 text-lg"
+    }
+
+    // 클래스 조합부
     const classes = clsx(
-        "rounded font-medium transition",
-        VARIANT_CLASSES[variant],
-        SIZE_CLASSES[size],
-        className
-    );
+        baseStyle,
+        variants[variant],
+        sizes[size],
+        {
+            "bg-gray-400 opacity-50 cursor-not-allowed": disabled,
+            "hover:bg-gray-400 hover:opacity-50 hover:cursor-not-allowed": disabled
+        }
+    )
+
+    // 버튼 실제 출력 부분
+    const ButtonContent = (
+        <>
+            {icon && iconPosition === "left" && <span className="mr-2">{icon}</span>}
+            {children}
+            {icon && iconPosition === "right" && <span className="ml-2">{icon}</span>}
+        </>
+    )
 
     return (
-        <button className={classes} {...rest}>
-            {children}
+        <button 
+            type={type}
+            className={classes}
+            disabled={disabled}
+            aria-disabled={disabled}
+            onClick={onClick}
+        >
+            {ButtonContent}
         </button>
-    );
-};
-
-export default Button;
+    )
+}

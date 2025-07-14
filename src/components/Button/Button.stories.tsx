@@ -1,21 +1,27 @@
+// components/ui/Button.stories.tsx
 import type { Meta, StoryObj } from "@storybook/react";
-import Button from "@/components/Button/Button";
+import Button from "./Button";
 
 const meta: Meta<typeof Button> = {
     title: "Components/Button",
     component: Button,
-    tags: ["autodocs"],
     argTypes: {
         variant: {
-            control: { type: "radio" },
-            options: ["primary", "secondary", "danger"],
+            control: "select",
+            options: ["primary", "outline", "ghost"],
         },
         size: {
-            control: { type: "radio" },
+            control: "select",
             options: ["sm", "md", "lg"],
         },
+        iconPosition: {
+            control: "inline-radio",
+            options: ["left", "right"],
+        },
+        icon: {
+            control: false,
+        },
         onClick: { action: "clicked" },
-        className: { table: { disable: true } },
     },
 };
 
@@ -24,24 +30,41 @@ type Story = StoryObj<typeof Button>;
 
 export const Primary: Story = {
     args: {
+        children: "Primary Button",
         variant: "primary",
         size: "md",
-        children: "Primary Button",
+        icon: "✈️",
+        iconPosition: "left",
     },
 };
 
-export const Secondary: Story = {
+export const Outline: Story = {
     args: {
-        variant: "secondary",
+        children: "Outline Button",
+        variant: "outline",
         size: "md",
-        children: "Secondary Button",
+        icon: "✈️",
+        iconPosition: "left",
     },
 };
 
-export const LargeDanger: Story = {
+export const Ghost: Story = {
     args: {
-        variant: "danger",
-        size: "lg",
-        children: "Danger Button",
+        children: "Ghost Button",
+        variant: "ghost",
+        size: "md",
+        icon: "✈️",
+        iconPosition: "left",
+    },
+};
+
+export const Disabled: Story = {
+    args: {
+        children: "Disabled",
+        variant: "ghost",
+        size: "md",
+        disabled: true,
+        icon: "✈️",
+        iconPosition: "left",
     },
 };
