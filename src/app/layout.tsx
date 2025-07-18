@@ -1,3 +1,4 @@
+import ModalProvider from '@/components/Modal/ModalProvider';
 import ReactQueryProvider from '@/components/ReactQueryProvider';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
@@ -27,7 +28,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <ReactQueryProvider>
+          <ModalProvider />
+          {children}
+        </ReactQueryProvider>
       </body>
     </html>
   );
