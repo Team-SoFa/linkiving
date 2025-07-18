@@ -27,6 +27,7 @@ import IC_Logout from './svgs/ic_logout.svg';
 import IC_MoreHori from './svgs/ic_more_hori.svg';
 import IC_MoreVert from './svgs/ic_more_vert.svg';
 import IC_Regenerate from './svgs/ic_regenerate.svg';
+import IC_Search from './svgs/ic_search.svg';
 import IC_SendFilled from './svgs/ic_send_filled.svg';
 import IC_SendOutline from './svgs/ic_send_outlined.svg';
 import IC_SidenavOpen from './svgs/ic_sidenav_open.svg';
@@ -70,6 +71,7 @@ export const IconMap = {
   IC_MoreHori,
   IC_MoreVert,
   IC_Regenerate,
+  IC_Search,
   IC_SendFilled,
   IC_SendOutline,
   IC_SidenavOpen,
