@@ -52,7 +52,7 @@ const Anchor = forwardRef<HTMLAnchorElement, AnchorProps>(function Anchor(
       {...rest}
     >
       {iconVisible && <SVGIcon icon="IC_LinkOpen" size={size} aria-hidden="true" />}
-      {children}
+      <span className="truncate">{children}</span>
     </a>
   );
 });
