@@ -10,10 +10,10 @@ export default function Header() {
 
   return (
     <header className={headerStyle}>
-      <Button>BTN</Button>
+      <Button label="BTN" />
       <div className={setStyle}>
-        <Button>더보기</Button>
-        <Button>로그인</Button>
+        <Button label="더보기" />
+        <Button label="로그인" />
       </div>
     </header>
   );
