@@ -3,26 +3,24 @@
 import { clsx } from 'clsx';
 import React from 'react';
 
-interface ButtonProps {
-  children: React.ReactNode;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  type?: 'button' | 'submit' | 'reset';
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  label?: React.ReactNode;
   variant?: 'primary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
-  disabled?: boolean;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
 }
 
 export default function Button({
-  children,
+  label,
   variant = 'primary',
-  onClick,
-  type = 'button',
   size = 'md',
+  disabled,
   icon,
   iconPosition = 'left',
-  disabled,
+  type = 'button',
+  onClick,
+  ...rest
 }: ButtonProps) {
   const baseStyle = 'inline-flex items-center outline-none rounded font-medium transition';
   const variants = {
@@ -39,25 +37,25 @@ export default function Button({
   // 클래스 조합부
   const classes = clsx(baseStyle, variants[variant], sizes[size], {
     'bg-gray-400 opacity-50 cursor-not-allowed': disabled,
-    'hover:bg-gray-400 hover:opacity-50 hover:cursor-not-allowed': disabled,
   });
 
   // 버튼 실제 출력 부분
   const ButtonContent = (
     <>
       {icon && iconPosition === 'left' && <span className="mr-2">{icon}</span>}
-      {children}
+      {label}
       {icon && iconPosition === 'right' && <span className="ml-2">{icon}</span>}
     </>
   );
 
   return (
     <button
-      type={type}
       className={classes}
+      onClick={onClick}
       disabled={disabled}
       aria-disabled={disabled}
-      onClick={onClick}
+      type={type}
+      {...rest}
     >
       {ButtonContent}
     </button>
