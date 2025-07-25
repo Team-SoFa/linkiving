@@ -51,6 +51,6 @@ export const Default: Story = {
   },
   args: {
     children: <div>모달 내용</div>,
-    type: 'EXAMPLE',
+    type: 'ADD_LINK',
   },
 };
