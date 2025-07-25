@@ -1,9 +1,9 @@
 import clsx from 'clsx';
-import React, { HTMLAttributes, forwardRef } from 'react';
+import React, { LabelHTMLAttributes, forwardRef } from 'react';
 
 import { style } from './Label.style';
 
-export interface LabelProps extends HTMLAttributes<HTMLLabelElement> {
+export interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
   children: React.ReactNode;
   textSize?: 'sm' | 'md' | 'lg' | 'xl';
   textColor?: string;

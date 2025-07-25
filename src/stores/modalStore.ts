@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export const MODAL_TYPE = {
-  EXAMPLE: 'example',
+  ADD_LINK: 'ADD_LINK',
 } as const;
 
 export type ModalType = keyof typeof MODAL_TYPE | null;
