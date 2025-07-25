@@ -1,7 +1,7 @@
 'use client';
 
-import { clsx } from 'clsx';
 import React, { ReactElement } from 'react';
+import { clsx } from 'clsx';
 
 interface IconButtonProps {
   icon: ReactElement;
