@@ -1,5 +1,5 @@
 module.exports = {
-  rules: {
+    rules: {
     "type-enum": [
       2,
       "always",
@@ -50,7 +50,7 @@ module.exports = {
 
             const bodyLines = lines.slice(2);
             const invalidLine = bodyLines.find(
-              (line) => line.trim() && !line.trim().startsWith("-")
+              (line) => line.trim() && !line.trim().startsWith("-"),
             );
 
             if (invalidLine) {
