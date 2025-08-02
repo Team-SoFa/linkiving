@@ -1,9 +1,0 @@
-{
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "prettier.ignorePath": ".prettierignore", // prettierignore 적용
-  "editor.formatOnSave": true, // 저장 시 자동 포맷
-  "[javascript]": {
-    "editor.formatOnSave": true
-  },
-  "prettier.configPath": ".prettierrc"
-}
