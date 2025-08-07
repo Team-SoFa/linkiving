@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  workflow_dispatch: {}
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prettier Check
+        run: npx prettier --check "src/**/*.{js,jsx,ts,tsx,json,css,md}"
+        
+      - name: Stylelint Check
+        run: npx stylelint "src/**/*.{css,scss,tsx,ts}"
+        
+      - name: ESLint Check
+        run: npx eslint "src/**/*.{js,jsx,ts,tsx}" --max-warnings=0
+
+      - name: TypeScript Check
+        run: npx tsc --noEmit
+
+      - name: Next.js Build
+        run: npm run build
