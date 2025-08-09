@@ -3,7 +3,7 @@ import Button, { ButtonProps } from '../Button';
 export default function ShareButton(props: ButtonProps) {
   const { label = '공유하기', onClick, variant, size, icon = '🔗', iconPosition, disabled } = props;
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleShare = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (onClick) {
       onClick(event);
     } else {
@@ -28,7 +28,7 @@ export default function ShareButton(props: ButtonProps) {
   return (
     <Button
       label={label}
-      onClick={handleClick}
+      onClick={handleShare}
       variant={variant}
       size={size}
       icon={icon}
