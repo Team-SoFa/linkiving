@@ -1,10 +1,9 @@
-// components/ui/Button.stories.tsx
 import type { Meta, StoryObj } from '@storybook/react';
-import Button from './Button';
+import ShareButton from './ShareButton';
 
-const meta: Meta<typeof Button> = {
-  title: 'Components/Button',
-  component: Button,
+const meta: Meta<typeof ShareButton> = {
+  title: 'Components/Button/ShareButton',
+  component: ShareButton,
   tags: ['autodocs'],
   argTypes: {
     iconPosition: {
@@ -19,14 +18,15 @@ const meta: Meta<typeof Button> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof Button>;
+type Story = StoryObj<typeof ShareButton>;
 
 export const Default: Story = {
   args: {
-    label: 'Primary Button',
+    label: '공유하기',
     variant: 'primary',
     size: 'md',
-    icon: '✈️',
+    icon: '🔗',
     iconPosition: 'left',
+    disabled: false,
   },
 };
