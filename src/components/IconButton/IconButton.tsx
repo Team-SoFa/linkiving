@@ -22,7 +22,7 @@ export default function IconButton({
   disabled = false,
   ariaLabel,
 }: IconButtonProps) {
-  const baseStyle = 'inline-flex items-center justify-center focus:bg-gray-300';
+  const baseStyle = 'inline-flex items-center justify-center hover:bg-gray-300';
   const variants = {
     solid: 'bg-gray-400 text-black hover:bg-gray-200',
     outline: 'border border-gray-200 hover:bg-gray-400',
