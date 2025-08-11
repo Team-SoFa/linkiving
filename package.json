@@ -14,10 +14,9 @@
     "format": "prettier --plugin=@trivago/prettier-plugin-sort-imports --config .prettierrc --write \"src/**/*.{js,jsx,ts,tsx}\""
   },
   "lint-staged": {
-    "*.{ts,tsx,js}": [
-      "eslint --fix --max-warnings=0",
+    "*.{ts,tsx,js,jsx}": [
       "prettier --write",
-      "eslint --fix"
+      "eslint --fix --max-warnings=0"
     ],
     "*.{json,md,css,html}": [
       "prettier --write"

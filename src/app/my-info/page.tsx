@@ -1,8 +1,9 @@
-import MyInfo from "./MyInfo";
+import MyInfo from './MyInfo';
+
 export default function MyInfoPage() {
-    return (
-        <main>
-            <MyInfo />
-        </main>
-    );
+  return (
+    <main>
+      <MyInfo />
+    </main>
+  );
 }
