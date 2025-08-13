@@ -1,5 +1,5 @@
 // src/apis/apiClient.ts
-import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 
 const apiClient = axios.create({
   baseURL: 'https://jsonplaceholder.typicode.com',
