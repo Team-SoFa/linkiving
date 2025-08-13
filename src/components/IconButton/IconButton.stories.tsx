@@ -31,7 +31,7 @@ type Story = StoryObj<typeof IconButton>;
 export const Default: Story = {
   args: {
     variant: 'solid',
-    size: 'md',
+    size: 'sm',
     radius: 'md',
     icon: <Image src="/next.svg" alt="Next.js Icon" width={20} height={20} />,
     ariaLabel: 'Icon Button',

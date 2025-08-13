@@ -1,0 +1,53 @@
+name: "Storybook Deployment"
+run-name: ${{ github.actor}}의 스토리북 배포
+on: # PR 머지 전에는 pull_request만 실행, 머지 후 main에는 push만 실행
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/*.stories.tsx'
+    types: [opened, synchronize, reopened]  # 이 상태일때만 PR 배포 실행
+
+  push:
+    branches: [main]
+    paths:
+      - '**/*.stories.tsx'
+
+jobs:
+  storybook-deploy: #job id명으로, 로그 화면에서 뜨는 이름. 걍 원하는 거 쓰면 됨(가독성, 관리 편의성 용도
+    # Operating System
+    runs-on: ubuntu-latest
+    outputs:
+        status: ${{ job.status }}   # job이 실행된 결과값을 정의해서, 다른 job에서 참조할 수 있도록 함(빌드 성공/실패 상태 전달, 빌드 결과물 경로/URL 공유, 테스트 커버리지 수치 전달
+    # Job steps
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3 # Update to the latest version of checkout action
+        with:
+            fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3 # Example of using a different action
+        with:
+            node-version: 18
+
+      - name: Cache Dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+            path: ~/.npm
+            key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+            restore-keys: |
+              ${{ runner.os }}-npm
+      - run: npm install
+
+      - name: Publish Chromatic
+        id: chromatic
+        uses: chromaui/action@v1 # Update to the latest version of Chromatic action
+        with:
+            projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+            buildScriptName: build-storybook
+      - name: PR Comment
+        uses: thollander/actions-comment-pull-request@v1
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+            message: '🚀 **storybook url**: ${{ steps.chromatic.outputs.storybookUrl }}'
