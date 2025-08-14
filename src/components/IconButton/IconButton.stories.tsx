@@ -1,5 +1,5 @@
+import CustomImage from '@/components/icons/TempIcon';
 import type { Meta, StoryObj } from '@storybook/react';
-import Image from 'next/image';
 
 import IconButton from './IconButton';
 
@@ -8,20 +8,10 @@ const meta: Meta<typeof IconButton> = {
   component: IconButton,
   tags: ['autodocs'],
   argTypes: {
-    variant: {
-      control: { type: 'radio' },
-      options: ['solid', 'outline'],
+    onClick: {
+      description: '아이콘만 가지는 버튼입니다.',
+      action: 'clicked',
     },
-    size: {
-      control: { type: 'radio' },
-      options: ['sm', 'md', 'lg'],
-    },
-    radius: {
-      control: { type: 'radio' },
-      options: ['none', 'sm', 'md', 'lg', 'full'],
-    },
-    onClick: { action: 'clicked' },
-    ariaLabel: { control: 'text' },
   },
 };
 
@@ -33,7 +23,8 @@ export const Default: Story = {
     variant: 'solid',
     size: 'md',
     radius: 'md',
-    icon: <Image src="/next.svg" alt="Next.js Icon" width={20} height={20} />,
+    icon: <CustomImage src="file.svg" alt="img" />,
     ariaLabel: 'Icon Button',
+    disabled: false,
   },
 };
