@@ -3,14 +3,14 @@
 import { clsx } from 'clsx';
 import React, { ReactElement } from 'react';
 
-interface IconButtonProps {
+export interface IconButtonProps {
   icon: ReactElement;
   variant?: 'solid' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   radius?: 'none' | 'sm' | 'md' | 'lg' | 'full';
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
-  ariaLabel?: string;
+  ariaLabel: string;
 }
 
 export default function IconButton({
