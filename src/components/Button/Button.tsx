@@ -3,10 +3,9 @@
 import { clsx } from 'clsx';
 import React from 'react';
 
-interface ButtonProps {
-  children: React.ReactNode;
+export interface ButtonProps {
+  label?: React.ReactNode;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  type?: 'button' | 'submit' | 'reset';
   variant?: 'primary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
@@ -15,10 +14,9 @@ interface ButtonProps {
 }
 
 export default function Button({
-  children,
+  label,
   variant = 'primary',
   onClick,
-  type = 'button',
   size = 'md',
   icon,
   iconPosition = 'left',
@@ -46,19 +44,13 @@ export default function Button({
   const ButtonContent = (
     <>
       {icon && iconPosition === 'left' && <span className="mr-2">{icon}</span>}
-      {children}
+      {label}
       {icon && iconPosition === 'right' && <span className="ml-2">{icon}</span>}
     </>
   );
 
   return (
-    <button
-      type={type}
-      className={classes}
-      disabled={disabled}
-      aria-disabled={disabled}
-      onClick={onClick}
-    >
+    <button className={classes} disabled={disabled} aria-disabled={disabled} onClick={onClick}>
       {ButtonContent}
     </button>
   );
