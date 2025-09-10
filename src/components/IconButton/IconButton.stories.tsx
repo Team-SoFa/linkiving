@@ -1,4 +1,4 @@
-import CustomImage from '@/components/icons/TempIcon';
+import CustomImage from '@/components/Icons/CustomImage';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import IconButton from './IconButton';
