@@ -36,7 +36,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       full: 'rounded-full',
     };
     const classes = clsx(baseStyle, variants[variant], sizes[size], radiuses[radius], {
-      'bg-gray-400 opacity-50 cursor-not-allowed hover:bg-gray-400 hover:opacity-50 hover:cursor-not-allowed':
+      'cursor-not-allowed bg-gray-400 opacity-50 hover:cursor-not-allowed hover:bg-gray-400 hover:opacity-50':
         disabled,
       'cursor-pointer': !disabled,
     });

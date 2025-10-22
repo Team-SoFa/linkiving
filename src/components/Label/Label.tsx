@@ -22,7 +22,7 @@ export default function Label({ text, htmlFor, size = 'md', required = false }: 
   return (
     <label htmlFor={htmlFor} className={classes}>
       {required && (
-        <span aria-hidden="true" className="text-red-500 ml-1">
+        <span aria-hidden="true" className="ml-1 text-red-500">
           *{' '}
         </span>
       )}

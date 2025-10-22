@@ -53,7 +53,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function TextField(
     sizeStyles[size],
     radiusStyles[radius],
     variantStyles[variant],
-    disabled && 'opacity-50 pointer-events-none'
+    disabled && 'pointer-events-none opacity-50'
   );
 
   return (
@@ -64,7 +64,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function TextField(
         value={value}
         placeholder={placeholder}
         disabled={disabled}
-        className="flex-1 min-w-0 bg-transparent outline-none"
+        className="min-w-0 flex-1 bg-transparent outline-none"
         onChange={onChange}
         {...rest}
       />
