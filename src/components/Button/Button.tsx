@@ -38,8 +38,8 @@ export default function Button({
 
   // 클래스 조합부
   const classes = clsx(baseStyle, variants[variant], sizes[size], {
-    'bg-gray-400 opacity-50 cursor-not-allowed': disabled,
-    'hover:bg-gray-400 hover:opacity-50 hover:cursor-not-allowed': disabled,
+    'cursor-not-allowed bg-gray-400 opacity-50': disabled,
+    'hover:cursor-not-allowed hover:bg-gray-400 hover:opacity-50': disabled,
   });
 
   // 버튼 실제 출력 부분
