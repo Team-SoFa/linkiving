@@ -1,71 +1,46 @@
 // components/ui/Button.stories.tsx
 import type { Meta, StoryObj } from '@storybook/react';
 
+import CustomImage from '../Icons/CustomImage';
 import Button from './Button';
 
-const meta: Meta<typeof Button> = {
+const meta = {
   title: 'Components/Button',
   component: Button,
+  tags: ['autodocs'],
   argTypes: {
     variant: {
-      control: 'select',
-      options: ['primary', 'outline', 'ghost'],
+      control: 'inline-radio',
     },
     size: {
-      control: 'select',
-      options: ['sm', 'md', 'lg'],
+      control: 'inline-radio',
+    },
+    radius: {
+      control: 'inline-radio',
     },
     iconPosition: {
       control: 'inline-radio',
-      options: ['left', 'right'],
     },
     icon: {
       control: false,
     },
+    type: {
+      control: 'inline-radio',
+    },
     onClick: { action: 'clicked' },
   },
-};
+} satisfies Meta<typeof Button>;
 
 export default meta;
 type Story = StoryObj<typeof Button>;
 
-export const Primary: Story = {
+export const Default: Story = {
   args: {
-    children: 'Primary Button',
+    label: 'Primary Button',
+    icon: <CustomImage src="file.svg" width={16} />,
+    iconPosition: 'left',
     variant: 'primary',
-    size: 'md',
-    icon: '✈️',
-    iconPosition: 'left',
-  },
-};
-
-export const Outline: Story = {
-  args: {
-    children: 'Outline Button',
-    variant: 'outline',
-    size: 'md',
-    icon: '✈️',
-    iconPosition: 'left',
-  },
-};
-
-export const Ghost: Story = {
-  args: {
-    children: 'Ghost Button',
-    variant: 'ghost',
-    size: 'md',
-    icon: '✈️',
-    iconPosition: 'left',
-  },
-};
-
-export const Disabled: Story = {
-  args: {
-    children: 'Disabled',
-    variant: 'ghost',
-    size: 'md',
-    disabled: true,
-    icon: '✈️',
-    iconPosition: 'left',
+    disabled: false, // 스토리북 데모 시 공유 API 미지원 브라우저 경고 억제
+    onClick: undefined,
   },
 };
