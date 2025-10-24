@@ -2,6 +2,7 @@
   "name": "sofa",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.19.0",
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
@@ -12,7 +13,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "format": "prettier --plugin=@trivago/prettier-plugin-sort-imports --config .prettierrc --write \"src/**/*.{js,jsx,ts,tsx}\"",
-    "chromatic": "npx chromatic --project-token=chpt_219dd64304c7da8"
+    "chromatic": "pnpm exec chromatic --project-token=chpt_219dd64304c7da8"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
