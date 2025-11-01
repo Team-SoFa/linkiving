@@ -6,6 +6,7 @@ import prettierPlugin from 'eslint-plugin-prettier';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import storybookPlugin from 'eslint-plugin-storybook';
+import validateFilename from 'eslint-plugin-validate-filename';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -26,6 +27,7 @@ const config = [
       prettier: prettierPlugin,
       'jsx-a11y': jsxA11yPlugin,
       storybook: storybookPlugin,
+      'validate-filename': validateFilename,
     },
     languageOptions: {
       parserOptions: {
@@ -54,6 +56,23 @@ const config = [
           components: ['Link'],
           specialLink: ['hrefLeft', 'hrefRight'],
           aspects: ['invalidHref', 'preferButton'],
+        },
+      ],
+      'validate-filename/naming-rules': [
+        'error',
+        {
+          rules: [
+            {
+              case: 'pascal',
+              target: 'src/components/**/*',
+              excludes: ['src/components/**/hooks/**/*'],
+            },
+            {
+              case: 'camel',
+              target: '**/hooks/**', // target "hooks" folder
+              patterns: '^use', // file names begin with "use".
+            },
+          ],
         },
       ],
     },
