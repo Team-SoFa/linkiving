@@ -15,7 +15,7 @@ interface InputProps
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(function TextField(
+const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
   {
     value,
     placeholder = 'Enter text...',
