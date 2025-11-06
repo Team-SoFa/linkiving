@@ -1,5 +1,6 @@
 'use client';
 
+import { Slot } from '@radix-ui/react-slot';
 import { clsx } from 'clsx';
 import React from 'react';
 import { tv } from 'tailwind-variants';
@@ -8,51 +9,48 @@ import SVGIcon from '../Icons/SVGIcon';
 import { IconMapTypes, IconSizeTypes } from '../Icons/icons';
 
 const styles = tv({
-  base: 'inline-flex cursor-pointer items-center justify-center whitespace-nowrap transition-all duration-150 outline-none focus:bg-gray-300',
+  base: 'iconBtn',
   variants: {
     variant: {
-      ghost: 'bg-gray-50 text-black hover:bg-blue-50 active:bg-blue-100',
-      outline: 'border border-gray-200 text-black hover:bg-gray-400 active:bg-gray-500',
+      primary: 'iconBtn-primary',
+      secondary: 'iconBtn-secondary',
+      tertiary: 'iconBtn-tertiary',
+      neutral: 'iconBtn-neutral',
     },
     size: {
-      sm: 'h-6 w-6 p-1',
-      md: 'h-8 w-8 p-2',
-      lg: 'h-10 w-10 p-3',
-    },
-    radius: {
-      sm: 'rounded-sm',
-      md: 'rounded-md',
-      lg: 'rounded-lg',
-      full: 'rounded-full',
+      sm: 'iconBtn-sm',
+      md: 'iconBtn-md',
+      lg: 'iconBtn-lg',
     },
     disabled: {
-      true: 'pointer-events-none cursor-not-allowed bg-gray-400 opacity-50',
+      true: 'iconBtn-disabled',
       false: '',
     },
   },
 });
 
 export interface IconButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'onClick' | 'children'> {
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'onClick'> {
+  asChild?: boolean;
   className?: string;
   icon: IconMapTypes; // icon 타입을 .svg 파일로 강제
   type?: 'button' | 'submit';
-  variant?: 'ghost' | 'outline';
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'neutral';
   size?: 'sm' | 'md' | 'lg';
-  radius?: 'sm' | 'md' | 'lg' | 'full';
   disabled?: boolean;
   ariaLabel: string;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton(
   {
+    asChild = false,
+    children,
     className,
     icon,
     type = 'button',
-    variant = 'ghost',
+    variant = 'primary',
     size = 'md',
-    radius = 'full',
     disabled = false,
     ariaLabel,
     onClick,
@@ -61,11 +59,14 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(function
   ref
 ) {
   // STYLES
-  const classes = styles({ variant, size, radius, disabled });
+  const classes = styles({ variant, size, disabled });
   const iconSize: IconSizeTypes = size;
 
+  // 인터랙션 요소 중첩 방지를 위해 Slot 적용
+  const Comp = asChild ? Slot : 'button';
+
   return (
-    <button
+    <Comp
       ref={ref}
       className={clsx(className, classes)}
       disabled={disabled}
@@ -74,8 +75,12 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(function
       onClick={onClick}
       {...rest}
     >
-      <SVGIcon icon={icon} size={iconSize} className="flex-shrink-0" aria-hidden="true" />
-    </button>
+      {asChild ? (
+        children
+      ) : (
+        <SVGIcon icon={icon} size={iconSize} className="flex-shrink-0" aria-hidden="true" />
+      )}
+    </Comp>
   );
 });
 

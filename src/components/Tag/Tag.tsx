@@ -16,7 +16,7 @@ export default function Tag({ label, onDelete }: TagProps) {
       {onDelete && (
         <IconButton
           icon="IC_Close"
-          variant="ghost"
+          variant="primary"
           size="sm"
           ariaLabel={label || `${label} 태그 삭제`}
           onClick={onDelete}
