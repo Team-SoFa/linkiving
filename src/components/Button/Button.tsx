@@ -1,5 +1,6 @@
 'use client';
 
+import { Slot } from '@radix-ui/react-slot';
 import { clsx } from 'clsx';
 import React from 'react';
 import { tv } from 'tailwind-variants';
@@ -8,46 +9,55 @@ import SVGIcon from '../Icons/SVGIcon';
 import { IconMapTypes, IconSizeTypes } from '../Icons/icons';
 
 const styles = tv({
-  base: 'inline-flex items-center justify-center rounded font-medium whitespace-nowrap transition-all duration-150 outline-none',
+  base: 'btn',
   variants: {
     variant: {
-      primary: 'cursor-pointer bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700',
-      outline:
-        'cursor-pointer border border-gray-300 text-gray-700 hover:bg-gray-50 active:bg-gray-100',
-      ghost: 'cursor-pointer bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200',
+      primary: 'btn-primary',
+      secondary: 'btn-secondary',
+      tertiary: 'btn-tertiary',
+      neutral: 'btn-neutral',
+    },
+    radius: {
+      md: 'rounded-lg',
+      full: 'rounded-full',
     },
     size: {
-      sm: 'h-8 px-4 py-1.5 text-sm',
-      md: 'h-10 px-5 py-2 text-base',
-      lg: 'h-12 px-6 py-3 text-lg',
+      sm: 'btn-sm',
+      md: 'btn-md',
+      lg: 'btn-lg',
     },
     disabled: {
-      true: 'pointer-events-none cursor-not-allowed bg-gray-400 opacity-50',
+      true: 'btn-disabled',
       false: '',
     },
   },
 });
 
 export interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled' | 'onClick' | 'children'> {
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled' | 'onClick'> {
+  asChild?: boolean;
   className?: string;
   icon?: IconMapTypes;
   iconPosition?: 'left' | 'right';
   label?: string;
-  variant?: 'primary' | 'outline' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'neutral';
+  radius?: 'md' | 'full';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
+    asChild = false,
+    children,
     className,
     icon,
     iconPosition = 'left',
     label,
     type = 'button',
     variant = 'primary',
+    radius = 'md',
     size = 'md',
     disabled = false,
     onClick,
@@ -58,17 +68,21 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   // STYLES
   const classes = styles({
     variant,
+    radius,
     size,
     disabled,
   });
   const iconSize: IconSizeTypes = size;
 
+  // 인터랙션 요소 중첩 방지를 위해 Slot 적용
+  const Comp = asChild ? Slot : 'button';
+
   // RENDERING
   const buttonIcon = icon ? (
     <span
       className={clsx('flex-shrink-0', {
-        'mr-2': iconPosition === 'left',
-        'ml-2': iconPosition === 'right',
+        'mr-1': iconPosition === 'left',
+        'ml-1': iconPosition === 'right',
       })}
     >
       <SVGIcon icon={icon} size={iconSize} />
@@ -94,7 +108,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   }
 
   return (
-    <button
+    <Comp
       ref={ref}
       className={clsx(classes, className)}
       disabled={disabled}
@@ -103,8 +117,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       onClick={onClick}
       {...rest}
     >
-      {content}
-    </button>
+      {asChild ? children : content}
+    </Comp>
   );
 });
 

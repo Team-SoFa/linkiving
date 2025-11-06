@@ -7,7 +7,7 @@ import Button from './Button';
 const ICONS = Object.keys(IconMap);
 
 const meta = {
-  title: 'Components/Button',
+  title: 'Components/Buttons/Button',
   component: Button,
   tags: ['autodocs'],
   parameters: {
@@ -24,7 +24,12 @@ const meta = {
     },
     variant: {
       control: 'inline-radio',
-      options: ['primary', 'outline', 'ghost'],
+      options: ['primary', 'secondary', 'tertiary', 'neutral'],
+      table: { type: { summary: 'string' } },
+    },
+    radius: {
+      control: 'inline-radio',
+      options: ['md', 'full'],
       table: { type: { summary: 'string' } },
     },
     size: {

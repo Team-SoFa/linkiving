@@ -2,6 +2,8 @@
 
 @import './colors.css';
 @import './tokens.css';
+@import './compStyles/buttonStyles.css';
+@import './compStyles/iconButtonStyles.css';
 
 /* === GLOBAL DEFAULT STYLES === */
 :root {

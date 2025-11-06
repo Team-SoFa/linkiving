@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import IconButton from './IconButton';
 
 const meta = {
-  title: 'Components/IconButton',
+  title: 'Components/Buttons/IconButton',
   component: IconButton,
   tags: ['autodocs'],
   parameters: {
@@ -21,7 +21,6 @@ const meta = {
       table: { type: { summary: 'IconMapTypes' } },
     },
     type: { control: 'inline-radio', table: { type: { summary: 'string' } } },
-    radius: { control: 'inline-radio', table: { type: { summary: 'string' } } },
     className: { table: { disable: true } },
     onClick: { action: 'clicked', table: { disable: true } },
   },
@@ -32,7 +31,7 @@ type Story = StoryObj<typeof IconButton>;
 
 export const Default: Story = {
   args: {
-    variant: 'ghost',
+    variant: 'primary',
     size: 'md',
     icon: 'IC_AllLink',
     ariaLabel: 'Icon Button',

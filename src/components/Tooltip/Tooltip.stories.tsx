@@ -48,7 +48,7 @@ export const Top: Story = {
   },
   render: args => (
     <Tooltip {...args}>
-      <Button variant="outline" label="위쪽" />
+      <Button variant="primary" label="위쪽" />
     </Tooltip>
   ),
 };
@@ -60,7 +60,7 @@ export const Left: Story = {
   },
   render: args => (
     <Tooltip {...args}>
-      <Button variant="ghost" label="왼쪽" />
+      <Button variant="primary" label="왼쪽" />
     </Tooltip>
   ),
 };
@@ -72,7 +72,7 @@ export const Right: Story = {
   },
   render: args => (
     <Tooltip {...args}>
-      <Button variant="ghost" label="오른쪽" />
+      <Button variant="primary" label="오른쪽" />
     </Tooltip>
   ),
 };
@@ -84,7 +84,7 @@ export const DisabledButton: Story = {
   },
   render: args => (
     <Tooltip {...args}>
-      <Button variant="outline" label="비활성" disabled />
+      <Button variant="primary" label="비활성" disabled />
     </Tooltip>
   ),
 };
