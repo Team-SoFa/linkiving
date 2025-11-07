@@ -16,12 +16,12 @@ const meta = {
   },
   argTypes: {
     orientation: {
-      description: '세로/가로 방향 지정',
-      control: { type: 'radio' },
+      description: '가로/세로 방향 지정',
+      control: { type: 'inline-radio' },
       options: ['horizontal', 'vertical'],
     },
     width: { description: '선 두께(px)', control: { type: 'number' } },
-    color: { description: '색상(#000000)', control: { type: 'color' } },
+    color: { description: 'trans: hover 효과 있음', control: { type: 'inline-radio' } },
   },
 } satisfies Meta<typeof Divider>;
 
@@ -41,6 +41,6 @@ export const Default: Story = {
   args: {
     orientation: 'horizontal',
     width: 1,
-    color: '#d8d8d8',
+    color: 'gray100',
   },
 };
