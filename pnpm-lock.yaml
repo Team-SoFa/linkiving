@@ -51,7 +51,7 @@ importers:
         specifier: ^19.0.0
         version: 19.2.1(react@19.2.1)
       react-hook-form:
-        specifier: ^7.66.1
+        specifier: ^7.68.0
         version: 7.68.0(react@19.2.1)
       tailwind-merge:
         specifier: ^3.3.1
@@ -60,7 +60,7 @@ importers:
         specifier: ^3.1.1
         version: 3.2.2(tailwind-merge@3.4.0)(tailwindcss@4.1.17)
       zod:
-        specifier: ^4.1.12
+        specifier: ^4.1.13
         version: 4.1.13
       zustand:
         specifier: ^5.0.8
