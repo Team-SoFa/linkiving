@@ -1,0 +1,18 @@
+@layer components {
+  .skeleton {
+    @apply relative isolate overflow-hidden select-none;
+    background-color: var(--skeleton-bg-light); /* <- 토큰 사용 */
+  }
+
+  .dark .skeleton {
+    background-color: var(--skeleton-bg-dark); /* <- 다크 토큰 */
+  }
+}
+
+@layer utilities {
+  @media (prefers-reduced-motion: reduce) {
+    .animate-pulse {
+      animation: none !important;
+    }
+  }
+}

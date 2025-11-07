@@ -83,6 +83,10 @@
   /* accent */
   --accent-default: var(--color-blue400);
 
+  /* skeleton */
+  --skeleton-bg-light: var(--color-gray200);
+  --skeleton-bg-dark: var(--color-gray300);
+
   /* === FONT FAMILY === */
   --font-family-base: 'Pretendard', sans-serif;
 
