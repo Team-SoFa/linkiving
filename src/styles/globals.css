@@ -4,6 +4,7 @@
 @import './tokens.css';
 @import './compStyles/buttonStyles.css';
 @import './compStyles/iconButtonStyles.css';
+@import './compStyles/dividerStyles.css';
 
 /* === GLOBAL DEFAULT STYLES === */
 :root {
