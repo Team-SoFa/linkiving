@@ -15,6 +15,11 @@ const meta = {
   },
   argTypes: {
     variant: { control: 'inline-radio', table: { type: { summary: 'string' } } },
+    contextStyle: {
+      description: 'neutral 버튼에서만 사용 (내부적으로 강제됨)',
+      control: 'inline-radio',
+      table: { type: { summary: 'string' } },
+    },
     size: { control: 'inline-radio' },
     icon: {
       control: 'select',
@@ -32,6 +37,8 @@ type Story = StoryObj<typeof IconButton>;
 export const Default: Story = {
   args: {
     variant: 'primary',
+    contextStyle: 'onMain',
+
     size: 'md',
     icon: 'IC_AllLink',
     ariaLabel: 'Icon Button',

@@ -51,19 +51,37 @@
       border-color: var(--border-tertiary-focus);
     }
   }
+
+  /* context에 따른 분기 있음 */
   .btn-neutral {
-    background-color: var(--container-neutral-onpanel-default);
+    background-color: var(--container-neutral-onpanel-default); /* 기본 onPanel */
     color: var(--label-neutral-default);
     border-color: var(--border-neutral-default);
     &:hover {
-      background-color: var(--container-neutral-onpanel-hover);
       color: var(--label-neutral-hover);
       border-color: var(--border-neutral-hover);
     }
     &:focus {
-      background-color: var(--container-neutral-onpanel-focus);
       color: var(--label-neutral-focus);
       border-color: var(--border-neutral-focus);
+    }
+  }
+  .btn-neutral-onpanel {
+    background-color: var(--container-neutral-onpanel-default);
+    &:hover {
+      background-color: var(--container-neutral-onpanel-hover);
+    }
+    &:focus {
+      background-color: var(--container-neutral-onpanel-focus);
+    }
+  }
+  .btn-neutral-onmain {
+    background-color: var(--container-neutral-onmain-default);
+    &:hover {
+      background-color: var(--container-neutral-onmain-hover);
+    }
+    &:focus {
+      background-color: var(--container-neutral-onmain-focus);
     }
   }
 

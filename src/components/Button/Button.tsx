@@ -17,6 +17,11 @@ const styles = tv({
       tertiary: 'btn-tertiary',
       neutral: 'btn-neutral',
     },
+    contextStyle: {
+      // neutral 외 다른 variant에서는 무시됨
+      onMain: '',
+      onPanel: '',
+    },
     radius: {
       md: 'rounded-lg',
       full: 'rounded-full',
@@ -31,6 +36,18 @@ const styles = tv({
       false: '',
     },
   },
+  compoundVariants: [
+    {
+      variant: 'neutral',
+      contextStyle: 'onPanel',
+      className: 'btn-neutral-onpanel',
+    },
+    {
+      variant: 'neutral',
+      contextStyle: 'onMain',
+      className: 'btn-neutral-onmain',
+    },
+  ],
 });
 
 export interface ButtonProps
@@ -41,6 +58,7 @@ export interface ButtonProps
   iconPosition?: 'left' | 'right';
   label?: string;
   variant?: 'primary' | 'secondary' | 'tertiary' | 'neutral';
+  contextStyle?: 'onPanel' | 'onMain'; // neutral 버튼에서만 사용 (내부적으로 강제됨)
   radius?: 'md' | 'full';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
@@ -57,6 +75,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
     label,
     type = 'button',
     variant = 'primary',
+    contextStyle = 'onMain',
     radius = 'md',
     size = 'md',
     disabled = false,
@@ -68,6 +87,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   // STYLES
   const classes = styles({
     variant,
+    contextStyle,
     radius,
     size,
     disabled,
