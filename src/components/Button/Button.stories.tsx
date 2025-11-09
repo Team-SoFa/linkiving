@@ -24,17 +24,19 @@ const meta = {
     },
     variant: {
       control: 'inline-radio',
-      options: ['primary', 'secondary', 'tertiary', 'neutral'],
+      table: { type: { summary: 'string' } },
+    },
+    contextStyle: {
+      description: 'neutral 버튼에서만 사용 (내부적으로 강제됨)',
+      control: 'inline-radio',
       table: { type: { summary: 'string' } },
     },
     radius: {
       control: 'inline-radio',
-      options: ['md', 'full'],
       table: { type: { summary: 'string' } },
     },
     size: {
       control: 'inline-radio',
-      options: ['sm', 'md', 'lg'],
       table: { type: { summary: 'string' } },
     },
     icon: {
@@ -43,7 +45,6 @@ const meta = {
     },
     iconPosition: {
       control: 'inline-radio',
-      options: ['left', 'right'],
       table: { type: { summary: 'string' } },
     },
     type: { table: { disable: true } },
@@ -59,6 +60,7 @@ export const Default: Story = {
   args: {
     label: 'Primary Button',
     variant: 'primary',
+    contextStyle: 'onMain',
     size: 'md',
     iconPosition: 'left',
     disabled: false,

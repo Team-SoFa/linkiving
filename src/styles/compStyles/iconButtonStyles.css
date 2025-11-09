@@ -51,6 +51,8 @@
       border-color: var(--border-tertiary-focus);
     }
   }
+
+  /* context에 따른 분기 있음 */
   .iconBtn-neutral {
     background-color: var(--container-neutral-onpanel-default);
     color: var(--label-neutral-default);
@@ -64,6 +66,24 @@
       background-color: var(--container-neutral-onpanel-focus);
       color: var(--label-neutral-focus);
       border-color: var(--border-neutral-focus);
+    }
+  }
+  .iconBtn-neutral-onpanel {
+    background-color: var(--container-neutral-onpanel-default);
+    &:hover {
+      background-color: var(--container-neutral-onpanel-hover);
+    }
+    &:focus {
+      background-color: var(--container-neutral-onpanel-focus);
+    }
+  }
+  .iconBtn-neutral-onmain {
+    background-color: var(--container-neutral-onmain-default);
+    &:hover {
+      background-color: var(--container-neutral-onmain-hover);
+    }
+    &:focus {
+      background-color: var(--container-neutral-onmain-focus);
     }
   }
 

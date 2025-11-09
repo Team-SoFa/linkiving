@@ -17,6 +17,11 @@ const styles = tv({
       tertiary: 'iconBtn-tertiary',
       neutral: 'iconBtn-neutral',
     },
+    contextStyle: {
+      // neutral 외 다른 variant에서는 무시됨
+      onMain: '',
+      onPanel: '',
+    },
     size: {
       sm: 'iconBtn-sm',
       md: 'iconBtn-md',
@@ -27,6 +32,18 @@ const styles = tv({
       false: '',
     },
   },
+  compoundVariants: [
+    {
+      variant: 'neutral',
+      contextStyle: 'onPanel',
+      className: 'iconBtn-neutral-onpanel',
+    },
+    {
+      variant: 'neutral',
+      contextStyle: 'onMain',
+      className: 'iconBtn-neutral-onmain',
+    },
+  ],
 });
 
 export interface IconButtonProps
@@ -36,6 +53,8 @@ export interface IconButtonProps
   icon: IconMapTypes; // icon 타입을 .svg 파일로 강제
   type?: 'button' | 'submit';
   variant?: 'primary' | 'secondary' | 'tertiary' | 'neutral';
+  contextStyle?: 'onPanel' | 'onMain'; // neutral 버튼에서만 사용 (내부적으로 강제됨)
+
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   ariaLabel: string;
@@ -50,6 +69,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(function
     icon,
     type = 'button',
     variant = 'primary',
+    contextStyle = 'onMain',
     size = 'md',
     disabled = false,
     ariaLabel,
@@ -59,7 +79,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(function
   ref
 ) {
   // STYLES
-  const classes = styles({ variant, size, disabled });
+  const classes = styles({ variant, contextStyle, size, disabled });
   const iconSize: IconSizeTypes = size;
 
   // 인터랙션 요소 중첩 방지를 위해 Slot 적용
