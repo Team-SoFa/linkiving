@@ -1,0 +1,43 @@
+@layer components {
+  /* 상태 행(로더/끝/에러) 공통 */
+  .infinite-status {
+    @apply flex items-center justify-center py-3 text-sm text-gray-500;
+  }
+
+  /* 로더 애니메이션 (간단한 맥락) */
+  .infinite-loader {
+    @apply animate-pulse;
+  }
+
+  /* 마지막 메시지 */
+  .infinite-end {
+    @apply text-gray-500;
+  }
+
+  /* 에러 표시 */
+  .infinite-error {
+    @apply flex items-center gap-2 text-red-500;
+  }
+
+  /* 관찰용 sentinel 영역 */
+  .infinite-sentinel {
+    height: 0.25rem; /* h-1 */
+    width: 100%;
+  }
+
+  /* 작은 원형 스피너 (optional) */
+  .infinite-spinner {
+    border: 2px solid transparent;
+    border-top-color: var(--color-gray600);
+    border-radius: 9999px;
+    width: 1rem;
+    height: 1rem;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
