@@ -2,19 +2,11 @@
 
 import clsx from 'clsx';
 import React, { useEffect, useId, useRef, useState } from 'react';
-import { tv } from 'tailwind-variants';
+
+import { style } from './Tooltip.style';
 
 type Side = 'top' | 'bottom' | 'left' | 'right';
 type Timer = ReturnType<typeof setTimeout>;
-
-const bubbleStyles = tv({
-  base: [
-    'pointer-events-none absolute z-50 rounded-lg',
-    'border bg-white text-black shadow-lg',
-    'px-3 py-2 text-xs font-medium tracking-wide',
-    'leading-tight whitespace-nowrap',
-  ].join(' '),
-});
 
 export interface TooltipProps
   extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'content' | 'children'> {
@@ -110,8 +102,6 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip
     onBlur?.(e);
   };
 
-  const classes = bubbleStyles();
-
   return (
     <span
       ref={ref}
@@ -129,8 +119,9 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip
         <span
           id={id}
           role="tooltip"
+          data-side={side}
           style={getPositionStyle()}
-          className={clsx(classes, className)}
+          className={clsx(style({ side }), className)}
         >
           {content}
         </span>
