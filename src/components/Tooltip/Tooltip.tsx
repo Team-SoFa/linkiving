@@ -7,13 +7,8 @@ import { tv } from 'tailwind-variants';
 type Side = 'top' | 'bottom' | 'left' | 'right';
 type Timer = ReturnType<typeof setTimeout>;
 
-const bubbleStyles = tv({
-  base: [
-    'pointer-events-none absolute z-50 rounded-lg',
-    'border bg-white text-black shadow-lg',
-    'px-3 py-2 text-xs font-medium tracking-wide',
-    'leading-tight whitespace-nowrap',
-  ].join(' '),
+const styles = tv({
+  base: ['tooltip'],
 });
 
 export interface TooltipProps
@@ -110,8 +105,6 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip
     onBlur?.(e);
   };
 
-  const classes = bubbleStyles();
-
   return (
     <span
       ref={ref}
@@ -130,7 +123,7 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip
           id={id}
           role="tooltip"
           style={getPositionStyle()}
-          className={clsx(classes, className)}
+          className={clsx(styles(), className)}
         >
           {content}
         </span>
