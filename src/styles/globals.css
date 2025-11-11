@@ -5,6 +5,7 @@
 @import './compStyles/buttonStyles.css';
 @import './compStyles/iconButtonStyles.css';
 @import './compStyles/dividerStyles.css';
+@import './compStyles/tooltipStyles.css';
 
 /* === GLOBAL DEFAULT STYLES === */
 :root {

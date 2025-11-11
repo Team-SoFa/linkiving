@@ -1,0 +1,8 @@
+@layer components {
+  .tooltip {
+    @apply pointer-events-none absolute z-50 rounded-lg border px-3 py-2 text-xs leading-tight font-medium tracking-wide whitespace-nowrap shadow-lg;
+    background-color: var(--container-tertiary-default) !important;
+    color: var(--text-default) !important;
+    border-color: var(--border-tertiary-default) !important;
+  }
+}
