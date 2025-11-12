@@ -1,6 +1,5 @@
+import Label from '@/components/Label/Label';
 import type { Meta, StoryObj } from '@storybook/react';
-
-import Label from './Label';
 
 const meta: Meta<typeof Label> = {
   title: 'Components/Label',
@@ -15,7 +14,6 @@ const meta: Meta<typeof Label> = {
     },
     size: {
       control: 'select',
-      options: ['sm', 'md', 'lg'],
     },
     required: {
       control: 'boolean',

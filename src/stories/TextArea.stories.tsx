@@ -1,9 +1,8 @@
 // TextArea.stories.tsx
+import TextArea, { TextAreaProps } from '@/components/TextArea/TextArea';
 import { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import React, { useState } from 'react';
-
-import TextArea, { TextAreaProps } from './TextArea';
 
 const meta = {
   title: 'Components/TextArea',
@@ -16,11 +15,9 @@ const meta = {
     placeholder: { control: 'text' },
     width: {
       control: { type: 'radio' },
-      options: ['sm', 'md', 'lg'],
     },
     height: {
       control: { type: 'radio' },
-      options: ['sm', 'md', 'lg'],
     },
     maxLength: {
       control: 'number',
@@ -28,11 +25,9 @@ const meta = {
     },
     radius: {
       control: { type: 'inline-radio' },
-      options: ['none', 'sm', 'md', 'lg'],
     },
     variant: {
       control: { type: 'inline-radio' },
-      options: ['default', 'surface'],
     },
   },
 } satisfies Meta<typeof TextArea>;

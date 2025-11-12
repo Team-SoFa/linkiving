@@ -2,7 +2,7 @@ import type { StorybookConfig } from '@storybook/nextjs';
 import type { RuleSetRule } from 'webpack';
 
 const config: StorybookConfig = {
-  stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+  stories: ['../src/stories/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
     '@storybook/addon-essentials',
     '@storybook/addon-onboarding',

@@ -1,8 +1,6 @@
-/*=== COLORS === */
-:root {
+@theme {
   --color-black: #07080b;
   --color-white: #fdfdfd;
-
   --color-gray50: #f5f6fa;
   --color-gray100: #e1e2e6;
   --color-gray200: #c7c8cd;

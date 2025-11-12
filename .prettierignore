@@ -17,3 +17,6 @@ yarn.lock
 # Git 관련
 .git
 .github
+
+colorTokens.css
+typoTokens.css

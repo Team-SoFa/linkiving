@@ -2,28 +2,13 @@
 
 import clsx from 'clsx';
 import React, { CSSProperties, HTMLAttributes } from 'react';
-import { tv } from 'tailwind-variants';
 
-const styles = tv({
-  base: 'divider',
-  variants: {
-    orientation: {
-      horizontal: 'divider-horizontal',
-      vertical: 'divider-vertical',
-    },
-    color: {
-      gray100: 'divider-gray100',
-      gray200: 'divider-gray200',
-      gray300: 'divider-gray300',
-      blue: 'divider-blue',
-      transBlue: 'divider-trans-blue',
-    },
-  },
-});
+import { style } from './Divider.style';
+
 export interface DividerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
   width?: number;
   orientation?: 'horizontal' | 'vertical';
-  color?: 'gray100' | 'gray200' | 'gray300' | 'blue' | 'transBlue';
+  color?: 'gray100' | 'gray200' | 'gray300' | 'blue';
 }
 
 const Divider = React.forwardRef<HTMLDivElement, DividerProps>(function Divider(
@@ -35,7 +20,7 @@ const Divider = React.forwardRef<HTMLDivElement, DividerProps>(function Divider(
   const dynamicStyle: CSSProperties =
     orientation === 'horizontal' ? { height: `${thickness}px` } : { width: `${thickness}px` };
 
-  const classes = styles({ orientation, color });
+  const classes = style({ orientation, color });
 
   return (
     <div

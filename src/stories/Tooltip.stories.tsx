@@ -1,8 +1,7 @@
 // src/components/Tooltip/Tooltip.stories.tsx
+import Button from '@/components/Button/Button';
+import Tooltip from '@/components/Tooltip/Tooltip';
 import type { Meta, StoryObj } from '@storybook/react';
-
-import Button from '../Button/Button';
-import Tooltip from './Tooltip';
 
 const meta = {
   title: 'Components/Tooltip',
@@ -12,7 +11,7 @@ const meta = {
     layout: 'centered',
   },
   argTypes: {
-    side: { control: 'select', options: ['top', 'bottom', 'left', 'right'] },
+    side: { control: 'select' },
     offset: { control: 'number' },
     delay: { control: 'number' },
     content: { control: 'text' },

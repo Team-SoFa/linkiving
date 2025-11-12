@@ -1,10 +1,9 @@
 @import 'tailwindcss';
 
-@import './colors.css';
-@import './tokens.css';
-@import './compStyles/buttonStyles.css';
-@import './compStyles/iconButtonStyles.css';
-@import './compStyles/dividerStyles.css';
+@import './custom/colors.css';
+
+@import './custom/colorTokens.css';
+@import './custom/typoTokens.css';
 
 /* === GLOBAL DEFAULT STYLES === */
 :root {
