@@ -1,0 +1,25 @@
+@layer components {
+  .toast {
+    @apply inline-flex items-center justify-between rounded p-4 shadow-md;
+  }
+
+  .toast-success {
+    background-color: var(--feedback-success-dark);
+    color: var(--label-primary-default);
+  }
+
+  .toast-error {
+    background-color: var(--feedback-error-dark);
+    color: var(--label-primary-default);
+  }
+
+  .toast-info {
+    background-color: var(--feedback-inform-dark);
+    color: var(--label-primary-default);
+  }
+
+  .toast-warning {
+    background-color: var(--feedback-warning-dark);
+    color: var(--text-default);
+  }
+}
