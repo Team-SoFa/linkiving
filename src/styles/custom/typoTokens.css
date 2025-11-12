@@ -25,8 +25,8 @@
   .font-label-xl { @apply text-[20px] leading-[150%] font-semibold; }
 
   /* Link */
-  .font-link-sm { @apply text-[12px] leading-[120%] font-medium; }
-  .font-link-md { @apply text-[13px] leading-[120%] font-medium; }
+  .font-anchor-sm { @apply text-[12px] leading-[120%] font-medium; }
+  .font-anchor-md { @apply text-[13px] leading-[120%] font-medium; }
 
   /* Detail */
   .font-detail { @apply text-[12px] leading-[130%] font-medium; }
