@@ -25,7 +25,7 @@
   
   
   /* ========== ANCHOR ========== */
-  .text-anchor-default { @apply text-gray400; }
+  .text-anchor { @apply text-gray400; }
   .text-anchor:hover { @apply hover:text-gray500; }
   .text-anchor:focus { @apply focus:text-gray500; }
   
