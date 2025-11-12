@@ -1,8 +1,7 @@
+import SVGIcon from '@/components/Icons/SVGIcon';
+import Input from '@/components/Input/Input';
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useState } from 'react';
-
-import CustomImage from '../Icons/CustomImage';
-import Input from './Input';
 
 const meta = {
   title: 'Components/Input',
@@ -11,15 +10,12 @@ const meta = {
   argTypes: {
     size: {
       control: { type: 'select' },
-      options: ['sm', 'md', 'lg'],
     },
     radius: {
       control: { type: 'select' },
-      options: ['none', 'sm', 'md', 'lg'],
     },
     variant: {
       control: { type: 'select' },
-      options: ['outline', 'filled'],
     },
     disabled: {
       control: { type: 'boolean' },
@@ -42,7 +38,7 @@ export const Default: Story = {
     size: 'md',
     radius: 'md',
     variant: 'outline',
-    icon: <CustomImage src="file.svg" alt="img" />,
+    icon: <SVGIcon icon="IC_AllLink" />,
     disabled: false,
   },
 };

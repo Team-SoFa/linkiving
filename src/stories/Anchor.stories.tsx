@@ -1,6 +1,5 @@
+import Anchor from '@/components/Anchor/Anchor';
 import { Meta, StoryObj } from '@storybook/react';
-
-import Anchor from './Anchor';
 
 const meta = {
   title: 'Components/Anchor',
@@ -13,13 +12,12 @@ const meta = {
     href: { control: 'text' },
     target: {
       description: '링크 오픈 방식',
-      control: { type: 'select', options: ['_self', '_blank', '_parent', '_top'] },
+      control: { type: 'select' },
     },
     rel: {
       description: '링크 관계/보안/SEO 목적',
       control: {
         type: 'select',
-        options: ['noopener', 'noreferrer', 'nofollow', 'noopener noreferrer', 'ugc', 'sponsored'],
       },
     },
     ariaLabel: { description: '접근성', control: 'text' },

@@ -1,7 +1,6 @@
+import Divider from '@/components/Divider/Divider';
 import { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
-
-import Divider from './Divider';
 
 const meta = {
   title: 'Components/Divider',
@@ -18,7 +17,6 @@ const meta = {
     orientation: {
       description: '가로/세로 방향 지정',
       control: { type: 'inline-radio' },
-      options: ['horizontal', 'vertical'],
     },
     width: { description: '선 두께(px)', control: { type: 'number' } },
     color: { description: 'trans: hover 효과 있음', control: { type: 'inline-radio' } },

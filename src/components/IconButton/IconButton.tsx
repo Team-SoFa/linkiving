@@ -3,48 +3,10 @@
 import { Slot } from '@radix-ui/react-slot';
 import { clsx } from 'clsx';
 import React from 'react';
-import { tv } from 'tailwind-variants';
 
 import SVGIcon from '../Icons/SVGIcon';
 import { IconMapTypes, IconSizeTypes } from '../Icons/icons';
-
-const styles = tv({
-  base: 'iconBtn',
-  variants: {
-    variant: {
-      primary: 'iconBtn-primary',
-      secondary: 'iconBtn-secondary',
-      tertiary: 'iconBtn-tertiary',
-      neutral: 'iconBtn-neutral',
-    },
-    contextStyle: {
-      // neutral 외 다른 variant에서는 무시됨
-      onMain: '',
-      onPanel: '',
-    },
-    size: {
-      sm: 'iconBtn-sm',
-      md: 'iconBtn-md',
-      lg: 'iconBtn-lg',
-    },
-    disabled: {
-      true: 'iconBtn-disabled',
-      false: '',
-    },
-  },
-  compoundVariants: [
-    {
-      variant: 'neutral',
-      contextStyle: 'onPanel',
-      className: 'iconBtn-neutral-onpanel',
-    },
-    {
-      variant: 'neutral',
-      contextStyle: 'onMain',
-      className: 'iconBtn-neutral-onmain',
-    },
-  ],
-});
+import { style } from './IconButton.style';
 
 export interface IconButtonProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'onClick'> {
@@ -79,7 +41,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(function
   ref
 ) {
   // STYLES
-  const classes = styles({ variant, contextStyle, size, disabled });
+  const classes = style({ variant, contextStyle, size, disabled });
   const iconSize: IconSizeTypes = size;
 
   // 인터랙션 요소 중첩 방지를 위해 Slot 적용
@@ -88,7 +50,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(function
   return (
     <Comp
       ref={ref}
-      className={clsx(className, classes)}
+      className={clsx(classes, className)}
       disabled={disabled}
       type={type}
       aria-label={ariaLabel}

@@ -1,8 +1,7 @@
 // components/ui/Button.stories.tsx
+import Button from '@/components/Button/Button';
+import { IconMap } from '@/components/Icons/icons';
 import type { Meta, StoryObj } from '@storybook/react';
-
-import { IconMap } from '../Icons/icons';
-import Button from './Button';
 
 const ICONS = Object.keys(IconMap);
 
@@ -43,10 +42,6 @@ const meta = {
       options: [undefined, ...ICONS],
       table: { type: { summary: 'IconMapTypes' } },
     },
-    iconPosition: {
-      control: 'inline-radio',
-      table: { type: { summary: 'string' } },
-    },
     type: { table: { disable: true } },
     className: { table: { disable: true } },
     onClick: { action: 'clicked', table: { disable: true } },
@@ -62,7 +57,6 @@ export const Default: Story = {
     variant: 'primary',
     contextStyle: 'onMain',
     size: 'md',
-    iconPosition: 'left',
     disabled: false,
   },
 };
