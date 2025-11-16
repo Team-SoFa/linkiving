@@ -14,8 +14,8 @@ export interface ButtonProps
   className?: string;
   icon?: IconMapTypes;
   label?: string;
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'neutral';
-  contextStyle?: 'onPanel' | 'onMain'; // neutral 버튼에서만 사용 (내부적으로 강제됨)
+  variant?: 'primary' | 'secondary' | 'teritary' | 'teritary_subtle';
+  contextStyle?: 'onPanel' | 'onMain'; // teritary_subtle 버튼에서만 사용 (내부적으로 강제됨)
   radius?: 'md' | 'full';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;

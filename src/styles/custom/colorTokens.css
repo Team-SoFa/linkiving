@@ -46,17 +46,17 @@
   .bg-btn-secondary:hover { @apply hover:hover:bg-blue100; }
   .bg-btn-secondary:focus { @apply focus:bg-blue100; }
   
-  .bg-btn-tertiary { @apply bg-white; }
-  .bg-btn-tertiary:hover { @apply hover:bg-gray50; }
-  .bg-btn-tertiary:focus { @apply focus:bg-gray50; }
+  .bg-btn-teritary { @apply bg-white; }
+  .bg-btn-teritary:hover { @apply hover:bg-gray50; }
+  .bg-btn-teritary:focus { @apply focus:bg-gray50; }
   
-  .bg-btn-neutral-onpanel { @apply bg-transparent; }
-  .bg-btn-neutral-onpanel:hover { background-color: color-mix(in srgb, var(--color-blue100) 32%, transparent); }
-  .bg-btn-neutral-onpanel:focus { background-color: color-mix(in srgb, var(--color-blue100) 32%, transparent); }
+  .bg-btn-teritary-subtle-onpanel { @apply bg-transparent; }
+  .bg-btn-teritary-subtle-onpanel:hover { background-color: color-mix(in srgb, var(--color-blue100) 32%, transparent); }
+  .bg-btn-teritary-subtle-onpanel:focus { background-color: color-mix(in srgb, var(--color-blue100) 32%, transparent); }
   
-  .bg-btn-neutral-onmain { @apply bg-transparent; }
-  .bg-btn-neutral-onmain:hover { background-color: color-mix(in srgb, var(--color-gray100) 52%, transparent); }
-  .bg-btn-neutral-onmain:focus { background-color: color-mix(in srgb, var(--color-gray100) 52%, transparent); }
+  .bg-btn-teritary-subtle-onmain { @apply bg-transparent; }
+  .bg-btn-teritary-subtle-onmain:hover { background-color: color-mix(in srgb, var(--color-gray100) 52%, transparent); }
+  .bg-btn-teritary-subtle-onmain:focus { background-color: color-mix(in srgb, var(--color-gray100) 52%, transparent); }
   
   /* button border color */
   .border-btn-primary { @apply border-gray900; }
@@ -67,13 +67,13 @@
   .border-btn-secondary:hover { @apply hover:border-blue200; }
   .border-btn-secondary:focus { @apply focus:border-blue200; }
   
-  .border-btn-tertiary { @apply border-gray200; }
-  .border-btn-tertiary:hover { @apply hover:border-gray200; }
-  .border-btn-tertiary:focus { @apply focus:border-gray200; }
+  .border-btn-teritary { @apply border-gray200; }
+  .border-btn-teritary:hover { @apply hover:border-gray200; }
+  .border-btn-teritary:focus { @apply focus:border-gray200; }
   
-  .border-btn-neutral { @apply border-none; }
-  .border-btn-neutral:hover { @apply hover:border-none; }
-  .border-btn-neutral:focus { @apply focus:border-none; }
+  .border-btn-teritary-subtle { @apply border-none; }
+  .border-btn-teritary-subtle:hover { @apply hover:border-none; }
+  .border-btn-teritary-subtle:focus { @apply focus:border-none; }
   
   /* button text color */
   .text-btn-primary { @apply text-white; }
@@ -84,11 +84,11 @@
   .text-btn-secondary:hover { @apply hover:text-blue400; }
   .text-btn-secondary:focus { @apply focus:text-blue400; }
   
-  .text-btn-tertiary { @apply text-gray700; }
-  .text-btn-tertiary:hover { @apply hover:text-gray700; }
-  .text-btn-tertiary:focus { @apply focus:text-gray700; }
+  .text-btn-teritary { @apply text-gray700; }
+  .text-btn-teritary:hover { @apply hover:text-gray700; }
+  .text-btn-teritary:focus { @apply focus:text-gray700; }
   
-  .text-btn-neutral { @apply text-gray500; }
-  .text-btn-neutral:hover { @apply hover:text-gray700; }
-  .text-btn-neutral:focus { @apply focus:text-gray700; }
+  .text-btn-teritary-subtle { @apply text-gray500; }
+  .text-btn-teritary-subtle:hover { @apply hover:text-gray700; }
+  .text-btn-teritary-subtle:focus { @apply focus:text-gray700; }
 }
