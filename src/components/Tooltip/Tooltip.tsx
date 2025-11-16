@@ -1,11 +1,11 @@
 'use client';
 
+import { useBoolean, useTimeoutFn, useUpdateEffect } from '@reactuses/core';
 import clsx from 'clsx';
-import React, { useEffect, useId, useRef, useState } from 'react';
+import React, { useId } from 'react';
 import { tv } from 'tailwind-variants';
 
 type Side = 'top' | 'bottom' | 'left' | 'right';
-type Timer = ReturnType<typeof setTimeout>;
 
 const bubbleStyles = tv({
   base: [
@@ -50,32 +50,24 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip
   ref
 ) {
   const id = useId();
-  const [open, setOpen] = useState(false);
-  const timerRef = useRef<Timer | null>(null);
+  const { value: open, setTrue: openTooltip, setFalse: closeTooltip } = useBoolean(false);
+  const [, startDelayTimer, stopDelayTimer] = useTimeoutFn(openTooltip, delay, {
+    immediate: false,
+  });
 
-  const setOpenSafe = (next: boolean) => {
-    setOpen(next);
-    onOpenChange?.(next);
-  };
+  useUpdateEffect(() => {
+    onOpenChange?.(open);
+  }, [onOpenChange, open]);
 
   const show = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setOpenSafe(true), delay);
+    stopDelayTimer();
+    startDelayTimer();
   };
 
   const hide = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    setOpenSafe(false);
+    stopDelayTimer();
+    closeTooltip();
   };
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
 
   const getPositionStyle = (): React.CSSProperties => {
     switch (side) {
