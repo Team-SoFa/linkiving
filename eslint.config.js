@@ -70,7 +70,6 @@ const config = [
             {
               case: 'camel',
               target: '**/hooks/**', // target "hooks" folder
-              patterns: '^use', // file names begin with "use".
             },
           ],
         },
