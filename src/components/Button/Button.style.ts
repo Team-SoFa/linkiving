@@ -6,11 +6,11 @@ export const style = tv({
     variant: {
       primary: 'btn-primary bg-btn-primary border-btn-primary text-btn-primary border',
       secondary: 'btn-secondary bg-btn-secondary border-btn-secondary text-btn-secondary border',
-      tertiary: 'btn-tertiary bg-btn-tertiary border-btn-tertiary text-btn-tertiary border',
-      neutral: 'btn-neutral bg-btn-neutral text-btn-neutral',
+      teritary: 'btn-teritary bg-btn-teritary border-btn-teritary text-btn-teritary border',
+      teritary_subtle: 'btn-teritary-subtle bg-btn-teritary-subtle text-btn-teritary-subtle',
     },
     contextStyle: {
-      // neutral 외 다른 variant에서는 무시됨
+      // teritary_subtle 외 다른 variant에서는 무시됨
       onMain: '',
       onPanel: '',
     },
@@ -30,14 +30,14 @@ export const style = tv({
   },
   compoundVariants: [
     {
-      variant: 'neutral',
+      variant: 'teritary_subtle',
       contextStyle: 'onPanel',
-      className: 'bg-btn-neutral-onpanel',
+      className: 'bg-btn-teritary-subtle-onpanel',
     },
     {
-      variant: 'neutral',
+      variant: 'teritary_subtle',
       contextStyle: 'onMain',
-      className: 'bg-btn-neutral-onmain',
+      className: 'bg-btn-teritary-subtle-onmain',
     },
   ],
 });
