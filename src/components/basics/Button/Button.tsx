@@ -4,8 +4,8 @@ import { Slot } from '@radix-ui/react-slot';
 import { clsx } from 'clsx';
 import React from 'react';
 
-import SVGIcon from '../Icons/SVGIcon';
-import { IconMapTypes, IconSizeTypes } from '../Icons/icons';
+import SVGIcon from '../../Icons/SVGIcon';
+import { IconMapTypes, IconSizeTypes } from '../../Icons/icons';
 import { style } from './Button.style';
 
 export interface ButtonProps

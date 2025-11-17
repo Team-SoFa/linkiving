@@ -1,10 +1,10 @@
 import SVGIcon from '@/components/Icons/SVGIcon';
-import Input from '@/components/Input/Input';
+import Input from '@/components/basics/Input/Input';
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useState } from 'react';
 
 const meta = {
-  title: 'Components/Input',
+  title: 'Components/Basics/Input',
   component: Input,
   tags: ['autodocs'],
   argTypes: {

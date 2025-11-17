@@ -1,8 +1,8 @@
-import Anchor from '@/components/Anchor/Anchor';
+import Anchor from '@/components/basics/Anchor/Anchor';
 import { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Components/Anchor',
+  title: 'Components/Basics/Anchor',
   component: Anchor,
   tags: ['autodocs'],
   argTypes: {

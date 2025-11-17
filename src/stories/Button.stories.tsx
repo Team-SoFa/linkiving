@@ -1,12 +1,12 @@
 // components/ui/Button.stories.tsx
-import Button from '@/components/Button/Button';
 import { IconMap } from '@/components/Icons/icons';
+import Button from '@/components/basics/Button/Button';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const ICONS = Object.keys(IconMap);
 
 const meta = {
-  title: 'Components/Buttons/Button',
+  title: 'Components/Basics/Button',
   component: Button,
   tags: ['autodocs'],
   parameters: {

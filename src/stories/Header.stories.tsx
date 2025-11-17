@@ -1,9 +1,9 @@
 // Header.stories.tsx
-import Header from '@/components/Header/Header';
+import Header from '@/components/basics/Header/Header';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta<typeof Header> = {
-  title: 'Components/Header',
+  title: 'Components/Basics/Header',
   component: Header,
   tags: ['autodocs'],
   parameters: {

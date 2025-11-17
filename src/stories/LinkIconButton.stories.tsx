@@ -1,9 +1,9 @@
-import LinkIconButton from '@/components/IconButton/Wrappers/LinkIconButton';
 import { IconMap } from '@/components/Icons/icons';
+import LinkIconButton from '@/components/wrappers/LinkIconButton/LinkIconButton';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Components/LinkIconButton',
+  title: 'Components/Wrappers/LinkIconButton',
   component: LinkIconButton,
   tags: ['autodocs'],
   argTypes: {

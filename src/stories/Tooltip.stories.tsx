@@ -1,10 +1,10 @@
 // src/components/Tooltip/Tooltip.stories.tsx
-import Button from '@/components/Button/Button';
-import Tooltip from '@/components/Tooltip/Tooltip';
+import Button from '@/components/basics/Button/Button';
+import Tooltip from '@/components/basics/Tooltip/Tooltip';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Components/Tooltip',
+  title: 'Components/Basics/Tooltip',
   component: Tooltip,
   tags: ['autodocs'],
   parameters: {
