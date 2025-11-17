@@ -1,4 +1,4 @@
-import LinkButton from '@/components/wrappers/wrappers/LinkButton/LinkButton';
+import LinkButton from '@/components/wrappers/LinkButton/LinkButton';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta<typeof LinkButton> = {
