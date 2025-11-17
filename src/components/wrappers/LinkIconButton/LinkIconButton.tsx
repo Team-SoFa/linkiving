@@ -1,8 +1,7 @@
 import SVGIcon from '@/components/Icons/SVGIcon';
+import IconButton, { IconButtonProps } from '@/components/basics/IconButton/IconButton';
 import { getSafeUrl } from '@/hooks/util/getSafeUrl';
 import Link from 'next/link';
-
-import IconButton, { IconButtonProps } from '../IconButton';
 
 interface LinkIconButtonProps extends Omit<IconButtonProps, 'ariaLabel'> {
   href: string;

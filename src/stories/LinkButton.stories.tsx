@@ -1,8 +1,8 @@
-import LinkButton from '@/components/Button/wrappers/LinkButton/LinkButton';
+import LinkButton from '@/components/wrappers/wrappers/LinkButton/LinkButton';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta<typeof LinkButton> = {
-  title: 'Components/Buttons/Wrappers/LinkButton',
+  title: 'Components/Wrappers/LinkButton',
   component: LinkButton,
   tags: ['autodocs'],
   argTypes: {

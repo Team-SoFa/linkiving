@@ -1,8 +1,8 @@
-import Footer from '@/components/Footer/Footer';
+import Footer from '@/components/basics/Footer/Footer';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Components/Footer',
+  title: 'Components/Basics/Footer',
   component: Footer,
   tags: ['autodocs'],
 } satisfies Meta<typeof Footer>;

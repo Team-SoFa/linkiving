@@ -1,11 +1,11 @@
 // TextArea.stories.tsx
-import TextArea, { TextAreaProps } from '@/components/TextArea/TextArea';
+import TextArea, { TextAreaProps } from '@/components/basics/TextArea/TextArea';
 import { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import React, { useState } from 'react';
 
 const meta = {
-  title: 'Components/TextArea',
+  title: 'Components/Basics/TextArea',
   component: TextArea,
   tags: ['autodocs'],
   parameters: {

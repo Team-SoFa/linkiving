@@ -1,9 +1,9 @@
 'use client';
 
+import SVGIcon from '@/components/Icons/SVGIcon';
 import clsx from 'clsx';
 import { HTMLAttributes, ReactNode, forwardRef } from 'react';
 
-import SVGIcon from '../Icons/SVGIcon';
 import { style } from './Anchor.style';
 
 interface AnchorProps

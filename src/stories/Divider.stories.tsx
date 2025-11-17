@@ -1,9 +1,9 @@
-import Divider from '@/components/Divider/Divider';
+import Divider from '@/components/basics/Divider/Divider';
 import { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 
 const meta = {
-  title: 'Components/Divider',
+  title: 'Components/Basics/Divider',
   component: Divider,
   tags: ['autodocs'],
   parameters: {

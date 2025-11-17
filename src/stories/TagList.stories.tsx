@@ -1,9 +1,9 @@
-import TagList from '@/components/Tag/TagList';
+import TagList from '@/components/basics/Tag/TagList';
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 
 const meta = {
-  title: 'Components/TagList',
+  title: 'Components/Basics/TagList',
   component: TagList,
   tags: ['autodocs'],
   argTypes: {

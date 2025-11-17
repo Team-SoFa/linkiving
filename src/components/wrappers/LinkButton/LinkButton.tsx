@@ -1,8 +1,7 @@
 import SVGIcon from '@/components/Icons/SVGIcon';
+import Button, { ButtonProps } from '@/components/basics/Button/Button';
 import { getSafeUrl } from '@/hooks/util/getSafeUrl';
 import Link from 'next/link';
-
-import Button, { ButtonProps } from '../../Button';
 
 interface LinkButtonProps extends ButtonProps {
   href: string;
