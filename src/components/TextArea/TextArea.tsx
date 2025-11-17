@@ -2,36 +2,26 @@
 
 import clsx from 'clsx';
 import React from 'react';
-import { tv } from 'tailwind-variants';
 
-const styles = tv({
-  base: 'resize-none border p-2 text-gray-900 placeholder:text-gray-300 focus:ring-1 focus:outline-none',
-  variants: {
-    variant: {
-      default: 'border-gray-300 bg-white focus:ring-gray-500',
-      surface: 'border-gray-200 bg-gray-50 focus:ring-gray-400',
-    },
-    radius: {
-      none: 'rounded-none',
-      sm: 'rounded-sm',
-      md: 'rounded',
-      lg: 'rounded-lg',
-    },
-  },
-});
+import { textAreaStyle, wholeBoxStyle } from './TextArea.style';
+import { useAutoResizeTextArea } from './hooks/useAutoResizeTextArea';
+
+const LINE_HEIGHTS = { sm: 19, md: 26, lg: 29 };
 export interface TextAreaProps
   extends Omit<
     React.TextareaHTMLAttributes<HTMLTextAreaElement>,
     'value' | 'onChange' | 'onSubmit'
   > {
   className?: string;
+  variant?: 'default';
+  textSize?: 'sm' | 'md' | 'lg';
+  widthPx: number; // px
+  heightLines: number; // 줄 수
+  maxHeightLines?: number; // 줄 수
+  radius?: 'md' | 'lg' | 'full';
   maxLength?: number;
   placeholder?: string;
   value: string;
-  variant?: 'default' | 'surface';
-  width?: 'sm' | 'md' | 'lg'; // 임의로 지정한 키워드로, 추후 변경 가능성 큼
-  height?: 'sm' | 'md' | 'lg';
-  radius?: 'none' | 'sm' | 'md' | 'lg';
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSubmit?: (e?: React.KeyboardEvent<HTMLTextAreaElement>) => void;
 }
@@ -39,31 +29,42 @@ export interface TextAreaProps
 const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextArea(
   {
     className,
-    maxLength = 200,
+    maxLength = 0,
     placeholder = '무엇이든 물어보세요',
     value,
     variant = 'default',
-    width = 'md',
-    height = 'md',
+    textSize = 'md',
+    widthPx,
+    heightLines,
+    maxHeightLines,
     radius = 'md',
     onChange,
     onSubmit,
     ...rest
   },
-  ref
+  forwardedRef
 ) {
-  const isOverMaxLength = value.length >= maxLength;
+  const lineHeight = LINE_HEIGHTS[textSize];
+  const minHeight = lineHeight * heightLines;
+  const maxPxHeight = maxHeightLines ? lineHeight * maxHeightLines : undefined;
 
-  const widthSizes = { sm: 150, md: 250, lg: 300 };
-  const heightSizes = { sm: 80, md: 140, lg: 200 };
+  const internalRef = useAutoResizeTextArea({ value, maxHeight: maxPxHeight });
 
-  const classes = styles({
-    variant,
-    radius,
-  });
+  // 불필요한 훅 호출 방지를 위해 forwardedRef와 internalRef를 모두 설정
+  const ref = React.useCallback(
+    (node: HTMLTextAreaElement | null) => {
+      internalRef.current = node;
+      if (typeof forwardedRef === 'function') {
+        forwardedRef(node);
+      } else if (forwardedRef) {
+        forwardedRef.current = node;
+      }
+    },
+    [forwardedRef, internalRef]
+  );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // IME(한글 등) 조합 중 Enter 잘못 제출되는 것 방지
+    // IME(한글 등) 조합 중 Enter 잘못 제출되는 상황 방지
     const isComposing =
       (e.nativeEvent as KeyboardEvent).isComposing ||
       (e as unknown as { isComposing?: boolean }).isComposing;
@@ -74,30 +75,32 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
   };
 
   return (
-    <div className="relative inline-block pb-4">
+    <div className={wholeBoxStyle({ variant, radius })}>
       <textarea
         ref={ref}
-        className={clsx(classes, className)}
+        className={clsx(textAreaStyle({ textSize }), className)}
         value={value}
         placeholder={placeholder}
         aria-label={placeholder}
-        maxLength={maxLength}
-        style={{ width: `${widthSizes[width]}px`, height: `${heightSizes[height]}px` }}
+        maxLength={maxLength && maxLength > 0 ? maxLength : undefined}
+        style={{ width: `${widthPx}px`, minHeight: `${minHeight}px` }}
         onChange={onChange}
         onKeyDown={handleKeyDown}
         {...rest}
       />
-      <div
-        className={clsx(
-          'absolute right-2 -bottom-1 text-xs select-none',
-          isOverMaxLength ? 'text-red-400' : 'text-gray-500'
-        )}
-        aria-live="polite"
-        aria-atomic="true"
-        role="status"
-      >
-        {value.length}/{maxLength}
-      </div>
+      {maxLength > 0 && (
+        <div
+          className={clsx(
+            'font-detail absolute right-2 bottom-2 select-none',
+            value.length > maxLength ? 'text-red200' : 'text-gray300'
+          )}
+          aria-live="polite"
+          aria-atomic="true"
+          role="status"
+        >
+          ({value.length}/{maxLength})
+        </div>
+      )}
     </div>
   );
 });

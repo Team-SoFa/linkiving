@@ -30,7 +30,7 @@
 
 /* ========== CUSTOM SCROLL BAR ========== */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
