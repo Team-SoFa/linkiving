@@ -5,7 +5,7 @@ import { clsx } from 'clsx';
 import React from 'react';
 
 import SVGIcon from '../../Icons/SVGIcon';
-import { IconMapTypes, IconSizeTypes } from '../../Icons/icons';
+import { IconMapTypes, buttonSizeMap } from '../../Icons/icons';
 import { style } from './IconButton.style';
 
 export interface IconButtonProps
@@ -16,54 +16,60 @@ export interface IconButtonProps
   type?: 'button' | 'submit';
   variant?: 'primary' | 'secondary' | 'teritary' | 'teritary_subtle';
   contextStyle?: 'onPanel' | 'onMain'; // teritary_subtle 버튼에서만 사용 (내부적으로 강제됨)
-
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   ariaLabel: string;
   onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
-const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton(
-  {
-    asChild = false,
-    children,
-    className,
-    icon,
-    type = 'button',
-    variant = 'primary',
-    contextStyle = 'onMain',
-    size = 'md',
-    disabled = false,
-    ariaLabel,
-    onClick,
-    ...rest
-  },
-  ref
-) {
-  // STYLES
-  const classes = style({ variant, contextStyle, size, disabled });
-  const iconSize: IconSizeTypes = size;
+const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
+  (
+    {
+      asChild = false,
+      children,
+      className,
+      icon,
+      type = 'button',
+      variant = 'primary',
+      contextStyle = 'onMain',
+      size = 'md',
+      disabled = false,
+      ariaLabel,
+      onClick,
+      ...rest
+    },
+    ref
+  ) => {
+    // STYLES
+    const classes = style({ variant, contextStyle, size, disabled });
 
-  // 인터랙션 요소 중첩 방지를 위해 Slot 적용
-  const Comp = asChild ? Slot : 'button';
+    // 인터랙션 요소 중첩 방지를 위해 Slot 적용
+    const Comp = asChild ? Slot : 'button';
 
-  return (
-    <Comp
-      ref={ref}
-      className={clsx(classes, className)}
-      disabled={disabled}
-      type={type}
-      aria-label={ariaLabel}
-      onClick={onClick}
-      {...rest}
-    >
-      {asChild ? (
-        children
-      ) : (
-        <SVGIcon icon={icon} size={iconSize} className="flex-shrink-0" aria-hidden="true" />
-      )}
-    </Comp>
-  );
-});
+    return (
+      <Comp
+        ref={ref}
+        className={clsx(classes, className)}
+        disabled={disabled}
+        type={type}
+        aria-label={ariaLabel}
+        onClick={onClick}
+        {...rest}
+      >
+        {asChild ? (
+          children
+        ) : (
+          <SVGIcon
+            icon={icon}
+            size={buttonSizeMap[size]}
+            className="flex-shrink-0"
+            aria-hidden="true"
+          />
+        )}
+      </Comp>
+    );
+  }
+);
 
+IconButton.displayName = 'IconButton';
 export default IconButton;

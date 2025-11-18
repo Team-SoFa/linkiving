@@ -35,6 +35,11 @@ const Anchor = forwardRef<HTMLAnchorElement, AnchorProps>(function Anchor(
   // === STYLES ===
   const classes = style({ size });
 
+  const sizeMap = {
+    sm: 'xs',
+    md: 'sm',
+  } as const;
+
   const finalRel = (() => {
     const tokens = new Set((rel ?? '').split(/\s+/).filter(Boolean));
     if (target === '_blank') tokens.add('noopener'); // window.opener 방지
@@ -51,8 +56,10 @@ const Anchor = forwardRef<HTMLAnchorElement, AnchorProps>(function Anchor(
       className={clsx(classes, className)}
       {...rest}
     >
-      {iconVisible && <SVGIcon icon="IC_LinkOpen" size={size} aria-hidden="true" />}
-      <span className="truncate">{children}</span>
+      {iconVisible && (
+        <SVGIcon icon="IC_LinkOpen" size={sizeMap[size]} aria-hidden="true" className="mb-[1px]" />
+      )}
+      {children}
     </a>
   );
 });
