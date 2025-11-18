@@ -1,5 +1,6 @@
 'use client';
 
+import Label from '@/components/basics/Label/Label';
 import { Slot } from '@radix-ui/react-slot';
 import { clsx } from 'clsx';
 import React from 'react';
@@ -66,7 +67,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       ) : (
         <div className="flex items-center gap-x-1">
           {icon && <SVGIcon icon={icon} size={iconSize} />}
-          <span className={icon ? 'pr-1' : ''}>{label}</span>
+          <Label textSize={size} className={icon ? 'pr-1' : ''}>
+            {label}
+          </Label>
         </div>
       )}
     </Comp>
