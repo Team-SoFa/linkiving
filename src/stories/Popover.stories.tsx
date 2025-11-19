@@ -1,11 +1,11 @@
-import Button from '@/components/Button/Button';
-import Popover, { PopoverProps } from '@/components/Popover/Popover';
-import Example from '@/components/Popover/PopoverContents/Example';
+import Button from '@/components/basics/Button/Button';
+import Popover, { PopoverProps } from '@/components/basics/Popover/Popover';
+import Example from '@/components/basics/Popover/PopoverContents/Example';
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 
 const meta = {
-  title: 'Components/Popover',
+  title: 'Components/Basics/Popover',
   component: Popover,
   tags: ['autodocs'],
   argTypes: {
