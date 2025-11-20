@@ -5,7 +5,7 @@ import { clsx } from 'clsx';
 import React from 'react';
 
 import SVGIcon from '../../Icons/SVGIcon';
-import { IconMapTypes, IconSizeTypes } from '../../Icons/icons';
+import { IconMapTypes, buttonSizeMap } from '../../Icons/icons';
 import { style } from './Button.style';
 
 export interface ButtonProps
@@ -22,55 +22,58 @@ export interface ButtonProps
   onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  {
-    asChild = false,
-    children,
-    className,
-    icon,
-    label,
-    type = 'button',
-    variant = 'primary',
-    contextStyle = 'onMain',
-    radius = 'md',
-    size = 'md',
-    disabled = false,
-    onClick,
-    ...rest
-  },
-  ref
-) {
-  // STYLES
-  const classes = style({
-    variant,
-    contextStyle,
-    radius,
-    size,
-    disabled,
-  });
-  const iconSize: IconSizeTypes = size;
-  const Comp = asChild ? Slot : 'button'; // 인터랙션 요소 중첩 방지를 위해 Slot 적용
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      asChild = false,
+      children,
+      className,
+      icon,
+      label,
+      type = 'button',
+      variant = 'primary',
+      contextStyle = 'onMain',
+      radius = 'md',
+      size = 'md',
+      disabled = false,
+      onClick,
+      ...rest
+    },
+    ref
+  ) => {
+    // STYLES
+    const classes = style({
+      variant,
+      contextStyle,
+      radius,
+      size,
+      disabled,
+    });
 
-  return (
-    <Comp
-      ref={ref}
-      className={clsx(classes, className)}
-      disabled={disabled}
-      type={type}
-      aria-disabled={disabled}
-      onClick={onClick}
-      {...rest}
-    >
-      {asChild ? (
-        children
-      ) : (
-        <div className="flex items-center gap-x-1">
-          {icon && <SVGIcon icon={icon} size={iconSize} />}
-          <span className={icon ? 'pr-1' : ''}>{label}</span>
-        </div>
-      )}
-    </Comp>
-  );
-});
+    const Comp = asChild ? Slot : 'button'; // 인터랙션 요소 중첩 방지를 위해 Slot 적용
 
+    return (
+      <Comp
+        ref={ref}
+        className={clsx(classes, className)}
+        disabled={disabled}
+        type={type}
+        aria-disabled={disabled}
+        onClick={onClick}
+        {...rest}
+      >
+        {asChild ? (
+          children
+        ) : (
+          <div className="flex items-center gap-x-1">
+            {icon && <SVGIcon icon={icon} size={buttonSizeMap[size]} />}
+            <span className={icon ? 'pr-1' : ''}>{label}</span>
+          </div>
+        )}
+      </Comp>
+    );
+  }
+);
+
+Button.displayName = 'Button';
 export default Button;
