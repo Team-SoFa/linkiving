@@ -8,7 +8,7 @@ interface LinkIconButtonProps extends Omit<IconButtonProps, 'ariaLabel'> {
   ariaLabel: string;
 }
 
-const LinkIconButton = ({ href, icon, size, ariaLabel }: LinkIconButtonProps) => {
+const LinkIconButton = ({ href, icon, size, ariaLabel, ...props }: LinkIconButtonProps) => {
   if (!icon)
     console.error('LinkIconButton: Either icon or label should be provided for accessibility');
 
@@ -17,7 +17,7 @@ const LinkIconButton = ({ href, icon, size, ariaLabel }: LinkIconButtonProps) =>
   const linkProps = isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
   return (
-    <IconButton asChild size={size} icon={icon} ariaLabel={ariaLabel}>
+    <IconButton asChild size={size} icon={icon} ariaLabel={ariaLabel} {...props}>
       <Link href={safeUrl} {...linkProps}>
         <SVGIcon icon={icon} size={size} />
       </Link>
