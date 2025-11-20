@@ -1,32 +1,26 @@
-'use client';
+import clsx from 'clsx';
+import React, { HTMLAttributes, forwardRef } from 'react';
 
-import { clsx } from 'clsx';
-import React from 'react';
+import { style } from './Label.style';
 
-interface LabelProps {
-  text: string;
-  htmlFor?: string;
-  size?: 'sm' | 'md' | 'lg';
-  required?: boolean;
+export interface LabelProps extends HTMLAttributes<HTMLLabelElement> {
+  children: React.ReactNode;
+  textSize?: 'sm' | 'md' | 'lg' | 'xl';
+  textColor?: string;
 }
 
-export default function Label({ text, htmlFor, size = 'md', required = false }: LabelProps) {
-  const baseStyle = 'block text-gray-800 font-semibold';
-  const sizes = {
-    sm: 'text-xs',
-    md: 'text-sm',
-    lg: 'text-base',
-  };
-  const classes = clsx(baseStyle, sizes[size]);
+const Label = forwardRef<HTMLLabelElement, LabelProps>(
+  ({ className, children, textSize = 'md', textColor = undefined, ...props }, ref) => {
+    const classes = style({
+      textSize,
+    });
 
-  return (
-    <label htmlFor={htmlFor} className={classes}>
-      {required && (
-        <span aria-hidden="true" className="ml-1 text-red-500">
-          *{' '}
-        </span>
-      )}
-      {text}
-    </label>
-  );
-}
+    return (
+      <label className={clsx(classes, textColor, className)} {...props} ref={ref}>
+        {children}
+      </label>
+    );
+  }
+);
+
+export default Label;

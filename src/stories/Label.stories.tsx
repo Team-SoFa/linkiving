@@ -1,34 +1,24 @@
-import Label from '@/components/basics/Label/Label';
+import Label, { LabelProps } from '@/components/basics/Label/Label';
 import type { Meta, StoryObj } from '@storybook/react';
 
-const meta: Meta<typeof Label> = {
+const meta = {
   title: 'Components/Basics/Label',
   component: Label,
   tags: ['autodocs'],
   argTypes: {
-    text: {
-      control: 'text',
-    },
-    htmlFor: {
-      control: 'text',
-    },
-    size: {
-      control: 'select',
-    },
-    required: {
-      control: 'boolean',
-    },
+    textSize: { control: { type: 'inline-radio' } },
+    textColor: { control: 'text' },
+    children: { control: 'text' },
   },
-};
+} satisfies Meta<LabelProps>;
 
 export default meta;
-type Story = StoryObj<typeof Label>;
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    text: 'Label',
-    htmlFor: 'input-id',
-    size: 'md',
-    required: false,
+    textSize: 'md',
+    textColor: 'text-black',
+    children: '🔍 검색 라벨',
   },
 };

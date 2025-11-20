@@ -19,9 +19,9 @@ export const style = tv({
       full: 'rounded-full',
     },
     size: {
-      sm: 'font-label-sm px-3 py-2',
-      md: 'font-label-md px-4 py-[10px]',
-      lg: 'font-label-lg px-5 py-3',
+      sm: 'px-3 py-2',
+      md: 'px-4 py-[10px]',
+      lg: 'px-5 py-3',
     },
     disabled: {
       true: 'cursor-not-allowed opacity-30',
