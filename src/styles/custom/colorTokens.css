@@ -23,6 +23,10 @@
   /* accent */
   .text-accent-default{ @apply text-blue400; }
   
+  /* ========== accordion ========== */
+  .text-accordion { @apply text-gray400; }
+  .text-accordion:hover { @apply hover:text-gray500; }
+  .text-accordion:focus { @apply focus:text-gray500; }
   
   /* ========== ANCHOR ========== */
   .text-anchor { @apply text-gray400; }
