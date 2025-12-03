@@ -13,7 +13,6 @@ const TitleTextArea = ({ value, onChange }: TitleTextAreaProps) => {
   return (
     <TextArea
       value={value}
-      widthPx={480}
       heightLines={2}
       maxHeightLines={3}
       maxLength={100}
