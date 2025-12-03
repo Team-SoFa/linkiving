@@ -44,8 +44,8 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
   if (!portalElement) return null;
 
   return createPortal(
-    <div ref={ref} className={clsx(modalOverlayStyle(), className)} onClick={close} {...rest}>
-      <div className={modalContentStyle()} onClick={e => e.stopPropagation()}>
+    <div ref={ref} className={modalOverlayStyle()} onClick={close} {...rest}>
+      <div className={clsx(modalContentStyle(), className)} onClick={e => e.stopPropagation()}>
         <div className={modalHeaderStyle()}>
           <IconButton
             icon="IC_Close"

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import React, { useState } from 'react';
 
 const meta = {
-  title: 'Wrapper/Wrappers/TitleTextArea',
+  title: 'Components/Wrappers/TitleTextArea',
   component: TitleTextArea,
   tags: ['autodocs'],
   argTypes: {
