@@ -38,9 +38,9 @@ const QueryBox = ({ onSubmit }: QueryBoxProps) => {
         placeholder="Linkiving에게 물어보세요."
         radius="lg"
         value={value}
-        widthPx={720}
         onChange={e => setValue(e.target.value)}
         onSubmit={onSubmit}
+        className="w-280"
       />
       <SendButton disabled={!value || isSending} onClick={handleSubmit} />
       {error && <div className="mt-1 text-sm text-red-500">{error}</div>}
