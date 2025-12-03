@@ -1,11 +1,11 @@
 'use client';
 
 import Button from '@/components/basics/Button/Button';
-import Divider from '@/components/basics/Divider/Divider';
 import Input from '@/components/basics/Input/Input';
 import Label from '@/components/basics/Label/Label';
 import Modal from '@/components/basics/Modal/Modal';
 import TextArea from '@/components/basics/TextArea/TextArea';
+import { useModalStore } from '@/stores/modalStore';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -20,7 +20,9 @@ const addLinkSchema = z.object({
 type AddLinkForm = z.infer<typeof addLinkSchema>;
 
 const AddLinkModal = () => {
-  const [imageUrl] = useState('/file.svg?react');
+  const { close } = useModalStore();
+  const [imageUrl] = useState('/file.svg');
+
   const {
     control,
     handleSubmit,
@@ -33,10 +35,11 @@ const AddLinkModal = () => {
 
   const onSubmit = (data: AddLinkForm) => {
     console.log(data);
+    close();
   };
 
   return (
-    <Modal type="ADD_LINK">
+    <Modal type="ADD_LINK" className="m-10 min-w-150">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <Label htmlFor="url-input">URL</Label>
@@ -54,15 +57,16 @@ const AddLinkModal = () => {
           />
           {errors.url && <span className="text-red500 text-xs">{errors.url.message}</span>}
         </div>
-        <Divider width={2} />
         <div className="flex flex-col gap-1">
-          <span>Contents</span>
-          <div className="flex items-center gap-2">
-            <div className="border-gray100 relative h-28 w-42 rounded-2xl border bg-white">
-              <Image src={imageUrl} alt="link thumbnail" fill />
+          <div className="flex gap-2">
+            <div className="flex flex-1 flex-col">
+              <Label>썸네일</Label>
+              <div className="relative h-23 rounded-lg bg-white">
+                <Image src={imageUrl} alt="link thumbnail" fill />
+              </div>
             </div>
-            <div className="flex flex-col">
-              <Label htmlFor="title-input">Title</Label>
+            <div className="flex flex-3 flex-col">
+              <Label htmlFor="title-input">제목</Label>
               <Controller
                 name="title"
                 control={control}
@@ -71,7 +75,6 @@ const AddLinkModal = () => {
                     {...field}
                     placeholder="제목을 입력해주세요"
                     id="title-input"
-                    widthPx={400}
                     radius="lg"
                     heightLines={2}
                     maxHeightLines={2}
@@ -83,9 +86,8 @@ const AddLinkModal = () => {
             </div>
           </div>
         </div>
-        <Divider width={2} />
-        <div className="flex flex-col">
-          <Label htmlFor="memo-input">Memo</Label>
+        <div className="flex w-full flex-col">
+          <Label htmlFor="memo-input">메모</Label>
           <Controller
             name="memo"
             control={control}
@@ -96,7 +98,6 @@ const AddLinkModal = () => {
                 id="memo-input"
                 placeholder="메모를 입력해주세요"
                 radius="lg"
-                widthPx={576}
                 heightLines={3}
                 maxHeightLines={3}
                 maxLength={600}

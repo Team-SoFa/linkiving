@@ -14,7 +14,6 @@ export interface TextAreaProps extends Omit<
   className?: string;
   variant?: 'default';
   textSize?: 'sm' | 'md' | 'lg';
-  widthPx: number; // px
   heightLines: number; // 줄 수
   maxHeightLines?: number; // 줄 수
   radius?: 'md' | 'lg' | 'full';
@@ -33,7 +32,6 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
     value,
     variant = 'default',
     textSize = 'md',
-    widthPx,
     heightLines,
     maxHeightLines,
     radius = 'md',
@@ -82,7 +80,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
         placeholder={placeholder}
         aria-label={placeholder}
         maxLength={maxLength && maxLength > 0 ? maxLength : undefined}
-        style={{ width: `${widthPx}px`, minHeight: `${minHeight}px` }}
+        style={{ minHeight: `${minHeight}px` }}
         onChange={onChange}
         onKeyDown={handleKeyDown}
         {...rest}
