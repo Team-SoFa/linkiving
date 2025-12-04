@@ -22,7 +22,7 @@
 ### 1. 필수 요구사항
 
 - Node.js **>= 18.18.0** (또는 >= 20.x)
-- npm (Node.js 설치 시 포함)
+- pnpm (별도 설치 필요)
 
 ### 2. 클론 & 설치
 
@@ -32,14 +32,14 @@ git clone https://github.com/Team-SoFa/linkiving.git
 cd linkiving
 
 # 의존성 설치
-npm install
+pnpm install
 ```
 
 ### 3. 개발 모드 실행
 
 ```bash
 # 개발 서버 실행
-npm run dev
+pnpm run dev
 ```
 
 브라우저에서 [http://localhost:3000](http://localhost:3000) 열기
@@ -48,20 +48,20 @@ npm run dev
 
 ```bash
 # 프로덕션 빌드
-npm run build
+pnpm run build
 
 # 프로덕션 서버 실행
-npm run start
+pnpm run start
 ```
 
 ## 🛠️ 사용 가능한 스크립트
 
-- `npm run dev` – 개발 서버 실행
-- `npm run build` – 프로덕션 빌드 생성
-- `npm run start` – 프로덕션 서버 실행
-- `npm run lint` – ESLint 실행
-- `npm run format` – Prettier 포맷 실행
-- `npm run lint:staged` – lint-staged로 변경된 파일 린트 및 포맷
+- `pnpm run dev` – 개발 서버 실행
+- `pnpm run build` – 프로덕션 빌드 생성
+- `pnpm run start` – 프로덕션 서버 실행
+- `pnpm run lint` – ESLint 실행
+- `pnpm run format` – Prettier 포맷 실행
+- `pnpm run lint:staged` – lint-staged로 변경된 파일 린트 및 포맷
 
 ## 📁 디렉터리 구조
 
