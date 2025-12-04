@@ -4,40 +4,40 @@ export const style = tv({
   base: 'inline-flex cursor-pointer items-center justify-center rounded-full whitespace-nowrap transition-all duration-150',
   variants: {
     variant: {
-      primary: 'btn-primary bg-btn-primary border-btn-primary text-btn-primary border',
-      secondary: 'btn-secondary bg-btn-secondary border-btn-secondary text-btn-secondary border',
-      teritary: 'btn-teritary bg-btn-teritary border-btn-teritary text-btn-teritary border',
-      teritary_subtle: 'btn-teritary-subtle bg-btn-teritary-subtle text-btn-teritary-subtle',
-    },
-    contextStyle: {
-      // teritary_subtle 외 다른 variant에서는 무시됨
-      onMain: '',
-      onPanel: '',
+      primary: 'bg-btn-primary border-btn-primary text-btn-primary border',
+      secondary: 'bg-btn-secondary border-btn-secondary text-btn-secondary border',
+      tertiary_neutral:
+        'bg-btn-tertiary-neutral border-btn-tertiary-neutral text-btn-tertiary-neutral border',
+      tertiary_subtle: 'text-btn-tertiary-subtle border-btn-tertiary-subtle border',
     },
     radius: {
       md: 'rounded-lg',
       full: 'rounded-full',
     },
+    contextStyle: {
+      onMain: '',
+      onPanel: '',
+    },
     size: {
-      sm: 'px-3 py-2',
-      md: 'px-4 py-[10px]',
-      lg: 'px-5 py-3',
+      sm: 'font-label-sm h-8 px-3',
+      md: 'font-label-md h-10 px-4',
+      lg: 'font-label-lg h-12 px-5',
     },
     disabled: {
-      true: 'cursor-not-allowed opacity-30',
+      true: 'pointer-events-none cursor-not-allowed',
       false: '',
     },
   },
   compoundVariants: [
     {
-      variant: 'teritary_subtle',
+      variant: 'tertiary_subtle',
       contextStyle: 'onPanel',
-      className: 'bg-btn-teritary-subtle-onpanel',
+      className: 'bg-btn-tertiary-subtle-onpanel',
     },
     {
-      variant: 'teritary_subtle',
+      variant: 'tertiary_subtle',
       contextStyle: 'onMain',
-      className: 'bg-btn-teritary-subtle-onmain',
+      className: 'bg-btn-tertiary-subtle-onmain',
     },
   ],
 });

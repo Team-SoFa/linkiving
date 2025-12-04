@@ -10,8 +10,7 @@ const SideNavToggle = ({ isOpen, onClick }: SideNavToggleProps) => {
   return (
     <IconButton
       icon="IC_SidenavOpen"
-      variant="teritary_subtle"
-      contextStyle="onPanel"
+      variant="tertiary_subtle"
       size="lg"
       ariaLabel={isOpen ? '좌측 사이드바 메뉴 닫기' : '좌측 사이드바 메뉴 열기'}
       onClick={onClick}
