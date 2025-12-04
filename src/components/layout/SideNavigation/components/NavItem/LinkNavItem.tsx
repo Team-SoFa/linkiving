@@ -20,7 +20,7 @@ const LinkNavItem = ({ children, href, icon, ariaLabel, ...props }: LinkNavItemP
 
   const commonProps = {
     href,
-    variant: 'teritary_subtle' as const,
+    variant: 'tertiary_subtle' as const,
     contextStyle: 'onPanel' as const,
     size: 'lg' as const,
     ...props,
