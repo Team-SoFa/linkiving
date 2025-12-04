@@ -50,9 +50,8 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
           <IconButton
             icon="IC_Close"
             size="sm"
-            variant="teritary_subtle"
-            contextStyle="onPanel"
-            ariaLabel="modal close button"
+            variant="tertiary_subtle"
+            ariaLabel="모달 닫기 버튼"
             onClick={close}
           />
         </div>

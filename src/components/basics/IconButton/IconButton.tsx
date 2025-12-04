@@ -16,8 +16,8 @@ export interface IconButtonProps extends Omit<
   className?: string;
   icon: IconMapTypes; // icon 타입을 .svg 파일로 강제
   type?: 'button' | 'submit' | 'reset';
-  variant?: 'primary' | 'secondary' | 'teritary' | 'teritary_subtle';
-  contextStyle?: 'onPanel' | 'onMain'; // teritary_subtle 버튼에서만 사용 (내부적으로 강제됨)
+  variant?: 'primary' | 'secondary' | 'tertiary_neutral' | 'tertiary_subtle';
+  contextStyle?: 'onPanel' | 'onMain'; // tertiary_subtle 버튼에서만 사용 (내부적으로 강제됨)
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   ariaLabel: string;

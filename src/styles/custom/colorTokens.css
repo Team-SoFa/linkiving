@@ -41,58 +41,88 @@
 
 
   /* ========== BUTTON ========== */
-  /* button background color */
+
+  /* primary/accent/filled (추후 다른 primary 소속디자인이 추가된다면 수정) */
   .bg-btn-primary { @apply bg-gray900; }
   .bg-btn-primary:hover { @apply hover:bg-gray800; }
   .bg-btn-primary:focus { @apply focus:bg-gray800; }
-  
-  .bg-btn-secondary { @apply bg-blue50; }
-  .bg-btn-secondary:hover { @apply hover:hover:bg-blue100; }
-  .bg-btn-secondary:focus { @apply focus:bg-blue100; }
-  
-  .bg-btn-teritary { @apply bg-white; }
-  .bg-btn-teritary:hover { @apply hover:bg-gray50; }
-  .bg-btn-teritary:focus { @apply focus:bg-gray50; }
-  
-  .bg-btn-teritary-subtle-onpanel { @apply bg-transparent; }
-  .bg-btn-teritary-subtle-onpanel:hover { background-color: color-mix(in srgb, var(--color-blue100) 32%, transparent); }
-  .bg-btn-teritary-subtle-onpanel:focus { background-color: color-mix(in srgb, var(--color-blue100) 32%, transparent); }
-  
-  .bg-btn-teritary-subtle-onmain { @apply bg-transparent; }
-  .bg-btn-teritary-subtle-onmain:hover { background-color: color-mix(in srgb, var(--color-gray100) 52%, transparent); }
-  .bg-btn-teritary-subtle-onmain:focus { background-color: color-mix(in srgb, var(--color-gray100) 52%, transparent); }
-  
-  /* button border color */
+  .bg-btn-primary:active{@apply active:bg-gray700;}
+  .bg-btn-primary:disabled {@apply disabled:bg-gray50; }
+
   .border-btn-primary { @apply border-gray900; }
   .border-btn-primary:hover { @apply hover:border-gray800; }
   .border-btn-primary:focus { @apply focus:border-gray800; }
-  
-  .border-btn-secondary { @apply border-blue200; }
-  .border-btn-secondary:hover { @apply hover:border-blue200; }
-  .border-btn-secondary:focus { @apply focus:border-blue200; }
-  
-  .border-btn-teritary { @apply border-gray200; }
-  .border-btn-teritary:hover { @apply hover:border-gray200; }
-  .border-btn-teritary:focus { @apply focus:border-gray200; }
-  
-  .border-btn-teritary-subtle { @apply border-none; }
-  .border-btn-teritary-subtle:hover { @apply hover:border-none; }
-  .border-btn-teritary-subtle:focus { @apply focus:border-none; }
-  
-  /* button text color */
+  .border-btn-primary:active { @apply active:border-gray700; }
+  .border-btn-primary:disabled { @apply disabled:border-gray50; } 
+
   .text-btn-primary { @apply text-white; }
   .text-btn-primary:hover { @apply hover:text-white; }
   .text-btn-primary:focus { @apply focus:text-white; }
+  .text-btn-primary:active { @apply active:text-white; }
+  .text-btn-primary:disabled {@apply disabled:text-gray200; }
   
-  .text-btn-secondary { @apply text-blue400; }
-  .text-btn-secondary:hover { @apply hover:text-blue400; }
-  .text-btn-secondary:focus { @apply focus:text-blue400; }
-  
-  .text-btn-teritary { @apply text-gray700; }
-  .text-btn-teritary:hover { @apply hover:text-gray700; }
-  .text-btn-teritary:focus { @apply focus:text-gray700; }
-  
-  .text-btn-teritary-subtle { @apply text-gray500; }
-  .text-btn-teritary-subtle:hover { @apply hover:text-gray700; }
-  .text-btn-teritary-subtle:focus { @apply focus:text-gray700; }
+  /* secondary/accent/tonal (추후 다른 secondary 소속 디자인이 추가된다면 수정) */
+  .bg-btn-secondary { @apply bg-white; }
+  .bg-btn-secondary:hover { @apply hover:bg-blue50; }
+  .bg-btn-secondary:focus { @apply focus:bg-blue50; }
+  .bg-btn-secondary:active { @apply active:bg-blue100; }
+  .bg-btn-secondary:disabled {@apply disabled:bg-gray50; }
+
+  .border-btn-secondary { @apply border-blue300; }
+  .border-btn-secondary:hover { @apply hover:border-blue300; }
+  .border-btn-secondary:focus { @apply focus:border-blue300; }
+  .border-btn-secondary:active { @apply active:border-blue300; }
+  .border-btn-secondary:disabled {@apply disabled:border-gray200; }
+
+  .text-btn-secondary { @apply text-blue500; }
+  .text-btn-secondary:hover { @apply hover:text-blue500; }
+  .text-btn-secondary:focus { @apply focus:text-blue500; }
+  .text-btn-secondary:active { @apply active:text-blue500; }
+  .text-btn-secondary:disabled {@apply disabled:text-gray200; }
+
+  /* tertiary/neutral/outlined */
+  .bg-btn-tertiary-neutral { @apply bg-white; }
+  .bg-btn-tertiary-neutral:hover { @apply hover:bg-gray50; }
+  .bg-btn-tertiary-neutral:focus { @apply focus:bg-gray50; }
+  .bg-btn-tertiary-neutral:active { @apply active:bg-gray100; }
+  .bg-btn-tertiary-neutral:disabled {@apply disabled:bg-gray50; }
+
+  .border-btn-tertiary-neutral { @apply border-gray200; }
+  .border-btn-tertiary-neutral:hover { @apply hover:border-gray200; }
+  .border-btn-tertiary-neutral:focus { @apply focus:border-gray200; }
+  .border-btn-tertiary-neutral:active { @apply active:border-gray200; }
+  .border-btn-tertiary-neutral:disabled {@apply disabled:border-gray200; }
+
+  .text-btn-tertiary-neutral { @apply text-gray700; }
+  .text-btn-tertiary-neutral:hover { @apply hover:text-gray700; }
+  .text-btn-tertiary-neutral:focus { @apply focus:text-gray700; }
+  .text-btn-tertiary-neutral:active { @apply active:text-gray700; }
+  .text-btn-tertiary-neutral:disabled {@apply disabled:text-gray200; }
+
+  /* tertiary/subtle/ghost (현재 해당 디자인 컴포넌트의 위치(onpanel/onmain)에 따라 배경색상만 달라지기 때문에 공용스타일 정의)*/
+  .border-btn-tertiary-subtle { @apply border-none; }
+  .border-btn-tertiary-subtle:hover { @apply hover:border-none; }
+  .border-btn-tertiary-subtle:focus { @apply focus:border-none; }
+  .border-btn-tertiary-subtle:active { @apply active:border-none; }
+  .border-btn-tertiary-subtle:disabled { @apply disabled:border-none; }
+
+  .text-btn-tertiary-subtle { @apply text-gray500; }
+  .text-btn-tertiary-subtle:hover { @apply hover:text-gray700; }
+  .text-btn-tertiary-subtle:focus { @apply focus:text-gray700; }
+  .text-btn-tertiary-subtle:active { @apply active:text-gray700; }
+  .text-btn-tertiary-subtle:disabled { @apply disabled:text-gray200; }
+
+  /* bg: tertiary/subtle/ghost/onPanel*/
+  .bg-btn-tertiary-subtle-onpanel { @apply bg-transparent; }
+  .bg-btn-tertiary-subtle-onpanel:hover { background-color: color-mix(in srgb, var(--color-blue100) 52%, transparent); }
+  .bg-btn-tertiary-subtle-onpanel:focus { background-color: color-mix(in srgb, var(--color-blue100) 52%, transparent); }
+  .bg-btn-tertiary-subtle-onpanel:active { background-color: color-mix(in srgb, var(--color-blue100) 80%, transparent); }
+  .bg-btn-tertiary-subtle-onpanel:disabled { @apply disabled:bg-none; }
+
+  /* bg: tertiary/subtle/ghost/onMain*/
+  .bg-btn-tertiary-subtle-onmain { @apply bg-transparent; }
+  .bg-btn-tertiary-subtle-onmain:hover { background-color: color-mix(in srgb, var(--color-gray100) 52%, transparent); }
+  .bg-btn-tertiary-subtle-onmain:focus { background-color: color-mix(in srgb, var(--color-gray100) 52%, transparent); }
+  .bg-btn-tertiary-subtle-onmain:active { background-color: color-mix(in srgb, var(--color-gray100) 80%, transparent); }
+  .bg-btn-tertiary-subtle-onmain:disabled { @apply disabled:bg-none; }
 }

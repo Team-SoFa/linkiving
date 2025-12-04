@@ -14,7 +14,7 @@ const NavItem = ({ children, icon, ariaLabel, ...props }: NavItemProps) => {
   const { ref, onClick } = useBlurOnClick(props.onClick);
 
   const commonProps = {
-    variant: 'teritary_subtle' as const,
+    variant: 'tertiary_subtle' as const,
     contextStyle: 'onPanel' as const,
     size: 'lg' as const,
     ...props,

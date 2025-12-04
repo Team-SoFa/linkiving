@@ -12,7 +12,7 @@ const SendButton = ({ disabled, onClick }: SendButtonProps) => {
       disabled={disabled}
       onClick={onClick}
       size="sm"
-      variant="teritary_subtle"
+      variant="tertiary_subtle"
       contextStyle="onMain"
       className="absolute right-0 bottom-0 mr-3 mb-1"
     />

@@ -16,8 +16,8 @@ export interface ButtonProps extends Omit<
   className?: string;
   icon?: IconMapTypes;
   label?: string;
-  variant?: 'primary' | 'secondary' | 'teritary' | 'teritary_subtle';
-  contextStyle?: 'onPanel' | 'onMain'; // teritary_subtle 버튼에서만 사용 (내부적으로 강제됨)
+  variant?: 'primary' | 'secondary' | 'tertiary_neutral' | 'tertiary_subtle';
+  contextStyle?: 'onPanel' | 'onMain';
   radius?: 'md' | 'full';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
@@ -34,7 +34,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       label,
       type = 'button',
       variant = 'primary',
-      contextStyle = 'onMain',
+      contextStyle = 'onPanel',
       radius = 'md',
       size = 'md',
       disabled = false,
@@ -46,8 +46,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     // STYLES
     const classes = style({
       variant,
-      contextStyle,
       radius,
+      contextStyle,
       size,
       disabled,
     });

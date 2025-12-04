@@ -43,7 +43,7 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(function Toast(
         variant="primary"
         size="sm"
         onClick={() => onClose(id)}
-        aria-label="Dismiss toast"
+        aria-label="토스트 알람 닫기 버튼"
         label="×"
       />
     </div>

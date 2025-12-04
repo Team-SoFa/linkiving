@@ -8,8 +8,7 @@ const AddSummaryButton = () => {
     <Button
       icon="IC_SumGenerate"
       label="요약 생성"
-      variant="teritary_subtle"
-      contextStyle="onPanel"
+      variant="tertiary_subtle"
       size="sm"
       className="w-[93px]"
       aria-label="요약 생성 버튼"
