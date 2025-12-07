@@ -31,7 +31,7 @@ const LinkNavItem = ({ children, href, icon, ariaLabel, ...props }: LinkNavItemP
       {...commonProps}
       icon={icon}
       radius="full"
-      className="flex h-10 w-50 justify-start gap-2 pl-2.5"
+      className="flex h-10 w-50 justify-start gap-2 pl-2"
       ref={ref}
       onClick={onClick}
     >
