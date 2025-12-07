@@ -1,15 +1,8 @@
 import type { StorybookConfig } from '@storybook/nextjs';
-import type { RuleSetRule } from 'webpack';
 
 const config: StorybookConfig = {
-  stories: ['../src/stories/**/*.stories.@(js|jsx|ts|tsx)'],
-  addons: [
-    '@storybook/addon-essentials',
-    '@storybook/addon-onboarding',
-    '@chromatic-com/storybook',
-    '@storybook/experimental-addon-test',
-  ],
-
+  stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+  addons: [],
   framework: {
     name: '@storybook/nextjs',
     options: {},
@@ -17,21 +10,23 @@ const config: StorybookConfig = {
   staticDirs: ['../public'],
 
   webpackFinal: async config => {
-    if (!config?.module?.rules) return config;
-    const rules = (config.module.rules as RuleSetRule[]).filter(
-      (rule): rule is RuleSetRule => typeof rule === 'object' && rule !== null
-    );
-
-    config.module.rules = rules.map(rule => {
-      if (rule.test instanceof RegExp && rule.test.test('file.svg')) {
-        return { ...rule, exclude: /\.svg$/i };
+    // 기존 SVG 처리 규칙 찾아서 제거
+    const fileLoaderRule = config.module?.rules?.find(rule => {
+      if (typeof rule !== 'object' || !rule) return false;
+      if ('test' in rule && rule.test instanceof RegExp) {
+        return rule.test.test('.svg');
       }
-      return rule;
+      return false;
     });
 
-    config.module.rules.push({
-      test: /\.svg$/i,
-      issuer: /\.[jt]sx?$/,
+    if (fileLoaderRule && typeof fileLoaderRule === 'object') {
+      // SVG는 제외
+      fileLoaderRule.exclude = /\.svg$/;
+    }
+
+    // SVG를 React 컴포넌트로 처리하는 규칙 추가
+    config.module?.rules?.push({
+      test: /\.svg$/,
       use: [
         {
           loader: '@svgr/webpack',
@@ -41,7 +36,9 @@ const config: StorybookConfig = {
         },
       ],
     });
+
     return config;
   },
 };
+
 export default config;

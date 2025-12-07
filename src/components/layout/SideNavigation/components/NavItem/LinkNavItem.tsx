@@ -5,8 +5,10 @@ import LinkIconButton from '@/components/wrappers/LinkIconButton/LinkIconButton'
 import { useBlurOnClick } from '@/hooks/util/useBlurOnClick';
 import { useSideNavStore } from '@/stores/sideNavStore';
 
-interface LinkNavItemProps
-  extends Omit<ButtonProps, 'variant' | 'contextStyle' | 'radius' | 'size'> {
+interface LinkNavItemProps extends Omit<
+  ButtonProps,
+  'variant' | 'contextStyle' | 'radius' | 'size'
+> {
   href: string;
   icon: IconMapTypes; // LinkIconButton
   ariaLabel: string; // LinkIconButton

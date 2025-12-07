@@ -1,5 +1,5 @@
 import TitleTextArea from '@/components/wrappers/TitleTextArea/TitleTextArea';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import React, { useState } from 'react';
 
 const meta = {

@@ -6,8 +6,10 @@ import { HTMLAttributes, ReactNode, forwardRef } from 'react';
 
 import { style } from './Anchor.style';
 
-interface AnchorProps
-  extends Omit<HTMLAttributes<HTMLAnchorElement>, 'href' | 'children' | 'target'> {
+interface AnchorProps extends Omit<
+  HTMLAttributes<HTMLAnchorElement>,
+  'href' | 'children' | 'target'
+> {
   className?: string;
   iconVisible?: boolean;
   ariaLabel?: string;
@@ -57,7 +59,7 @@ const Anchor = forwardRef<HTMLAnchorElement, AnchorProps>(function Anchor(
       {...rest}
     >
       {iconVisible && (
-        <SVGIcon icon="IC_LinkOpen" size={sizeMap[size]} aria-hidden="true" className="mb-[1px]" />
+        <SVGIcon icon="IC_LinkOpen" size={sizeMap[size]} aria-hidden="true" className="mb-px" />
       )}
       {children}
     </a>

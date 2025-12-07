@@ -1,8 +1,7 @@
 import Button from '@/components/basics/Button/Button';
 import Popover, { PopoverProps } from '@/components/basics/Popover/Popover';
 import Example from '@/components/basics/Popover/PopoverContents/Example';
-import type { Meta, StoryObj } from '@storybook/react';
-import React from 'react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   title: 'Components/Basics/Popover',

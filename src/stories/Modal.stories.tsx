@@ -1,7 +1,7 @@
 import Button from '@/components/basics/Button/Button';
 import Modal from '@/components/basics/Modal/Modal';
 import { MODAL_TYPE, useModalStore } from '@/stores/modalStore';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { useEffect } from 'react';
 
 const meta = {

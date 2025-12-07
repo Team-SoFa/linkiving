@@ -1,5 +1,5 @@
 import Tab from '@/components/basics/Tab/Tab';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   title: 'Components/Basics/Tab',

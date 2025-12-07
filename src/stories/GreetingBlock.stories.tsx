@@ -1,5 +1,5 @@
 import GreetingBlock from '@/components/basics/GreetingBlock/GreetingBlock';
-import { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   title: 'Components/Basics/GreetingBlock',

@@ -20,7 +20,7 @@ const addLinkSchema = z.object({
 type AddLinkForm = z.infer<typeof addLinkSchema>;
 
 const AddLinkModal = () => {
-  const [imageUrl] = useState('/file.svg');
+  const [imageUrl] = useState('/file.svg?react');
   const {
     control,
     handleSubmit,

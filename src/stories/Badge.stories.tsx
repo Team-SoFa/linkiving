@@ -1,5 +1,5 @@
 import Badge from '@/components/basics/Badge/Badge';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   title: 'Components/Basics/Badge',

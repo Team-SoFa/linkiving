@@ -1,8 +1,7 @@
 import Button from '@/components/basics/Button/Button';
 import ReSummaryModal from '@/components/wrappers/ReSummaryModal/ReSummaryModal';
 import { useModalStore } from '@/stores/modalStore';
-import type { Meta, StoryObj } from '@storybook/react';
-import React from 'react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   title: 'Components/Wrappers/SummaryRegeneratingModal',

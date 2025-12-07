@@ -7,8 +7,10 @@ import { style } from './Tooltip.style';
 
 type Timer = ReturnType<typeof setTimeout>;
 
-export interface TooltipProps
-  extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'content' | 'children'> {
+export interface TooltipProps extends Omit<
+  React.HTMLAttributes<HTMLSpanElement>,
+  'content' | 'children'
+> {
   // 동작 관련 props
   content: React.ReactNode;
   delay?: number;

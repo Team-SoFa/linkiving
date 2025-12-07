@@ -8,8 +8,10 @@ import SVGIcon from '../../Icons/SVGIcon';
 import { IconMapTypes, buttonSizeMap } from '../../Icons/icons';
 import { style } from './Button.style';
 
-export interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled' | 'onClick'> {
+export interface ButtonProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'disabled' | 'onClick'
+> {
   asChild?: boolean;
   className?: string;
   icon?: IconMapTypes;
