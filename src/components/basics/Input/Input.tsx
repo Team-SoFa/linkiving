@@ -3,8 +3,10 @@
 import clsx from 'clsx';
 import React from 'react';
 
-interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'value' | 'onChange'> {
+interface InputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'size' | 'value' | 'onChange'
+> {
   value: string;
   placeholder?: string;
   size?: 'sm' | 'md' | 'lg';

@@ -1,5 +1,5 @@
 import Label, { LabelProps } from '@/components/basics/Label/Label';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   title: 'Components/Basics/Label',

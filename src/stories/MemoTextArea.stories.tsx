@@ -1,6 +1,6 @@
 import MemoTextArea from '@/components/wrappers/MemoTextArea/MemoTextArea';
-import type { Meta, StoryObj } from '@storybook/react';
-import React, { useState } from 'react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { useState } from 'react';
 
 const meta = {
   title: 'Components/Wrappers/MemoTextArea',

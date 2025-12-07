@@ -1,5 +1,5 @@
 import TagList from '@/components/basics/Tag/TagList';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import React from 'react';
 
 const meta = {

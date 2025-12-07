@@ -1,5 +1,5 @@
 import IconButton from '@/components/basics/IconButton/IconButton';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   title: 'Components/Basics/IconButton',

@@ -1,8 +1,7 @@
 // TextArea.stories.tsx
 import TextArea, { TextAreaProps } from '@/components/basics/TextArea/TextArea';
-import { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
-import React, { useState } from 'react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { useState } from 'react';
 
 const meta = {
   title: 'Components/Basics/TextArea',
@@ -37,7 +36,7 @@ function InteractiveTextArea(props: TextAreaProps) {
       {...props}
       value={text}
       onChange={e => setText(e.target.value)}
-      onSubmit={props.onSubmit ?? fn()} // fn() 사용
+      onSubmit={props.onSubmit}
     />
   );
 }

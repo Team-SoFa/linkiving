@@ -18,6 +18,20 @@ const compat = new FlatCompat({
 });
 
 const config = [
+  // 제외할 파일/폴더 먼저 정의
+  {
+    ignores: [
+      '.next/**',
+      'out/**',
+      'dist/**',
+      'build/**',
+      'next-env.d.ts',
+      'node_modules/**',
+      'storybook-static/**',
+      '.storybook/cache/**',
+    ],
+  },
+
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
     plugins: {
@@ -69,13 +83,18 @@ const config = [
             },
             {
               case: 'camel',
-              target: '**/hooks/**', // target "hooks" folder
+              target: '**/hooks/**',
             },
           ],
         },
       ],
     },
   },
+
+  // Storybook ESLint Flat Config 적용 (정상 동작)
+  ...storybookPlugin.configs['flat/recommended'],
+
+  // prettierConfig 유지
   prettierConfig,
 ];
 

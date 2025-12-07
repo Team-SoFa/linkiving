@@ -1,5 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import React from 'react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import Skeleton from '../components/basics/Skeleton/Skeleton';
 
@@ -42,7 +41,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Basic: Story = {
-  name: 'Basic',
   args: {
     width: 160,
     height: 24,

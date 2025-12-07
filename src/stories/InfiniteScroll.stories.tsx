@@ -1,8 +1,9 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import InfiniteScroll, {
+  type InfiniteScrollProps,
+} from '@/components/basics/InfiniteScroll/InfiniteScroll';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import clsx from 'clsx';
 import React from 'react';
-
-import InfiniteScroll, { type InfiniteScrollProps } from './InfiniteScroll';
 
 const DEFAULT_TOTAL = 95;
 const DEFAULT_PAGE_SIZE = 20;
@@ -172,7 +173,7 @@ const DemoList: React.FC<DemoStateProps> = ({
 };
 
 const meta = {
-  title: 'Components/InfiniteScroll',
+  title: 'Components/Basics/InfiniteScroll',
   component: InfiniteScroll,
   tags: ['autodocs'],
   parameters: {

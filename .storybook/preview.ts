@@ -1,6 +1,4 @@
-// .storybook/preview.ts
-// ① 프로젝트 전역에 선언된 Tailwind 디렉티브를 먼저 불러옵니다.
-import type { Preview } from '@storybook/react';
+import type { Preview } from '@storybook/nextjs-vite';
 
 import '../src/styles/globals.css';
 

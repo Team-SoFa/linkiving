@@ -8,8 +8,10 @@ import SVGIcon from '../../Icons/SVGIcon';
 import { IconMapTypes, buttonSizeMap } from '../../Icons/icons';
 import { style } from './IconButton.style';
 
-export interface IconButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'onClick'> {
+export interface IconButtonProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'type' | 'onClick'
+> {
   asChild?: boolean;
   className?: string;
   icon: IconMapTypes; // icon 타입을 .svg 파일로 강제
@@ -59,12 +61,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
         {asChild ? (
           children
         ) : (
-          <SVGIcon
-            icon={icon}
-            size={buttonSizeMap[size]}
-            className="flex-shrink-0"
-            aria-hidden="true"
-          />
+          <SVGIcon icon={icon} size={buttonSizeMap[size]} className="shrink-0" aria-hidden="true" />
         )}
       </Comp>
     );

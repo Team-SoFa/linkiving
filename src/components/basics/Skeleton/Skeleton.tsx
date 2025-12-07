@@ -8,8 +8,7 @@ import { type VariantProps } from 'tailwind-variants';
 import { styles } from './Skeleton.style';
 
 export interface SkeletonProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>,
-    VariantProps<typeof styles> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>, VariantProps<typeof styles> {
   asChild?: boolean;
   isLoading?: boolean;
   width?: number | string;
