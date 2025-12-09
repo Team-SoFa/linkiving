@@ -1,8 +1,7 @@
 import ReactQueryProvider from '@/components/ReactQueryProvider';
 import SideNavigation from '@/components/layout/SideNavigation/SideNavigation';
+import '@/styles/globals.css';
 import type { Metadata } from 'next';
-
-import '../styles/globals.css';
 
 export const metadata: Metadata = {
   title: {
@@ -38,11 +37,6 @@ export const metadata: Metadata = {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-  },
 
   // 검색 인덱싱 정책 (로그인 기반 서비스 기준)
   robots: {
@@ -50,6 +44,8 @@ export const metadata: Metadata = {
     follow: false,
   },
 };
+
+export const viewport = 'width=device-width, initial-scale=1, maximum-scale=1';
 
 export default function RootLayout({
   children,
