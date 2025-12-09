@@ -33,7 +33,7 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
       onKeyDown={handleKeyDown}
       {...rest}
     >
-      <div className="bg-gray900 flex h-22 w-full flex-shrink-0">
+      <div className="bg-gray900 flex h-22 w-full shrink-0">
         <Image
           src={imageUrl ? imageUrl : '/images/default_linkcard_image.png'}
           alt={title}

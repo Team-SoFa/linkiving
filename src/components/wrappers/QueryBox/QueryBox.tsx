@@ -31,7 +31,7 @@ const QueryBox = ({ onSubmit }: QueryBoxProps) => {
   };
 
   return (
-    <div className="relative w-fit shadow-[0_2px_4px_rgba(0,0,0,0.04),_0_4px_8px_rgba(0,0,0,0.04)]">
+    <div className="relative w-fit shadow-[0_2px_4px_rgba(0,0,0,0.04),0_4px_8px_rgba(0,0,0,0.04)]">
       <TextArea
         heightLines={1}
         maxHeightLines={6}

@@ -5,7 +5,7 @@
   "packageManager": "pnpm@10.19.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev --webpack",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "exec eslint .",
@@ -25,6 +25,9 @@
     ]
   },
   "dependencies": {
+    "@emotion/is-prop-valid": "^1.4.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@floating-ui/react-dom": "^2.1.6",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-slot": "^1.2.4",
@@ -71,7 +74,6 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "playwright": "^1.52.0",
-    "postcss-nesting": "^13.0.2",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.1",
     "storybook": "^10.1.4",
