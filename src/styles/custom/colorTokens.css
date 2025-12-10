@@ -8,17 +8,17 @@
   .text-etc-linkcard-summary { @apply text-gray700; }
   
   /* bg-feedback */
-  .bg-feedback-success-light { @apply bg-green50; }
-  .bg-feedback-success-dark { @apply bg-green500; }
+  .bg-success-light { @apply bg-green50; }
+  .bg-success-dark { @apply bg-green500; }
   
-  .bg-feedback-error-light { @apply bg-red50; }
-  .bg-feedback-error-dark { @apply bg-red500; }
+  .bg-error-light { @apply bg-red50; }
+  .bg-error-dark { @apply bg-red500; }
   
   .bg-feedback-inform-light { @apply bg-skyblue50; }
-  .bg-feedback-inform-dark { @apply bg-skyblue500; }
+  .bg-inform-dark { @apply bg-skyblue500; }
   
-  .bg-feedback-warning-light { @apply bg-yellow50; }
-  .bg-feedback-warning-dark { @apply bg-yellow500; }
+  .bg-warning-light { @apply bg-yellow50; }
+  .bg-warning-dark { @apply bg-yellow500; }
   
   /* accent */
   .text-accent-default{ @apply text-blue400; }

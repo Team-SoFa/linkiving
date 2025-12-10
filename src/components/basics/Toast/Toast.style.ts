@@ -15,32 +15,32 @@ export const style = tv({
     },
   },
   compoundVariants: [
-    { variant: 'success', theme: 'light', class: 'bg-feedback-success-light text-default' },
+    { variant: 'success', theme: 'light', class: 'bg-success-light text-default' },
     {
       variant: 'success',
       theme: 'dark',
-      class: 'bg-feedback-success-dark [color:var(--label-primary-default)]',
+      class: 'bg-success-dark [color:var(--label-primary-default)]',
     },
 
-    { variant: 'error', theme: 'light', class: 'bg-feedback-error-light text-default' },
+    { variant: 'error', theme: 'light', class: 'bg-error-light text-default' },
     {
       variant: 'error',
       theme: 'dark',
-      class: 'bg-feedback-error-dark [color:var(--label-primary-default)]',
+      class: 'bg-error-dark [color:var(--label-primary-default)]',
     },
 
-    { variant: 'info', theme: 'light', class: 'bg-feedback-inform-light text-default' },
+    { variant: 'info', theme: 'light', class: 'bg-inform-light text-default' },
     {
       variant: 'info',
       theme: 'dark',
-      class: 'bg-feedback-inform-dark [color:var(--label-primary-default)]',
+      class: 'bg-inform-dark [color:var(--label-primary-default)]',
     },
 
-    { variant: 'warning', theme: 'light', class: 'bg-feedback-warning-light text-default' },
+    { variant: 'warning', theme: 'light', class: 'bg-warning-light text-default' },
     {
       variant: 'warning',
       theme: 'dark',
-      class: 'bg-feedback-warning-dark [color:var(--text-default)]',
+      class: 'bg-warning-dark [color:var(--text-default)]',
     },
   ],
   defaultVariants: {
