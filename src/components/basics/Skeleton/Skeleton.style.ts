@@ -1,7 +1,7 @@
 import { tv } from 'tailwind-variants';
 
 export const styles = tv({
-  base: 'relative isolate overflow-hidden select-none',
+  base: 'bg-gray100 relative isolate overflow-hidden text-transparent select-none',
   variants: {
     radius: {
       none: 'rounded-none',
