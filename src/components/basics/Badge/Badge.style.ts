@@ -6,6 +6,7 @@ export const style = tv({
     variant: {
       primary: 'bg-blue400 text-white',
       neutral: 'bg-gray200 text-gray900',
+      warning: 'bg-warning-dark text-gray800',
     },
     withIcon: {
       true: 'pr-3 pl-2',

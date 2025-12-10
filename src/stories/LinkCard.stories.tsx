@@ -10,7 +10,6 @@ const meta = {
   },
   argTypes: {
     imageUrl: { control: 'text' },
-    isHaveSummary: { control: 'boolean' },
     title: { control: 'text' },
     summary: { control: 'text' },
     link: { control: 'text' },
@@ -24,7 +23,6 @@ type Story = StoryObj<typeof LinkCard>;
 export const Default: Story = {
   args: {
     imageUrl: '',
-    isHaveSummary: false,
     link: 'https://naver.com',
     summary: 'This is a sample bookmark card with a placeholder image.',
     title: 'Link Title',

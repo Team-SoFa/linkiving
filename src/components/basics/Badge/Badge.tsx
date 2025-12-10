@@ -10,7 +10,7 @@ import { style } from './Badge.style';
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   label: React.ReactNode;
   icon?: IconMapTypes | null;
-  variant?: 'primary' | 'neutral';
+  variant?: 'primary' | 'neutral' | 'warning';
 }
 
 export default function Badge({
