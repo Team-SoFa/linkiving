@@ -11,7 +11,7 @@ export const style = tv({
       gray100: 'divider-gray100',
       gray200: 'divider-gray200',
       gray300: 'divider-gray300',
-      blue: 'divider-blue',
+      gray400: 'divider-gray400',
     },
   },
 });
