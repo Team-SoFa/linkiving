@@ -34,10 +34,11 @@
   .text-anchor:focus { @apply focus:text-gray500; }
   
   /* ========== DIVIDER ========== */
-  .divider-gray100 { @apply bg-gray100; }
-  .divider-gray200 { @apply bg-gray200; }
-  .divider-gray300 { @apply bg-gray300; }
-  .divider-blue { @apply bg-gray400; }
+  /* Use direct color values so dividers render even when @apply is not processed (e.g. Storybook/Turbopack). */
+  .divider-gray100 { background-color: var(--color-gray100); }
+  .divider-gray200 { background-color: var(--color-gray200); }
+  .divider-gray300 { background-color: var(--color-gray300); }
+  .divider-blue { background-color: var(--color-gray400); }
 
 
   /* ========== BUTTON ========== */
