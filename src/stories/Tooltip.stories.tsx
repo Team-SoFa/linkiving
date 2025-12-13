@@ -18,12 +18,19 @@ const meta = {
   },
   argTypes: {
     delay: { control: 'number' },
+    offset: { control: 'number' },
+    side: {
+      control: { type: 'select' },
+      options: ['top', 'right', 'bottom', 'left'],
+    },
     content: { control: 'text' },
     children: { control: false },
   },
   args: {
     content: '툴팁',
     delay: 80,
+    offset: 12,
+    side: 'bottom',
   },
 } satisfies Meta<typeof Tooltip>;
 

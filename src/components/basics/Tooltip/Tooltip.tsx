@@ -1,11 +1,15 @@
 'use client';
 
+import { useBoolean, useTimeoutFn, useUpdateEffect } from '@reactuses/core';
 import clsx from 'clsx';
-import React, { useEffect, useId, useRef, useState } from 'react';
+import React, { useId } from 'react';
 
 import { style } from './Tooltip.style';
 
-type Timer = ReturnType<typeof setTimeout>;
+type Side = 'top' | 'bottom' | 'left' | 'right';
+type TooltipInlineStyle = React.CSSProperties & {
+  '--tooltip-offset'?: string;
+};
 
 export interface TooltipProps extends Omit<
   React.HTMLAttributes<HTMLSpanElement>,
@@ -13,6 +17,8 @@ export interface TooltipProps extends Omit<
 > {
   // 동작 관련 props
   content: React.ReactNode;
+  side?: Side;
+  offset?: number;
   delay?: number;
   children: React.ReactNode;
 
@@ -26,6 +32,8 @@ export interface TooltipProps extends Omit<
 const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip(
   {
     content,
+    side = 'bottom',
+    offset = 12,
     delay = 80,
     className,
     children,
@@ -39,39 +47,24 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip
   ref
 ) {
   const id = useId();
-  const [open, setOpen] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const timerRef = useRef<Timer | null>(null);
+  const { value: open, setTrue: openTooltip, setFalse: closeTooltip } = useBoolean(false);
+  const [, startDelayTimer, stopDelayTimer] = useTimeoutFn(openTooltip, delay, {
+    immediate: false,
+  });
 
-  const setOpenSafe = (next: boolean) => {
-    setOpen(next);
-    onOpenChange?.(next);
-  };
+  useUpdateEffect(() => {
+    onOpenChange?.(open);
+  }, [onOpenChange, open]);
 
   const show = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setOpenSafe(true), delay);
+    stopDelayTimer();
+    startDelayTimer();
   };
 
   const hide = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    setOpenSafe(false);
+    stopDelayTimer();
+    closeTooltip();
   };
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
-
-  const getPositionStyle = (): React.CSSProperties => ({
-    top: `${mousePos.y + 8}px`,
-    left: `${mousePos.x + 8}px`,
-    position: 'fixed',
-  });
 
   // 사용자 이벤트 핸들러와 합성
   const handleMouseEnter: React.MouseEventHandler<HTMLSpanElement> = e => {
@@ -82,9 +75,6 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip
     hide();
     onMouseLeave?.(e);
   };
-  const handleMouseMove: React.MouseEventHandler<HTMLSpanElement> = e => {
-    setMousePos({ x: e.clientX, y: e.clientY });
-  };
   const handleFocus: React.FocusEventHandler<HTMLSpanElement> = e => {
     show();
     onFocus?.(e);
@@ -94,13 +84,17 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip
     onBlur?.(e);
   };
 
+  const tooltipClassName = style({ side });
+  const tooltipStyle: TooltipInlineStyle = {
+    '--tooltip-offset': `${offset}px`,
+  };
+
   return (
     <span
       ref={ref}
       className="relative inline-flex"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onMouseMove={handleMouseMove}
       onFocus={handleFocus}
       onBlur={handleBlur}
       {...rest}
@@ -111,8 +105,8 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip
         <span
           id={id}
           role="tooltip"
-          style={getPositionStyle()}
-          className={clsx(style(), className)}
+          style={tooltipStyle}
+          className={clsx(tooltipClassName, className)}
         >
           {content}
         </span>

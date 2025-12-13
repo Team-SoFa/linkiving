@@ -1,5 +1,6 @@
 'use client';
 
+import { useTimeoutFn } from '@reactuses/core';
 import clsx from 'clsx';
 import React, { useEffect } from 'react';
 
@@ -26,13 +27,16 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(function Toast(
   { id, message, duration = 3000, variant = 'info', className, onClose, ...rest },
   ref
 ) {
+  const [, startAutoClose, clearAutoClose] = useTimeoutFn(() => onClose(id), duration, {
+    immediate: false,
+  });
+
   // 자동 닫기
   useEffect(() => {
-    if (duration > 0) {
-      const t = setTimeout(() => onClose(id), duration);
-      return () => clearTimeout(t);
-    }
-  }, [duration, id, onClose]);
+    if (duration <= 0) return;
+    startAutoClose();
+    return clearAutoClose;
+  }, [clearAutoClose, duration, id, startAutoClose]);
 
   const classes = style({ variant, theme: 'light' });
 

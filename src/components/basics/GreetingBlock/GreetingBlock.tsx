@@ -1,5 +1,6 @@
 'use client';
 
+import { useInterval } from '@reactuses/core';
 import { useEffect, useState } from 'react';
 
 import { useGreeting } from './utils/useGreeting';
@@ -13,19 +14,29 @@ const GreetingBlock = ({ context, typingSpeed = 30 }: GreetingBlockProps) => {
   const fullText = useGreeting(context);
   const [displayText, setDisplayText] = useState('');
 
+  const { resume: startTyping, pause: stopTyping } = useInterval(
+    () => {
+      setDisplayText(prev => {
+        if (prev.length >= fullText.length) {
+          stopTyping();
+          return prev;
+        }
+        return prev + fullText.charAt(prev.length);
+      });
+    },
+    typingSpeed,
+    { controls: true }
+  );
+
   useEffect(() => {
     setDisplayText('');
+    stopTyping();
 
-    let index = 0;
-    const interval = setInterval(() => {
-      setDisplayText(prev => prev + fullText.charAt(index));
-      index++;
+    if (!fullText) return;
+    startTyping();
 
-      if (index >= fullText.length) clearInterval(interval);
-    }, typingSpeed);
-
-    return () => clearInterval(interval);
-  }, [fullText, typingSpeed]);
+    return stopTyping;
+  }, [fullText, startTyping, stopTyping, typingSpeed]);
 
   return (
     <div className="font-display flex gap-1 whitespace-pre-wrap">
