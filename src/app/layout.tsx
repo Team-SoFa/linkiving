@@ -1,4 +1,5 @@
 import ReactQueryProvider from '@/components/ReactQueryProvider';
+import ToastContainer from '@/components/basics/Toast/ToastContainer';
 import SideNavigation from '@/components/layout/SideNavigation/SideNavigation';
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
@@ -59,6 +60,7 @@ export default function RootLayout({
         <main className="min-h-screen flex-1 overflow-x-hidden">
           <ReactQueryProvider>{children}</ReactQueryProvider>
         </main>
+        <ToastContainer />
       </body>
     </html>
   );

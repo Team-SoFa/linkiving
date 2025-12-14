@@ -2,9 +2,9 @@ import Button from '@/components/basics/Button/Button';
 import Modal from '@/components/basics/Modal/Modal';
 import TextArea from '@/components/basics/TextArea/TextArea';
 import { useModalStore } from '@/stores/modalStore';
+import { showToast } from '@/stores/toastStore';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller } from 'react-hook-form';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const reportSchema = z.object({
@@ -32,7 +32,12 @@ const ReportModal = () => {
       console.log('신고 내용: ', data.content);
 
       reset();
-      alert('제출되었습니다.');
+      showToast({
+        id: 'report-submit-toast',
+        message: '신고가 제출되었습니다.',
+        variant: 'success',
+        duration: 2000,
+      });
       close();
     } catch (err) {
       if (err instanceof Error) {
