@@ -12,7 +12,7 @@ export const useAutoResizeTextArea = ({ value, maxHeight }: UseAutoResizeTextAre
     const el = ref.current;
     if (!el) return;
 
-    el.style.height = 'auto';
+    el.style.height = '0px';
     const newHeight = el.scrollHeight;
 
     if (maxHeight && newHeight > maxHeight) {

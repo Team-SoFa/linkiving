@@ -1,15 +1,20 @@
 import { tv } from 'tailwind-variants';
 
 export const wholeBoxStyle = tv({
-  base: 'relative inline-block w-full border bg-white pt-2 pr-1 pb-6 pl-3',
+  base: 'relative inline-block w-full pt-2 pr-1 pl-3',
   variants: {
-    variant: {
-      default: 'border-gray100 focus-within:border-gray300',
-    },
     radius: {
       md: 'rounded',
       lg: 'rounded-lg',
       full: 'rounded-full',
+    },
+    color: {
+      white: 'border-gray100 focus-within:border-gray300 border bg-white',
+      blue: 'bg-blue50',
+    },
+    showMaxLength: {
+      true: 'pb-5',
+      false: '',
     },
   },
 });

@@ -18,8 +18,9 @@ const meta = {
       control: 'number',
       description: '최대 글자 수 지정',
     },
+    showMaxLength: { control: 'boolean', description: '최대 글자 수 보임 여부' },
     radius: { control: 'inline-radio' },
-    variant: { control: 'inline-radio' },
+    color: { control: 'inline-radio' },
     textSize: { control: 'inline-radio' },
   },
 } satisfies Meta<typeof TextArea>;
@@ -44,6 +45,7 @@ export const Default: Story = {
   render: args => <InteractiveTextArea {...args} />,
   args: {
     placeholder: '무엇이든 물어보세요',
+    color: 'white',
     heightLines: 3,
     maxHeightLines: 6,
     maxLength: 200,
