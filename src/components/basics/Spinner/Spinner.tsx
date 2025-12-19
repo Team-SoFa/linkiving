@@ -1,27 +1,30 @@
 interface SpinnerProps extends React.SVGProps<SVGSVGElement> {
-  size?: number; // 스피너 가로/세로 크기 (px)
-  strokeWidth?: number; // 테두리 두께(px)
-  color?: string; // 테두리 색상
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'; // 스피너 가로/세로 크기 (px)
   speed?: number; // 회전 속도 (초)
   ariaLabel?: string;
 }
 
-const Spinner = ({
-  size = 40,
-  strokeWidth = 6,
-  color = '#6f00ff',
-  speed = 1.6,
-  ariaLabel = '로딩중',
-}: SpinnerProps) => {
-  const radius = (size - strokeWidth) / 2;
+const strokeWidth = 2.1;
+const bg_stroke_color = '#C7C8CD'; // gray200
+const child_stroke_color = '#7A7C86'; // gray500
+
+const Spinner = ({ size = 'md', speed = 1, ariaLabel = '로딩중' }: SpinnerProps) => {
+  const sizeMap = {
+    xs: 14,
+    sm: 16,
+    md: 18,
+    lg: 20,
+    xl: 24,
+  };
+  const radius = (sizeMap[size] - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius; // 원의 둘레 길이
 
   return (
     <svg
       className="animate-spin"
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
+      width={sizeMap[size]}
+      height={sizeMap[size]}
+      viewBox={`0 0 ${sizeMap[size]} ${sizeMap[size]}`}
       style={{
         animation: `spin ${speed}s linear infinite`,
       }}
@@ -33,20 +36,20 @@ const Spinner = ({
     >
       {/* 배경 원 */}
       <circle
-        cx={size / 2}
-        cy={size / 2}
+        cx={sizeMap[size] / 2}
+        cy={sizeMap[size] / 2}
         r={radius}
-        stroke="#e3e3e3"
+        stroke={bg_stroke_color}
         strokeWidth={strokeWidth}
         fill="none"
       />
       {/* 바 */}
       <circle
-        cx={size / 2}
-        cy={size / 2}
+        cx={sizeMap[size] / 2}
+        cy={sizeMap[size] / 2}
         r={radius}
         fill="transparent"
-        stroke={color}
+        stroke={child_stroke_color}
         strokeWidth={strokeWidth}
         strokeLinecap="round" // round, butt, square
         strokeDasharray={circumference} // 전체 바 길이
