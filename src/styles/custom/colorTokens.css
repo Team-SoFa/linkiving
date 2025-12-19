@@ -48,13 +48,13 @@
   .bg-btn-primary:hover { @apply hover:bg-gray800; }
   .bg-btn-primary:focus { @apply focus:bg-gray800; }
   .bg-btn-primary:active{@apply active:bg-gray700;}
-  .bg-btn-primary:disabled {@apply disabled:bg-gray50; }
+  .bg-btn-primary:disabled {@apply disabled:bg-gray100; }
 
   .border-btn-primary { @apply border-gray900; }
   .border-btn-primary:hover { @apply hover:border-gray800; }
   .border-btn-primary:focus { @apply focus:border-gray800; }
   .border-btn-primary:active { @apply active:border-gray700; }
-  .border-btn-primary:disabled { @apply disabled:border-gray50; } 
+  .border-btn-primary:disabled { @apply disabled:border-gray100; } 
 
   .text-btn-primary { @apply text-white; }
   .text-btn-primary:hover { @apply hover:text-white; }
@@ -67,7 +67,7 @@
   .bg-btn-secondary:hover { @apply hover:bg-blue50; }
   .bg-btn-secondary:focus { @apply focus:bg-blue50; }
   .bg-btn-secondary:active { @apply active:bg-blue100; }
-  .bg-btn-secondary:disabled {@apply disabled:bg-gray50; }
+  .bg-btn-secondary:disabled {@apply disabled:bg-gray100; }
 
   .border-btn-secondary { @apply border-blue300; }
   .border-btn-secondary:hover { @apply hover:border-blue300; }
@@ -86,7 +86,7 @@
   .bg-btn-tertiary-neutral:hover { @apply hover:bg-gray50; }
   .bg-btn-tertiary-neutral:focus { @apply focus:bg-gray50; }
   .bg-btn-tertiary-neutral:active { @apply active:bg-gray100; }
-  .bg-btn-tertiary-neutral:disabled {@apply disabled:bg-gray50; }
+  .bg-btn-tertiary-neutral:disabled {@apply disabled:bg-gray100; }
 
   .border-btn-tertiary-neutral { @apply border-gray200; }
   .border-btn-tertiary-neutral:hover { @apply hover:border-gray200; }
