@@ -6,9 +6,7 @@ const meta = {
   component: Spinner,
   tags: ['autodocs'],
   argTypes: {
-    size: { control: 'number' },
-    strokeWidth: { control: 'number' },
-    color: { control: 'color' },
+    size: { control: 'inline-radio' },
     speed: { control: 'number' },
   },
 } satisfies Meta<typeof Spinner>;
@@ -18,9 +16,7 @@ type Story = StoryObj<typeof Spinner>;
 
 export const Default: Story = {
   args: {
-    size: 40,
-    strokeWidth: 6,
-    color: '#6f00ff',
-    speed: 1.6,
+    size: 'md',
+    speed: 1,
   },
 };
