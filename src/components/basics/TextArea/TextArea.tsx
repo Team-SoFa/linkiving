@@ -12,12 +12,13 @@ export interface TextAreaProps extends Omit<
   'value' | 'onChange' | 'onSubmit'
 > {
   className?: string;
-  variant?: 'default';
+  color?: 'white' | 'blue';
   textSize?: 'sm' | 'md' | 'lg';
   heightLines: number; // 줄 수
   maxHeightLines?: number; // 줄 수
   radius?: 'md' | 'lg' | 'full';
   maxLength?: number;
+  showMaxLength?: boolean;
   placeholder?: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -27,10 +28,11 @@ export interface TextAreaProps extends Omit<
 const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextArea(
   {
     className,
+    color = 'white',
     maxLength = 0,
+    showMaxLength = false,
     placeholder = '무엇이든 물어보세요',
     value,
-    variant = 'default',
     textSize = 'md',
     heightLines,
     maxHeightLines,
@@ -72,7 +74,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
   };
 
   return (
-    <div className={wholeBoxStyle({ variant, radius })}>
+    <div className={wholeBoxStyle({ radius, color, showMaxLength })}>
       <textarea
         ref={ref}
         className={clsx(textAreaStyle({ textSize }), className)}
@@ -85,7 +87,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
         onKeyDown={handleKeyDown}
         {...rest}
       />
-      {maxLength > 0 && (
+      {maxLength > 0 && showMaxLength && (
         <div
           className={clsx(
             'font-detail absolute right-2 bottom-2 select-none',
