@@ -9,7 +9,5 @@ interface CardListProps {
 }
 
 export default function CardList({ children }: CardListProps) {
-  return (
-    <div className="flex w-149 flex-wrap justify-start gap-4 md:w-200 lg:w-251">{children}</div>
-  );
+  return <div className="grid w-full max-w-251 grid-cols-4 gap-4">{children}</div>;
 }

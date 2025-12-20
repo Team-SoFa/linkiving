@@ -1,6 +1,7 @@
 // src/apis/userApi.ts
 import apiClient from '@/apis/apiClient';
 
+// TODO: User types로 통합?
 export interface User {
   id: number;
   name: string;
