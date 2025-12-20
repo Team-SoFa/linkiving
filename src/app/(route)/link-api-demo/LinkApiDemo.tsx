@@ -18,9 +18,6 @@ const defaultCreate = {
   title: '',
   memo: '',
   imageUrl: '',
-  metadataJson: '',
-  tags: '',
-  isImportant: false,
 };
 
 export default function LinkApiDemo() {
@@ -113,15 +110,6 @@ export default function LinkApiDemo() {
               placeholder="링크 제목"
               onChange={e => setCreateForm(prev => ({ ...prev, title: e.target.value }))}
               required
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="create-tags">태그 (콤마 구분)</Label>
-            <Input
-              id="create-tags"
-              value={createForm.tags}
-              placeholder="예) 개발,자료,참고"
-              onChange={e => setCreateForm(prev => ({ ...prev, tags: e.target.value }))}
             />
           </div>
           <div className="col-span-2 flex flex-col gap-2">
@@ -326,8 +314,6 @@ function LinkCardRow({
         </div>
       </div>
 
-      {link.tags && <p className="text-gray600 text-sm">태그: {link.tags}</p>}
-      {link.isImportant && <p className="text-amber600 text-sm">중요 표시됨</p>}
       {error && <p className="text-red500 text-sm">오류: {error}</p>}
     </div>
   );
