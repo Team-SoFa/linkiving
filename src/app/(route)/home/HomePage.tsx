@@ -1,35 +1,20 @@
 'use client';
 
-import GreetingBlock from '@/components/basics/GreetingBlock/GreetingBlock';
-import QueryBox from '@/components/wrappers/QueryBox/QueryBox';
-import { useRouter } from 'next/navigation';
+import GreetingBlock from './_components/GreetingBlock/GreetingBlock';
+import HomeQueryBox from './_components/HomeQueryBox/HomeQueryBox';
 
 export default function Home() {
-  const route = useRouter();
   return (
-    <div className="mt-50 flex flex-col items-center gap-15">
-      <GreetingBlock />
-      <div className="w-180">
-        <QueryBox
-          onSubmit={() => {
-            alert('submit');
-            route.push('/chat');
-          }}
-        />
+    <div className="flex h-screen w-full flex-col items-center justify-center">
+      <div className="mb-7 flex w-fit flex-col">
+        <div className="font-title-md ml-6 flex flex-col gap-1.5 md:flex-row">
+          <span>저장한 링크 속 내용을 바탕으로</span>
+          <span> 답변해 드려요.</span>
+        </div>
+        <GreetingBlock context="default" />
       </div>
-      <div className="flex gap-7">
-        <span className="flex h-15 w-40 items-center justify-center rounded-2xl bg-gray-200">
-          menu
-        </span>
-        <span className="flex h-15 w-40 items-center justify-center rounded-2xl bg-gray-200">
-          menu
-        </span>
-        <span className="flex h-15 w-40 items-center justify-center rounded-2xl bg-gray-200">
-          menu
-        </span>
-        <span className="flex h-15 w-40 items-center justify-center rounded-2xl bg-gray-200">
-          menu
-        </span>
+      <div className="w-full max-w-184 px-4">
+        <HomeQueryBox />
       </div>
     </div>
   );

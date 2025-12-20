@@ -39,7 +39,7 @@ const GreetingBlock = ({ context, typingSpeed = 30 }: GreetingBlockProps) => {
   }, [fullText, startTyping, stopTyping, typingSpeed]);
 
   return (
-    <div className="font-display flex gap-1 whitespace-pre-wrap">
+    <div className="font-display flex gap-1 px-4 whitespace-pre-wrap">
       {displayText}
       <span className="cursor-blink">|</span>
     </div>

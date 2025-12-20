@@ -12,5 +12,6 @@ export const msg = {
   ],
   ETC_MSG: {
     login: '또 만나서 반가워요.',
+    default: '무엇을 찾고 있나요?',
   },
 } as const;

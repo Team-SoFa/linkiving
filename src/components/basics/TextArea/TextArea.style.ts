@@ -12,8 +12,8 @@ export const wholeBoxStyle = tv({
       white: 'border-gray100 focus-within:border-gray300 border bg-white',
       blue: 'bg-blue50',
     },
-    showMaxLength: {
-      true: 'pb-5',
+    setBottomPlace: {
+      true: 'pb-8',
       false: '',
     },
   },

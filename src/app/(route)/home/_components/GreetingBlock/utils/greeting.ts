@@ -6,7 +6,11 @@ export function getDate(): Date {
 
 export function getGreetingMessage(time: Date, context?: string): string {
   // context 우선 적용
-  if (context === 'login') return msg.ETC_MSG.login;
+  if (context === 'login') {
+    return msg.ETC_MSG.login;
+  } else if (context === 'default') {
+    return msg.ETC_MSG.default;
+  }
 
   const hour = time.getHours();
 
@@ -19,7 +23,7 @@ export function greetingText(context?: string): string {
   const now = getDate();
   const base = getGreetingMessage(now, context);
 
-  const extra = msg.RANDOM_MSG[Math.floor(Math.random() * msg.RANDOM_MSG.length)];
+  const extra = context ? '' : msg.RANDOM_MSG[Math.floor(Math.random() * msg.RANDOM_MSG.length)];
 
   return `${base} ${extra}`;
 }
