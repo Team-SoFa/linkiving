@@ -2,8 +2,8 @@ import type {
   DeleteLinkApiResponse,
   DuplicateLinkApiResponse,
   LinkApiResponse,
-  LinkListApiData,
   LinkListApiResponse,
+  LinkListViewData,
 } from '@/types/api/linkApi';
 import type { CreateLinkPayload, Link, UpdateLinkPayload } from '@/types/link';
 
@@ -43,8 +43,8 @@ const withAuth = (init?: RequestInit): RequestInit => {
   return { ...init, headers };
 };
 
-const normalizeLink = (data: Partial<Link> & { imageURL?: string; timestamp?: string }): Link => {
-  const fallbackTimestamp = data.timestamp ?? new Date().toISOString();
+const normalizeLink = (data: Partial<Link>): Link => {
+  const now = new Date().toISOString();
 
   return {
     id: data.id ?? 0,
@@ -52,18 +52,13 @@ const normalizeLink = (data: Partial<Link> & { imageURL?: string; timestamp?: st
     title: data.title ?? '',
     summary: data.summary ?? '',
     memo: data.memo ?? undefined,
-    imageUrl: data.imageUrl ?? data.imageURL ?? '',
-    metadataJson: data.metadataJson,
-    tags: data.tags,
-    isImportant: data.isImportant,
-    isDeleted: data.isDeleted,
-    deletedAt: data.deletedAt,
-    createdAt: data.createdAt ?? fallbackTimestamp,
-    updatedAt: data.updatedAt ?? fallbackTimestamp,
+    imageUrl: data.imageUrl ?? '',
+    createdAt: data.createdAt ?? now,
+    updatedAt: data.updatedAt ?? now,
   };
 };
 
-export const fetchLinks = async (params?: LinkListParams): Promise<LinkListApiData> => {
+export const fetchLinks = async (params?: LinkListParams): Promise<LinkListViewData> => {
   const body = await request<LinkListApiResponse>(
     `${LINKS_ENDPOINT}${buildQuery(params)}`,
     withAuth({ cache: 'no-store' }),

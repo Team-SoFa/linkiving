@@ -8,7 +8,16 @@ export interface ApiResponseBase<T> {
   timestamp?: string;
 }
 
-export type LinkApiData = Link;
+export interface LinkRes {
+  id: number;
+  url: string;
+  title: string;
+  summary?: string;
+  memo?: string;
+  imageUrl?: string;
+}
+
+export type LinkApiData = LinkRes;
 
 export type LinkApiResponse = ApiResponseBase<LinkApiData>;
 
@@ -27,6 +36,10 @@ export interface LinkListApiData {
 }
 
 export type LinkListApiResponse = ApiResponseBase<LinkListApiData>;
+
+export type LinkListViewData = Omit<LinkListApiData, 'content'> & {
+  content: Link[];
+};
 
 export type DeleteLinkApiResponse = ApiResponseBase<string> & { timestamp: string };
 
