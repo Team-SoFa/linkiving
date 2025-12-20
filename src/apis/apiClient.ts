@@ -1,4 +1,5 @@
 // src/apis/apiClient.ts
+import { COOKIES_KEYS } from '@/lib/constants/cookies';
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
@@ -35,9 +36,9 @@ apiClient.interceptors.response.use(
       try {
         // raw axios로만 호출 → 이 호출엔 interceptor가 걸리지 않음
         const { data } = await axios.post(`${API_URL}/auth/refresh`, {
-          refreshToken: localStorage.getItem('REFRESH_TOKEN'),
+          refreshToken: localStorage.getItem(COOKIES_KEYS.REFRESH_TOKEN),
         });
-        localStorage.setItem('ACCESS_TOKEN', data.accessToken);
+        localStorage.setItem(COOKIES_KEYS.ACCESS_TOKEN, data.accessToken);
 
         // 갱신된 토큰으로 헤더 재설정 후 원래 요청 재실행
         originalRequest.headers!['Authorization'] = `Bearer ${data.accessToken}`;

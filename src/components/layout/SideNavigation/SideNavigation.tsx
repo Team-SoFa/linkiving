@@ -4,11 +4,12 @@ import { useModalStore } from '@/stores/modalStore';
 import { useSideNavStore } from '@/stores/sideNavStore';
 import { motion } from 'framer-motion';
 
-import AddLinkButton from './components/AddLink/AddLinkButton';
-import AddLinkModal from './components/AddLinkModal/AddLinkModal';
-import AllLinkButton from './components/AllLink/AllLinkButton';
-import NewChatButton from './components/NewChat/NewChatButton';
-import SideNavHeaderIconButton from './components/SideNavToggle/SideNavToggle';
+import AddLinkButton from './components/AddLinkButton';
+import AddLinkModal from './components/AddLinkModal';
+import AllLinkButton from './components/AllLinkButton';
+import MypageButton from './components/MypageButton';
+import NewChatButton from './components/NewChatButton';
+import SideNavHeaderIconButton from './components/SideNavToggle';
 
 export default function SideNavigation() {
   const { type, open } = useModalStore();
@@ -24,7 +25,7 @@ export default function SideNavigation() {
       <motion.div
         animate={{ width: isOpen ? 240 : 80 }} // px 단위도 가능
         transition={{ type: 'spring', stiffness: 200, damping: 24 }}
-        className="bg-gray50 h-screen p-5 shadow-md"
+        className="bg-gray50 flex h-screen flex-col justify-between overflow-hidden p-5 shadow-md"
       >
         <div>
           {/* 사이드 메뉴 헤더 */}
@@ -56,6 +57,7 @@ export default function SideNavigation() {
             ))}
           </nav>
         </div>
+        <MypageButton />
       </motion.div>
       {type === 'ADD_LINK' && <AddLinkModal />}
     </>
