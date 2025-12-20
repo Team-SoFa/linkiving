@@ -18,7 +18,7 @@ export interface TextAreaProps extends Omit<
   maxHeightLines?: number; // 줄 수
   radius?: 'md' | 'lg' | 'full';
   maxLength?: number;
-  showMaxLength?: boolean;
+  setBottomPlace?: boolean;
   placeholder?: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -30,7 +30,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
     className,
     color = 'white',
     maxLength = 0,
-    showMaxLength = false,
+    setBottomPlace = false,
     placeholder = '무엇이든 물어보세요',
     value,
     textSize = 'md',
@@ -74,10 +74,10 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
   };
 
   return (
-    <div className={wholeBoxStyle({ radius, color, showMaxLength })}>
+    <div className={clsx(wholeBoxStyle({ radius, color, setBottomPlace }), className)}>
       <textarea
         ref={ref}
-        className={clsx(textAreaStyle({ textSize }), className)}
+        className={textAreaStyle({ textSize })}
         value={value}
         placeholder={placeholder}
         aria-label={placeholder}
@@ -87,7 +87,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
         onKeyDown={handleKeyDown}
         {...rest}
       />
-      {maxLength > 0 && showMaxLength && (
+      {maxLength > 0 && setBottomPlace && (
         <div
           className={clsx(
             'font-detail absolute right-2 bottom-2 select-none',

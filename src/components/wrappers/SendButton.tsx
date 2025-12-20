@@ -14,7 +14,7 @@ const SendButton = ({ disabled, onClick }: SendButtonProps) => {
       size="sm"
       variant="tertiary_subtle"
       contextStyle="onMain"
-      className="absolute right-0 bottom-0 mr-3 mb-1"
+      className="absolute right-0 bottom-0 mr-3 mb-2"
     />
   );
 };

@@ -24,7 +24,7 @@ export default function SideNavigation() {
       <motion.div
         animate={{ width: isOpen ? 240 : 80 }} // px 단위도 가능
         transition={{ type: 'spring', stiffness: 200, damping: 24 }}
-        className="bg-gray50 h-screen overflow-hidden p-5 shadow-md"
+        className="bg-gray50 h-screen p-5 shadow-md"
       >
         <div>
           {/* 사이드 메뉴 헤더 */}

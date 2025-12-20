@@ -1,4 +1,4 @@
-import QueryBox from '@/components/wrappers/QueryBox/QueryBox';
+import QueryBox from '@/app/(route)/home/_components/HomeQueryBox/HomeQueryBox';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
