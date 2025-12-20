@@ -1,8 +1,9 @@
-import ReactQueryProvider from '@/components/ReactQueryProvider';
+// app/layout.tsx
 import ToastContainer from '@/components/basics/Toast/ToastContainer';
-import SideNavigation from '@/components/layout/SideNavigation/SideNavigation';
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
+
+import LayoutClient from './layout-client';
 
 export const metadata: Metadata = {
   title: {
@@ -55,11 +56,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="flex min-h-screen bg-white">
-        <SideNavigation />
-        <main className="min-h-screen flex-1 overflow-x-hidden">
-          <ReactQueryProvider>{children}</ReactQueryProvider>
-        </main>
+      <body>
+        <LayoutClient>{children}</LayoutClient>
         <ToastContainer />
       </body>
     </html>

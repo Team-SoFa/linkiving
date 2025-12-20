@@ -1,5 +1,5 @@
-import Home from './(route)/home/HomePage';
+import Landing from './LandingPage';
 
-export default function homepage() {
-  return <Home />;
+export default function page() {
+  return <Landing />;
 }
