@@ -6,14 +6,17 @@ import { useMutation } from '@tanstack/react-query';
 import { FetchError } from './util/server/safeFetch';
 import { safeFetch } from './util/server/safeFetch';
 
-interface ReportReauest {
+interface ReportRequest {
   content: string;
 }
 
 export default function usePostReport(onSuccess?: () => void) {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   const mutation = useMutation({
-    mutationFn: async (data: ReportReauest) => {
-      return await safeFetch('/api/reports', {
+    mutationFn: async (data: ReportRequest) => {
+      return await safeFetch(`${API_BASE_URL}/v1/reports`, {
+        // TODO: 백엔드 업로드 및 env 작성 후 엔드포인트 수정
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
