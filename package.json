@@ -13,7 +13,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "format": "prettier --plugin=@trivago/prettier-plugin-sort-imports --config .prettierrc --write \"src/**/*.{js,jsx,ts,tsx}\"",
-    "chromatic": "pnpm exec chromatic --project-token=chpt_219dd64304c7da8"
+    "chromatic": "node scripts/run-chromatic.js"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [

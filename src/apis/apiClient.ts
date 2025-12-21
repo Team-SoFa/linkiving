@@ -1,8 +1,14 @@
 // src/apis/apiClient.ts
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
+const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
+
+if (!API_URL) {
+  throw new Error('Missing environment variable: NEXT_PUBLIC_BASE_API_URL');
+}
+
 const apiClient = axios.create({
-  baseURL: 'https://jsonplaceholder.typicode.com',
+  baseURL: API_URL,
   timeout: 5000,
 });
 
@@ -28,7 +34,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && originalRequest.url !== '/auth/refresh') {
       try {
         // raw axios로만 호출 → 이 호출엔 interceptor가 걸리지 않음
-        const { data } = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/refresh`, {
+        const { data } = await axios.post(`${API_URL}/auth/refresh`, {
           refreshToken: localStorage.getItem('REFRESH_TOKEN'),
         });
         localStorage.setItem('ACCESS_TOKEN', data.accessToken);
