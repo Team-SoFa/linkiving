@@ -9,10 +9,18 @@ import type { CreateLinkPayload, Link, UpdateLinkPayload } from '@/types/link';
 
 import { request } from './http';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://43.200.105.93';
-const LINKS_ENDPOINT = `${API_BASE_URL}/v1/links`;
-const DEV_FALLBACK_TOKEN =
-  'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMUBsaW5raXZpbmcuY29tIiwidG9rZW5fdHlwZSI6ImFjY2VzcyIsImlhdCI6MTc2NjA3NjEwNSwiZXhwIjo5NzY2MDc5NzA1fQ.Gmc1VkeGtG4stsg5px1tWWG7c6BU8zKjkVTpJBgaAkY';
+const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
+const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
+
+if (!API_URL) {
+  throw new Error('Missing environment variable: NEXT_PUBLIC_BASE_API_URL');
+}
+
+if (!API_TOKEN) {
+  throw new Error('Missing environment variable: NEXT_PUBLIC_API_TOKEN');
+}
+
+const LINKS_ENDPOINT = `${API_URL}/v1/links`;
 
 export type LinkListParams = {
   page?: number;
@@ -34,9 +42,8 @@ function buildQuery(params?: LinkListParams) {
 }
 
 const withAuth = (init?: RequestInit): RequestInit => {
-  const token = process.env.NEXT_PUBLIC_API_TOKEN ?? DEV_FALLBACK_TOKEN;
   const headers: HeadersInit = {
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${API_TOKEN}`,
     ...(init?.headers ?? {}),
   };
 
