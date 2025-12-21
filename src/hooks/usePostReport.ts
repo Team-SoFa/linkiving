@@ -1,25 +1,16 @@
 'use client';
 
+import { createReport } from '@/apis/report';
 import { showToast } from '@/stores/toastStore';
+import type { ReportRequest } from '@/types/api/report';
 import { useMutation } from '@tanstack/react-query';
 
 import { FetchError } from './util/server/safeFetch';
-import { safeFetch } from './util/server/safeFetch';
-
-interface ReportReauest {
-  content: string;
-}
 
 export default function usePostReport(onSuccess?: () => void) {
   const mutation = useMutation({
-    mutationFn: async (data: ReportReauest) => {
-      return await safeFetch('/api/reports', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-        timeout: 10000,
-      });
-    },
+    mutationFn: (data: ReportRequest) => createReport(data),
+
     onSuccess: () => {
       showToast({
         id: 'report-submit-toast',

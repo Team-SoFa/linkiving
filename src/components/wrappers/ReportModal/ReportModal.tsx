@@ -27,7 +27,7 @@ const ReportModal = () => {
     return true;
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!validate(content)) return;
 
@@ -58,7 +58,11 @@ const ReportModal = () => {
         />
 
         {validationError && <p className="text-red500 text-sm">{validationError}</p>}
-        <Button type="submit" label="제출하기" disabled={content.length < 5 || isLoading} />
+        <Button
+          type="submit"
+          label="제출하기"
+          disabled={content.length < 5 || content.length > 500 || isLoading}
+        />
       </form>
     </Modal>
   );
