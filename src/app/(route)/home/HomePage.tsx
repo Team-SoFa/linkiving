@@ -1,5 +1,6 @@
 'use client';
 
+import LinkApiDemo from '../link-api-demo/LinkApiDemo';
 import GreetingBlock from './_components/GreetingBlock/GreetingBlock';
 import HomeQueryBox from './_components/HomeQueryBox';
 
@@ -16,6 +17,7 @@ export default function Home() {
       <div className="w-full max-w-184 px-4">
         <HomeQueryBox />
       </div>
+      <LinkApiDemo />
     </div>
   );
 }

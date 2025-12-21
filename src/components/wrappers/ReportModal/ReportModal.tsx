@@ -10,7 +10,7 @@ const ReportModal = () => {
   const [content, setContent] = useState('');
   const [validationError, setValidationError] = useState('');
   const { submit, isLoading } = usePostReport(() => {
-    setContent('');
+    setValidationError('');
     close();
   });
 
@@ -27,8 +27,9 @@ const ReportModal = () => {
     return true;
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     if (!validate(content)) return;
 
     submit({ content });
@@ -36,29 +37,47 @@ const ReportModal = () => {
 
   return (
     <Modal type="REPORT">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="space-y-2">
-          <span className="font-title-md">의견 보내기</span>
-          <div className="flex flex-col gap-2">
-            <span className="font-body-md">어떤 점이 마음에 들지 않으셨나요?</span>
+      <form onSubmit={handleSubmit} className="flex w-full max-w-150 flex-col gap-4 p-4">
+        <div className="flex flex-col gap-2">
+          <span className="font-title-md">문제 보내기</span>
+          <div className="flex flex-col">
             <span className="font-body-md">
-              자세한 답변을 알려주시면 더 좋은 서비스를 만드는 데 도움이 됩니다.
+              어떤 점이 마음에 들지 않으셨나요? 자세한 답변을 알려주시면 더 좋은 서비스를 만드는 데
+              도움이 됩니다.
             </span>
           </div>
         </div>
-        <TextArea
-          value={content}
-          placeholder="어떤 문제를 겪으셨나요?"
-          heightLines={5}
-          className="w-150"
-          onChange={e => {
-            setContent(e.target.value);
-            if (validationError) validate(e.target.value);
-          }}
-        />
+        <div>
+          <TextArea
+            id="report-content"
+            value={content}
+            placeholder="어떤 문제를 겪으셨나요?"
+            radius="lg"
+            heightLines={4}
+            maxHeightLines={4}
+            showMax
+            maxLength={500}
+            className="w-150"
+            aria-invalid={!!validationError}
+            aria-describedby={validationError ? 'report-error' : undefined}
+            onChange={e => {
+              const next = e.target.value;
+              setContent(next);
+              validate(next);
+            }}
+          />
 
-        {validationError && <p className="text-red500 text-sm">{validationError}</p>}
-        <Button type="submit" label="제출하기" disabled={content.length < 5 || isLoading} />
+          {validationError && (
+            <p id="report-error" role="alert" className="text-red500 text-sm">
+              {validationError}
+            </p>
+          )}
+        </div>
+        <Button
+          type="submit"
+          label="제출하기"
+          disabled={content.length < 5 || content.length > 500 || isLoading}
+        />
       </form>
     </Modal>
   );

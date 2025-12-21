@@ -24,7 +24,7 @@ export default function LinkApiDemo() {
   const [createForm, setCreateForm] = useState(defaultCreate);
   const [duplicateUrl, setDuplicateUrl] = useState('');
   const [duplicateQueryUrl, setDuplicateQueryUrl] = useState<string | undefined>();
-  const { data, isLoading, isError, refetch } = useGetLinks({ page: 0, size: 20 });
+  const { data, isLoading, isError, refetch } = useGetLinks({ size: 20 });
   const createMut = usePostLinks();
   const deleteMut = useDeleteLink();
   const updateTitleMut = useUpdateLinkTitle();
@@ -38,10 +38,11 @@ export default function LinkApiDemo() {
   useEffect(() => {
     if (createMut.isSuccess) {
       setCreateForm(defaultCreate);
+      refetch();
     }
-  }, [createMut.isSuccess]);
+  }, [createMut.isSuccess, refetch]);
 
-  const links = useMemo(() => data?.content ?? [], [data]);
+  const links = useMemo(() => data?.links ?? [], [data]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -169,7 +170,7 @@ export default function LinkApiDemo() {
         <div className="mb-3 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold">링크 목록</h2>
-            <p className="text-gray600 text-sm">총 {data?.totalElements ?? 0}개</p>
+            <p className="text-gray600 text-sm">{links.length}개</p>
           </div>
           <Button variant="secondary" label="새로고침" onClick={() => refetch()} />
         </div>

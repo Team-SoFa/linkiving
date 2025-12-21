@@ -59,12 +59,22 @@ export async function safeFetch<T = unknown>(
     // HTTP 상태 코드 체크
     if (!res.ok) {
       let bodyText: string | undefined;
+
       try {
         const text = await res.text();
         bodyText = text.length > maxErrorBodyBytes ? text.slice(0, maxErrorBodyBytes) + '…' : text;
-      } catch {
+      } catch (e) {
         bodyText = undefined;
       }
+
+      console.error('[safeFetch][HTTP ERROR]', {
+        url,
+        status: res.status,
+        statusText: res.statusText,
+        headers: Object.fromEntries(res.headers.entries()),
+        body: bodyText,
+      });
+
       throw new FetchError(`Request failed with status ${res.status}`, {
         status: res.status,
         body: bodyText,

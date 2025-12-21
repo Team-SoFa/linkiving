@@ -1,3 +1,4 @@
+// apis/linkApi.ts (BFF 기준으로 정리된 최종본)
 import { type SafeFetchOptions, safeFetch } from '@/hooks/util/server/safeFetch';
 import type {
   DeleteLinkApiResponse,
@@ -8,51 +9,32 @@ import type {
 } from '@/types/api/linkApi';
 import type { CreateLinkPayload, Link, UpdateLinkPayload } from '@/types/link';
 
-const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
-const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
-
-if (!API_URL) {
-  throw new Error('Missing environment variable: NEXT_PUBLIC_BASE_API_URL');
-}
-
-if (!API_TOKEN) {
-  throw new Error('Missing environment variable: NEXT_PUBLIC_API_TOKEN');
-}
-
-const LINKS_ENDPOINT = `${API_URL}/v1/links`;
+// ✅ BFF 엔드포인트
+const LINKS_ENDPOINT = '/api/links';
 
 export type LinkListParams = {
-  page?: number;
+  lastId?: number;
   size?: number;
-  sort?: string[] | string;
 };
 
 function buildQuery(params?: LinkListParams) {
   if (!params) return '';
+
   const usp = new URLSearchParams();
-  if (params.page !== undefined) usp.set('page', String(params.page));
+
+  if (params.lastId !== undefined) usp.set('lastId', String(params.lastId));
   if (params.size !== undefined) usp.set('size', String(params.size));
-  if (params.sort) {
-    const sorts = Array.isArray(params.sort) ? params.sort : [params.sort];
-    sorts.forEach(s => usp.append('sort', s));
-  }
+
   const qs = usp.toString();
   return qs ? `?${qs}` : '';
 }
 
-const withAuth = (init?: SafeFetchOptions): SafeFetchOptions => {
-  const headers: HeadersInit = {
-    Authorization: `Bearer ${API_TOKEN}`,
-    ...(init?.headers ?? {}),
-  };
-
-  return {
-    timeout: 15_000,
-    jsonContentTypeCheck: true,
-    ...init,
-    headers,
-  };
-};
+// ✅ Authorization 제거 (BFF가 처리)
+const baseOptions = (init?: SafeFetchOptions): SafeFetchOptions => ({
+  timeout: 15_000,
+  jsonContentTypeCheck: false,
+  ...init,
+});
 
 const normalizeLink = (data: Partial<Link>): Link => {
   const now = new Date().toISOString();
@@ -72,7 +54,7 @@ const normalizeLink = (data: Partial<Link>): Link => {
 export const fetchLinks = async (params?: LinkListParams): Promise<LinkListViewData> => {
   const body = await safeFetch<LinkListApiResponse>(
     `${LINKS_ENDPOINT}${buildQuery(params)}`,
-    withAuth({ cache: 'no-store' })
+    baseOptions({ cache: 'no-store' })
   );
 
   if (!body?.data || !body.success) {
@@ -80,15 +62,16 @@ export const fetchLinks = async (params?: LinkListParams): Promise<LinkListViewD
   }
 
   return {
-    ...body.data,
-    content: body.data.content.map(normalizeLink),
+    links: body.data.links.map(normalizeLink),
+    hasNext: body.data.hasNext,
+    lastId: body.data.lastId,
   };
 };
 
 export const createLink = async (payload: CreateLinkPayload): Promise<Link> => {
   const body = await safeFetch<LinkApiResponse>(
     LINKS_ENDPOINT,
-    withAuth({
+    baseOptions({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -105,7 +88,7 @@ export const createLink = async (payload: CreateLinkPayload): Promise<Link> => {
 export const fetchLink = async (id: number): Promise<Link> => {
   const body = await safeFetch<LinkApiResponse>(
     `${LINKS_ENDPOINT}/${id}`,
-    withAuth({ cache: 'no-store' })
+    baseOptions({ cache: 'no-store' })
   );
 
   if (!body?.data || !body.success) {
@@ -118,7 +101,7 @@ export const fetchLink = async (id: number): Promise<Link> => {
 export const updateLink = async (id: number, payload: UpdateLinkPayload): Promise<Link> => {
   const body = await safeFetch<LinkApiResponse>(
     `${LINKS_ENDPOINT}/${id}`,
-    withAuth({
+    baseOptions({
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -135,7 +118,7 @@ export const updateLink = async (id: number, payload: UpdateLinkPayload): Promis
 export const updateLinkTitle = async (id: number, title: string): Promise<Link> => {
   const body = await safeFetch<LinkApiResponse>(
     `${LINKS_ENDPOINT}/${id}/title`,
-    withAuth({
+    baseOptions({
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title }),
@@ -152,7 +135,7 @@ export const updateLinkTitle = async (id: number, title: string): Promise<Link> 
 export const updateLinkMemo = async (id: number, memo: string): Promise<Link> => {
   const body = await safeFetch<LinkApiResponse>(
     `${LINKS_ENDPOINT}/${id}/memo`,
-    withAuth({
+    baseOptions({
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ memo }),
@@ -169,10 +152,10 @@ export const updateLinkMemo = async (id: number, memo: string): Promise<Link> =>
 export const deleteLink = async (id: number): Promise<DeleteLinkApiResponse> => {
   const body = await safeFetch<DeleteLinkApiResponse>(
     `${LINKS_ENDPOINT}/${id}`,
-    withAuth({ method: 'DELETE' })
+    baseOptions({ method: 'DELETE' })
   );
 
-  if (!body || typeof body.success !== 'boolean' || !body.status || !body.message) {
+  if (!body || typeof body.success !== 'boolean') {
     throw new Error(body?.message ?? 'Invalid response');
   }
 
@@ -183,9 +166,10 @@ export const checkDuplicateLink = async (
   url: string
 ): Promise<{ exists: boolean; linkId?: number }> => {
   const usp = new URLSearchParams({ url });
+
   const body = await safeFetch<DuplicateLinkApiResponse>(
     `${LINKS_ENDPOINT}/duplicate?${usp.toString()}`,
-    withAuth({ cache: 'no-store' })
+    baseOptions({ cache: 'no-store' })
   );
 
   if (!body?.data || typeof body.data.exists !== 'boolean') {

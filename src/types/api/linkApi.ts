@@ -1,4 +1,4 @@
-import type { Link, PageSort, Pageable } from '@/types/link';
+import type { Link } from '@/types/link';
 
 export interface ApiResponseBase<T> {
   success: boolean;
@@ -22,26 +22,22 @@ export type LinkApiData = LinkRes;
 export type LinkApiResponse = ApiResponseBase<LinkApiData>;
 
 export interface LinkListApiData {
-  totalPages: number;
-  totalElements: number;
-  pageable: Pageable;
-  numberOfElements: number;
-  size: number;
-  content: LinkApiData[];
-  number: number;
-  sort: PageSort;
-  first: boolean;
-  last: boolean;
-  empty: boolean;
+  links: LinkRes[];
+  hasNext: boolean;
+  lastId: number | null;
 }
 
 export type LinkListApiResponse = ApiResponseBase<LinkListApiData>;
 
-export type LinkListViewData = Omit<LinkListApiData, 'content'> & {
-  content: Link[];
-};
+export interface LinkListViewData {
+  links: Link[];
+  hasNext: boolean;
+  lastId: number | null;
+}
 
-export type DeleteLinkApiResponse = ApiResponseBase<string> & { timestamp: string };
+export type DeleteLinkApiResponse = ApiResponseBase<string> & {
+  timestamp: string;
+};
 
 export type DuplicateLinkApiResponse = ApiResponseBase<{
   exists: boolean;
