@@ -1,5 +1,7 @@
 'use client';
 
+import { mockChats } from '@/mocks';
+import { useChatStore } from '@/stores/chatStore';
 import { useModalStore } from '@/stores/modalStore';
 import { useSideNavStore } from '@/stores/sideNavStore';
 import { motion } from 'framer-motion';
@@ -7,18 +9,28 @@ import { motion } from 'framer-motion';
 import AddLinkButton from './components/AddLink/AddLinkButton';
 import AddLinkModal from './components/AddLinkModal/AddLinkModal';
 import AllLinkButton from './components/AllLink/AllLinkButton';
+import ChatRoomList from './components/ChatRoomList/ChatRoomList';
 import NewChatButton from './components/NewChat/NewChatButton';
 import SideNavHeaderIconButton from './components/SideNavToggle/SideNavToggle';
 
 export default function SideNavigation() {
   const { type, open } = useModalStore();
   const { isOpen, toggle } = useSideNavStore();
+  const { chats, activeChatId } = useChatStore();
+  const useMockData = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
 
   const MENU_ITEMS = [
     { id: 'new-chat', item: <NewChatButton /> },
     { id: 'add-link', item: <AddLinkButton onClick={() => open('ADD_LINK')} /> },
     { id: 'all-link', item: <AllLinkButton /> },
   ];
+
+  const resolvedChats = useMockData && chats.length === 0 ? mockChats : chats;
+  const chatRooms = resolvedChats.map(chat => ({
+    id: chat.id,
+    title: chat.title,
+    href: `/chat?chatId=${chat.id}`,
+  }));
   return (
     <>
       <motion.div
@@ -55,6 +67,8 @@ export default function SideNavigation() {
               </div>
             ))}
           </nav>
+
+          <ChatRoomList items={chatRooms} activeId={activeChatId} />
         </div>
       </motion.div>
       {type === 'ADD_LINK' && <AddLinkModal />}
