@@ -1,3 +1,4 @@
+import IC_Account from './svgs/account_circle.svg';
 import IC_AllLink from './svgs/all_link.svg';
 import IC_ArrowdropDown from './svgs/arrowdrop_down.svg';
 import IC_ArrowdropLeft from './svgs/arrowdrop_left.svg';
@@ -66,6 +67,7 @@ export const IconMap = {
   IC_Undo,
   IC_Up,
   IC_Warning,
+  IC_Account,
 } as const;
 
 export type IconMapTypes = keyof typeof IconMap;
