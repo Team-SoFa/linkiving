@@ -4,7 +4,7 @@ import { useModalStore } from '@/stores/modalStore';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
-  title: 'Components/Wrappers/SummaryRegeneratingModal',
+  title: 'Components/Wrappers/ReSummaryModal',
   component: ReSummaryModal,
   tags: ['autodocs'],
   argTypes: {},
