@@ -1,32 +1,50 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { fetchNewSummary } from '@/apis/summary';
+import { FetchError } from '@/hooks/util/server/safeFetch';
+import { showToast } from '@/stores/toastStore';
+import { ReSummaryRequest } from '@/types/api/summaryApi';
+import { useMutation } from '@tanstack/react-query';
 
-export default function useReSummary() {
-  const [loading] = useState(false);
-  const [error] = useState<string | null>(null);
-  const [writing] = useState(false);
+type Format = ReSummaryRequest['format'];
 
-  useEffect(() => {
-    const reSummary = () => {
-      // TODO: API 연결 시 구현
-      //   try {
-      //     setLoading(true);
-      //     setError(null);
-      //     // 재생성한 요약 데이터 받아오기
-      //     setWriting(false);
-      //   } catch (err) {
-      //     if (err instanceof Error) {
-      //       setError(err.message);
-      //     } else {
-      //       setError('알 수 없는 오류가 발생했습니다.');
-      //     }
-      //   } finally {
-      //     setLoading(false);
-      //   }
-      // };
-    };
-    reSummary();
+export default function useReSummary(id: number, format: Format = 'DETAILED') {
+  const mutation = useMutation({
+    mutationFn: () =>
+      fetchNewSummary({
+        id,
+        format,
+      }),
+
+    onSuccess: () => {
+      showToast({
+        id: 'resummary-success',
+        message: '요약이 업데이트 되었습니다.',
+        variant: 'success',
+      });
+    },
+    onError: err => {
+      let errorMessage = '요약 업데이트에 실패했습니다.';
+
+      if (err instanceof FetchError) {
+        errorMessage = err.status === 500 ? '서버 오류가 발생했습니다.' : err.message;
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+
+      showToast({
+        id: 'resummary-failed',
+        message: errorMessage,
+        variant: 'error',
+      });
+    },
   });
-  return { loading, writing, error };
+
+  return {
+    mutate: mutation.mutate,
+    isLoading: mutation.isPending,
+    isSuccess: mutation.isSuccess,
+    error: mutation.error,
+    data: mutation.data,
+  };
 }

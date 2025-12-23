@@ -1,68 +1,77 @@
 'use client';
 
-import SVGIcon from '@/components/Icons/SVGIcon';
 import Badge from '@/components/basics/Badge/Badge';
+import IconButton from '@/components/basics/IconButton/IconButton';
 import Modal from '@/components/basics/Modal/Modal';
+import ProgressNotification from '@/components/basics/ProgressNotification/ProgressNotification';
+import clsx from 'clsx';
+import { useEffect } from 'react';
 
+import NewSummary from './NewSummary';
 import PostReSummaryButton from './PostReSummaryButton';
+import PrevSummary from './PrevSummary';
 import useReSummary from './hooks/useReSummary';
 
-const DIFF =
-  '어쩌구 저쩌구 어쩌구 저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구 어쩌구저쩌구';
-const PREV =
-  '기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. 기존 요약입니다. ';
-const NEW =
-  '새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. 새로운 요약입니다. ';
+interface ReSummaryProps {
+  summaryId: number;
+}
 
-// interface ReSummary {
-//   id: string;
-// }
+export default function ReSummaryModal({ summaryId }: ReSummaryProps) {
+  const { mutate, isLoading, error, data } = useReSummary(summaryId);
 
-export default function ReSummaryModal() {
-  const { loading, writing, error } = useReSummary();
+  useEffect(() => {
+    mutate();
+  }, [mutate, summaryId]);
+
+  const prevContent = data?.existingSummary ?? '';
+  const newContent = data?.newSummary ?? '';
+  const comparison = data?.comparison ?? '';
 
   return (
-    <Modal type="RE_SUMMARY" className="m-10 max-w-240 min-w-150">
-      <div>
-        {loading && (
-          <div className="flex gap-2">
-            <span>SUMMARY COMPARE</span>
-            <SVGIcon icon="IC_SumGenerate" />
-            <span>요약 재생성 중입니다...</span>
+    <Modal
+      type="RE_SUMMARY"
+      className={clsx('m-10 max-w-240 min-w-150', error && 'border-red500 border')}
+    >
+      <div className="p-2">
+        <span className="font-title-md">요약 비교</span>
+        {isLoading && (
+          <div className="text-gray500 flex gap-2">
+            <ProgressNotification animated={isLoading} />
           </div>
         )}
-        {error && <div>에러가 발생했습니다.</div>}
-        {!loading && !error && (
+        {error && (
+          <div className="text-red500 mb-64 flex items-center gap-2">
+            <span className="font-body-md">요약 재생성 중 문제가 발생했습니다.</span>
+            <IconButton
+              icon="IC_Regenerate"
+              size="sm"
+              variant="tertiary_subtle"
+              ariaLabel="요약 재생성 재시도"
+            />
+          </div>
+        )}
+        {!isLoading && !error && (
           <div className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
-              <span className="font-title-md">요약 비교</span>
-              <span className="relative flex gap-2 rounded-lg bg-white p-2">
-                <Badge label="WHAT'S CHANGED" className="h-fit" />
-                <span className="custom-scrollbar font-body-md max-h-20 w-full overflow-auto">
-                  {DIFF}
-                </span>
+              <span className="relative flex items-center gap-2 rounded-lg bg-white p-2">
+                <Badge icon="IC_SumGenerate" label="변화 지점" className="h-fit" />
+                <span className="font-label-md w-full truncate">{comparison}</span>
               </span>
             </div>
             <div className="flex gap-2">
-              <div className="flex flex-1 flex-col gap-2">
-                <span className="font-title-sm">기존 요약</span>
-                <div className="rounded-lg bg-white p-2">
-                  <div className="custom-scrollbar h-45 overflow-auto pr-1">{PREV}</div>
-                </div>
-              </div>
-              <div className="flex flex-1 flex-col gap-2">
-                <span className="font-title-sm">재생성 요약</span>
-                <div className="rounded-lg bg-white p-2">
-                  <div className="custom-scrollbar h-45 overflow-auto pr-1">{NEW}</div>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <PostReSummaryButton type="prev" isWriting={writing} />
-              <PostReSummaryButton type="new" isWriting={writing} />
+              <PrevSummary content={prevContent} />
+              <NewSummary content={newContent} />
             </div>
           </div>
         )}
+        <div className="flex gap-2">
+          <PostReSummaryButton type="prev" disabled={isLoading} />
+          <PostReSummaryButton
+            type="new"
+            disabled={!!error || isLoading}
+            onClick={() => console.log('new')} // TODO: 재생성된 요약 저장 api 구현 후 연결
+          />
+        </div>
       </div>
     </Modal>
   );
