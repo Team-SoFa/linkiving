@@ -1,45 +1,33 @@
 import Button from '@/components/basics/Button/Button';
-// import Toast from '@/components/basics/Toast/Toast';
 import { useModalStore } from '@/stores/modalStore';
+import { showToast } from '@/stores/toastStore';
 
 interface Props {
+  disabled: boolean;
   type: 'prev' | 'new';
-  isWriting?: boolean;
-  // content: string;
+  onClick?: () => void;
 }
 
-export default function PostReSummaryButton({ type, isWriting }: Props) {
+export default function PostReSummaryButton({ type, disabled, onClick }: Props) {
   const { close } = useModalStore();
-  // const [toastVisible, setToastVisible] = useState(false);
 
-  const onClick = () => {
+  const handleClick = async () => {
+    await onClick?.();
     close();
-    // setToastVisible(true);
+    showToast({
+      id: type === 'prev' ? 'save-prev' : 'save-new',
+      message: type === 'prev' ? '기존 요약을 유지했습니다.' : '새로운 요약을 저장했습니다.',
+      variant: 'success',
+    });
   };
 
-  // const handleToastClose = () => {
-  //   setToastVisible(false);
-  // };
-
   return (
-    <>
-      <Button
-        variant={type === 'prev' ? 'secondary' : 'primary'}
-        label={type === 'prev' ? '기존 요약 유지하기' : '새 요약 적용하기'}
-        disabled={isWriting}
-        className="w-full"
-        onClick={onClick}
-      />
-
-      {/* {toastVisible && (
-        <Toast
-          id="summary-toast"
-          message="요약을 적용했습니다."
-          variant="success"
-          duration={2000}
-          onClose={handleToastClose}
-        />
-      )} */}
-    </>
+    <Button
+      variant={type === 'prev' ? 'secondary' : 'primary'}
+      label={type === 'prev' ? '기존 요약 유지하기' : '재생성된 요약 덮어쓰기'}
+      disabled={disabled}
+      className="w-full"
+      onClick={handleClick}
+    />
   );
 }
