@@ -1,3 +1,4 @@
+import { type SafeFetchOptions, safeFetch } from '@/hooks/util/server/safeFetch';
 import type {
   DeleteLinkApiResponse,
   DuplicateLinkApiResponse,
@@ -6,8 +7,6 @@ import type {
   LinkListViewData,
 } from '@/types/api/linkApi';
 import type { CreateLinkPayload, Link, UpdateLinkPayload } from '@/types/link';
-
-import { request } from './http';
 
 const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
@@ -41,13 +40,18 @@ function buildQuery(params?: LinkListParams) {
   return qs ? `?${qs}` : '';
 }
 
-const withAuth = (init?: RequestInit): RequestInit => {
+const withAuth = (init?: SafeFetchOptions): SafeFetchOptions => {
   const headers: HeadersInit = {
     Authorization: `Bearer ${API_TOKEN}`,
     ...(init?.headers ?? {}),
   };
 
-  return { ...init, headers };
+  return {
+    timeout: 15_000,
+    jsonContentTypeCheck: true,
+    ...init,
+    headers,
+  };
 };
 
 const normalizeLink = (data: Partial<Link>): Link => {
@@ -66,10 +70,9 @@ const normalizeLink = (data: Partial<Link>): Link => {
 };
 
 export const fetchLinks = async (params?: LinkListParams): Promise<LinkListViewData> => {
-  const body = await request<LinkListApiResponse>(
+  const body = await safeFetch<LinkListApiResponse>(
     `${LINKS_ENDPOINT}${buildQuery(params)}`,
-    withAuth({ cache: 'no-store' }),
-    'Failed to fetch links'
+    withAuth({ cache: 'no-store' })
   );
 
   if (!body?.data || !body.success) {
@@ -83,14 +86,13 @@ export const fetchLinks = async (params?: LinkListParams): Promise<LinkListViewD
 };
 
 export const createLink = async (payload: CreateLinkPayload): Promise<Link> => {
-  const body = await request<LinkApiResponse>(
+  const body = await safeFetch<LinkApiResponse>(
     LINKS_ENDPOINT,
     withAuth({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    }),
-    'Failed to create link'
+    })
   );
 
   if (!body?.data || !body.success) {
@@ -101,10 +103,9 @@ export const createLink = async (payload: CreateLinkPayload): Promise<Link> => {
 };
 
 export const fetchLink = async (id: number): Promise<Link> => {
-  const body = await request<LinkApiResponse>(
+  const body = await safeFetch<LinkApiResponse>(
     `${LINKS_ENDPOINT}/${id}`,
-    withAuth({ cache: 'no-store' }),
-    'Failed to fetch link'
+    withAuth({ cache: 'no-store' })
   );
 
   if (!body?.data || !body.success) {
@@ -115,14 +116,13 @@ export const fetchLink = async (id: number): Promise<Link> => {
 };
 
 export const updateLink = async (id: number, payload: UpdateLinkPayload): Promise<Link> => {
-  const body = await request<LinkApiResponse>(
+  const body = await safeFetch<LinkApiResponse>(
     `${LINKS_ENDPOINT}/${id}`,
     withAuth({
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    }),
-    'Failed to update link'
+    })
   );
 
   if (!body?.data || !body.success) {
@@ -133,14 +133,13 @@ export const updateLink = async (id: number, payload: UpdateLinkPayload): Promis
 };
 
 export const updateLinkTitle = async (id: number, title: string): Promise<Link> => {
-  const body = await request<LinkApiResponse>(
+  const body = await safeFetch<LinkApiResponse>(
     `${LINKS_ENDPOINT}/${id}/title`,
     withAuth({
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title }),
-    }),
-    'Failed to update link title'
+    })
   );
 
   if (!body?.data || !body.success) {
@@ -151,14 +150,13 @@ export const updateLinkTitle = async (id: number, title: string): Promise<Link> 
 };
 
 export const updateLinkMemo = async (id: number, memo: string): Promise<Link> => {
-  const body = await request<LinkApiResponse>(
+  const body = await safeFetch<LinkApiResponse>(
     `${LINKS_ENDPOINT}/${id}/memo`,
     withAuth({
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ memo }),
-    }),
-    'Failed to update link memo'
+    })
   );
 
   if (!body?.data || !body.success) {
@@ -169,10 +167,9 @@ export const updateLinkMemo = async (id: number, memo: string): Promise<Link> =>
 };
 
 export const deleteLink = async (id: number): Promise<DeleteLinkApiResponse> => {
-  const body = await request<DeleteLinkApiResponse>(
+  const body = await safeFetch<DeleteLinkApiResponse>(
     `${LINKS_ENDPOINT}/${id}`,
-    withAuth({ method: 'DELETE' }),
-    'Failed to delete link'
+    withAuth({ method: 'DELETE' })
   );
 
   if (!body || typeof body.success !== 'boolean' || !body.status || !body.message) {
@@ -186,10 +183,9 @@ export const checkDuplicateLink = async (
   url: string
 ): Promise<{ exists: boolean; linkId?: number }> => {
   const usp = new URLSearchParams({ url });
-  const body = await request<DuplicateLinkApiResponse>(
+  const body = await safeFetch<DuplicateLinkApiResponse>(
     `${LINKS_ENDPOINT}/duplicate?${usp.toString()}`,
-    withAuth({ cache: 'no-store' }),
-    'Failed to check duplicate link'
+    withAuth({ cache: 'no-store' })
   );
 
   if (!body?.data || typeof body.data.exists !== 'boolean') {

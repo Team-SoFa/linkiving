@@ -1,13 +1,13 @@
 import type {
-  ChatSummary,
-  ChatsApiResponse,
-  ChatsRes,
+  ChatListApiResponse,
+  ChatListData,
+  ChatRoom,
   CreateChatApiResponse,
 } from '@/types/api/chatApi';
 
 import { buildResponse } from '../response';
 
-export const mockChats: ChatSummary[] = [
+export const mockChats: ChatRoom[] = [
   { id: 201, title: '웹 접근성 요약 요청' },
   { id: 202, title: 'AI 관련 링크 찾아줘' },
   { id: 203, title: '요즘 IT 트렌드 정리' },
@@ -16,11 +16,11 @@ export const mockChats: ChatSummary[] = [
   { id: 206, title: '회의록 템플릿 질문' },
 ];
 
-export const mockChatsData: ChatsRes = {
+export const mockChatsData: ChatListData = {
   chats: mockChats,
 };
 
-export const mockChatsResponse: ChatsApiResponse = buildResponse(mockChatsData);
+export const mockChatsResponse: ChatListApiResponse = buildResponse(mockChatsData);
 
 export const buildCreateChatResponse = (input: {
   id: number;

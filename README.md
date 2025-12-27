@@ -84,6 +84,7 @@ _이제 Linkiving과 함께 스마트하고 효율적인 북마크 관리를 시
 | 키                         | 용도                                                                     | 사용처                               |
 | -------------------------- | ------------------------------------------------------------------------ | ------------------------------------ |
 | `NEXT_PUBLIC_BASE_API_URL` | Linkiving API 베이스 URL                                                 | App / CI / Vercel / Chromatic        |
+| `NEXT_PUBLIC_WS_BASE_URL`  | Linkiving API WebSocket 베이스 URL                                       | App / CI / Vercel / Chromatic        |
 | `NEXT_PUBLIC_API_TOKEN`    | API Bearer 토큰                                                          | App / CI / Vercel / Chromatic        |
 | `CHROMATIC_PROJECT_TOKEN`  | Chromatic 퍼블리시 토큰                                                  | Chromatic 워크플로우 / 로컬 퍼블리시 |
 | `STORYBOOK_TOKEN`          | Chromatic 토큰 대체용 (로컬/CI에서 CHROMATIC_PROJECT_TOKEN 부재 시 대체) | Chromatic 로컬 퍼블리시              |
@@ -97,6 +98,7 @@ _이제 Linkiving과 함께 스마트하고 효율적인 북마크 관리를 시
 GitHub Secrets (Repository → Settings → Secrets and variables → Actions):
 
 - `NEXT_PUBLIC_BASE_API_URL`
+- `NEXT_PUBLIC_WS_BASE_URL`
 - `NEXT_PUBLIC_API_TOKEN`
 - `CHROMATIC_PROJECT_TOKEN`
   - 필요 시 `STORYBOOK_TOKEN`을 같은 값으로 추가해도 됩니다.
@@ -104,4 +106,4 @@ GitHub Secrets (Repository → Settings → Secrets and variables → Actions):
 
 Vercel (Project Settings → Environment Variables):
 
-- Production/Preview에 `NEXT_PUBLIC_BASE_API_URL`, `NEXT_PUBLIC_API_TOKEN`을 추가해 빌드/런타임에서 사용합니다.
+- Production/Preview에 `NEXT_PUBLIC_BASE_API_URL`, `NEXT_PUBLIC_WS_BASE_URL`, `NEXT_PUBLIC_API_TOKEN`을 추가해 빌드/런타임에서 사용합니다.

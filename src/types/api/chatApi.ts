@@ -1,26 +1,25 @@
-import type { ApiResponseBase } from '@/types/api/linkApi';
+import type { ApiResponseBase } from './linkApi';
 
-export interface ChatSummary {
+export interface ChatRoom {
   id: number;
   title: string;
+  firstChat?: string;
 }
 
-export interface ChatsRes {
-  chats: ChatSummary[];
+export interface ChatListData {
+  chats: ChatRoom[];
 }
 
-export type ChatsApiResponse = ApiResponseBase<ChatsRes>;
+export type ChatListApiResponse = ApiResponseBase<ChatListData>;
 
-export interface CreateChatReq {
+export interface CreateChatPayload {
   firstChat: string;
 }
 
-export interface CreateChatRes {
-  id: number;
-  title: string;
-  firstChat: string;
+export type CreateChatApiResponse = ApiResponseBase<ChatRoom>;
+
+export interface ChatMessageChunk {
+  chatId: number;
+  content: string;
+  isEnd: boolean;
 }
-
-export type CreateChatApiResponse = ApiResponseBase<CreateChatRes>;
-
-export type DeleteChatApiResponse = ApiResponseBase<string>;
