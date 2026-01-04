@@ -4,7 +4,7 @@ import { Placement, flip, offset, shift, useFloating } from '@floating-ui/react-
 import { useEffect } from 'react';
 
 export const usePopoverPosition = (
-  triggerRef: React.RefObject<HTMLElement | null>, // 기준이 되는 엘리먼트 (trigger)
+  triggerRef: HTMLElement | null, // 기준이 되는 엘리먼트 (trigger)
   isOpen: boolean, // Popover가 열려있을 때만 위치를 계산
   placement: Placement = 'bottom-start' // 기본 위치
 ) => {
@@ -15,7 +15,7 @@ export const usePopoverPosition = (
 
   // trigger를 Floating UI에 연결
   useEffect(() => {
-    refs.setReference(triggerRef.current);
+    refs.setReference(triggerRef);
   }, [triggerRef, refs]);
 
   // Popover가 열릴 때마다 위치 업데이트
