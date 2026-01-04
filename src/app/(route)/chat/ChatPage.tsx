@@ -1,6 +1,6 @@
 'use client';
 
-import QueryBox from '@/app/(route)/home/_components/HomeQueryBox/HomeQueryBox';
+import QueryBox from '@/app/(route)/home/_components/HomeQueryBox';
 
 export default function Chat() {
   return (
