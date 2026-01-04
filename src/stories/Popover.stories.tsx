@@ -1,61 +1,49 @@
-import Button from '@/components/basics/Button/Button';
-import Popover, { PopoverProps } from '@/components/basics/Popover/Popover';
-import Example from '@/components/basics/Popover/PopoverContents/Example';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import IconButton from '@/components/basics/IconButton/IconButton';
+import PopoverContent from '@/components/basics/Popover/Content';
+import Popover from '@/components/basics/Popover/Popover';
+import PopoverTrigger from '@/components/basics/Popover/Trigger';
+import { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   title: 'Components/Basics/Popover',
   component: Popover,
   tags: ['autodocs'],
   argTypes: {
-    type: {
-      control: { type: 'radio' },
-      description: 'Popover 내용 타입',
-    },
-    label: {
-      control: { type: 'text' },
-    },
     placement: {
-      control: { type: 'radio' },
+      control: { type: 'select' },
       options: [
+        'top',
         'top-start',
         'top-end',
+        'bottom',
         'bottom-start',
         'bottom-end',
-        'right-start',
-        'right-end',
+        'left',
         'left-start',
         'left-end',
+        'right',
+        'right-start',
+        'right-end',
       ],
-      description: '컨텐츠 위치를 설정',
-    },
-    trigger: {
-      control: false,
-      description: 'Popover를 열 버튼 엘리먼트',
     },
   },
 } satisfies Meta<typeof Popover>;
 
 export default meta;
 
-type Story = StoryObj<typeof Popover>;
-
-function PopoverStory(args: PopoverProps) {
-  return (
-    <div className="p-10">
+export const Default: StoryObj<typeof Popover> = {
+  render: args => (
+    <div className="m-20">
       <Popover {...args}>
-        <Example />
+        <PopoverTrigger popoverKey="trigger1" label="Open Popover">
+          <IconButton icon="IC_AllLink" ariaLabel="아이콘버튼" />
+        </PopoverTrigger>
+        <PopoverContent popoverKey="trigger1">
+          <div className="cursor-pointer hover:bg-gray-50">Popover Content</div>
+          <div className="cursor-pointer hover:bg-gray-50">Popover Content</div>
+          <div className="cursor-pointer hover:bg-gray-50">Popover Content</div>
+        </PopoverContent>
       </Popover>
     </div>
-  );
-}
-
-export const Default: Story = {
-  args: {
-    type: 'EXAMPLE',
-    label: 'Open Example Popover',
-    placement: 'bottom-start',
-    trigger: <Button label="트리거버튼" />,
-  },
-  render: PopoverStory,
+  ),
 };
