@@ -6,6 +6,7 @@ import prettierPlugin from 'eslint-plugin-prettier';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import storybookPlugin from 'eslint-plugin-storybook';
+import unusedImports from 'eslint-plugin-unused-imports';
 import validateFilename from 'eslint-plugin-validate-filename';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -42,6 +43,7 @@ const config = [
       'jsx-a11y': jsxA11yPlugin,
       storybook: storybookPlugin,
       'validate-filename': validateFilename,
+      'unused-imports': unusedImports,
     },
     languageOptions: {
       parserOptions: {
@@ -51,15 +53,7 @@ const config = [
     },
     rules: {
       'react/react-in-jsx-scope': 'off',
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          vars: 'all',
-          varsIgnorePattern: '^_',
-          args: 'after-used',
-          argsIgnorePattern: '^_',
-        },
-      ],
+      '@typescript-eslint/no-unused-vars': 'off',
       'require-jsdoc': 'off',
       'react/display-name': 'off',
       'react-hooks/exhaustive-deps': 'warn',
@@ -88,6 +82,7 @@ const config = [
           ],
         },
       ],
+      'unused-imports/no-unused-imports': 'error',
     },
   },
 
