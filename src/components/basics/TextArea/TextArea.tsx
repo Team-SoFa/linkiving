@@ -1,5 +1,6 @@
 'use client';
 
+import Skeleton from '@/components/basics/Skeleton/Skeleton';
 import clsx from 'clsx';
 import React from 'react';
 
@@ -23,6 +24,7 @@ export interface TextAreaProps extends Omit<
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSubmit?: (e?: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  isLoading?: boolean;
 }
 
 const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextArea(
@@ -37,6 +39,8 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
     heightLines,
     maxHeightLines,
     radius = 'md',
+    isLoading = false,
+    disabled = false,
     onChange,
     onSubmit,
     ...rest
@@ -46,6 +50,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
   const lineHeight = LINE_HEIGHTS[textSize];
   const minHeight = lineHeight * heightLines;
   const maxPxHeight = maxHeightLines ? lineHeight * maxHeightLines : undefined;
+  const skeletonHeight = minHeight + 8 + (setBottomPlace ? 32 : 0);
 
   const internalRef = useAutoResizeTextArea({ value, maxHeight: maxPxHeight });
 
@@ -73,16 +78,35 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
     }
   };
 
+  if (isLoading) {
+    return (
+      <Skeleton
+        radius={radius}
+        animated
+        width="100%"
+        className={clsx('h-full min-h-0', className)}
+        style={{ height: skeletonHeight }}
+      />
+    );
+  }
+
   return (
-    <div className={clsx(wholeBoxStyle({ radius, color, setBottomPlace }), className)}>
+    <div
+      className={clsx(wholeBoxStyle({ radius, color, setBottomPlace, disabled }), className)}
+      aria-disabled={disabled}
+    >
       <textarea
         ref={ref}
-        className={textAreaStyle({ textSize })}
+        className={clsx(
+          textAreaStyle({ textSize }),
+          disabled && 'text-gray500 placeholder:text-gray500 cursor-not-allowed'
+        )}
         value={value}
         placeholder={placeholder}
         aria-label={placeholder}
         maxLength={maxLength && maxLength > 0 ? maxLength : undefined}
         style={{ minHeight: `${minHeight}px` }}
+        disabled={disabled}
         onChange={onChange}
         onKeyDown={handleKeyDown}
         {...rest}

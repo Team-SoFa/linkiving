@@ -16,6 +16,10 @@ export const wholeBoxStyle = tv({
       true: 'pb-8',
       false: '',
     },
+    disabled: {
+      true: 'border-gray200 bg-gray100 text-gray500 pointer-events-none',
+      false: '',
+    },
   },
 });
 
