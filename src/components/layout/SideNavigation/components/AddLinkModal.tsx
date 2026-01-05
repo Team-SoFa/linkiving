@@ -1,7 +1,6 @@
 'use client';
 
 import Button from '@/components/basics/Button/Button';
-import Input from '@/components/basics/Input/Input';
 import Label from '@/components/basics/Label/Label';
 import Modal from '@/components/basics/Modal/Modal';
 import TextArea from '@/components/basics/TextArea/TextArea';
@@ -12,9 +11,11 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import AddLinkUrlInput from './AddLinkUrlInput';
+
 const addLinkSchema = z.object({
-  url: z.string().url({ message: '유효한 URL을 입력해주세요.' }),
-  title: z.string().min(1, { message: '제목을 입력해주세요.' }),
+  url: z.string().url({ message: '유효하지 않은 링크 주소입니다. URL을 다시 확인해주세요.' }),
+  title: z.string().min(1, { message: '제목을 입력해 주세요.' }),
   memo: z.string().optional(),
 });
 type AddLinkForm = z.infer<typeof addLinkSchema>;
@@ -30,7 +31,7 @@ const AddLinkModal = () => {
   } = useForm<AddLinkForm>({
     resolver: zodResolver(addLinkSchema),
     defaultValues: { url: '', title: '', memo: '' },
-    mode: 'all', // 유효성 검사
+    mode: 'all',
   });
 
   const onSubmit = (data: AddLinkForm) => {
@@ -42,20 +43,20 @@ const AddLinkModal = () => {
     <Modal type="ADD_LINK" className="m-10 min-w-150">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <Label htmlFor="url-input">URL</Label>
+          <Label htmlFor="url-input">링크 주소</Label>
           <Controller
             name="url"
             control={control}
             render={({ field }) => (
-              <Input
+              <AddLinkUrlInput
                 {...field}
                 id="url-input"
-                placeholder="URL을 입력해주세요"
-                className="w-full"
+                placeholder="URL을 입력해 주세요"
+                onChange={field.onChange}
+                errorMessage={errors.url?.message}
               />
             )}
           />
-          {errors.url && <span className="text-red500 text-xs">{errors.url.message}</span>}
         </div>
         <div className="flex flex-col gap-1">
           <div className="flex gap-2">
@@ -73,12 +74,14 @@ const AddLinkModal = () => {
                 render={({ field }) => (
                   <TextArea
                     {...field}
-                    placeholder="제목을 입력해주세요"
+                    placeholder="제목을 입력해 주세요"
                     id="title-input"
                     radius="lg"
                     heightLines={2}
                     maxHeightLines={2}
                     maxLength={100}
+                    value={field.value ?? ''}
+                    onChange={e => field.onChange(e)}
                   />
                 )}
               />
@@ -94,13 +97,14 @@ const AddLinkModal = () => {
             render={({ field }) => (
               <TextArea
                 {...field}
-                value={field.value ?? ''}
                 id="memo-input"
-                placeholder="메모를 입력해주세요"
+                placeholder="메모를 입력해 주세요"
                 radius="lg"
                 heightLines={3}
                 maxHeightLines={3}
                 maxLength={600}
+                value={field.value ?? ''}
+                onChange={e => field.onChange(e)}
               />
             )}
           />
