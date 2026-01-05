@@ -22,6 +22,8 @@ const meta = {
     radius: { control: 'inline-radio' },
     color: { control: 'inline-radio' },
     textSize: { control: 'inline-radio' },
+    disabled: { control: 'boolean' },
+    isLoading: { control: 'boolean' },
   },
 } satisfies Meta<typeof TextArea>;
 
@@ -49,5 +51,27 @@ export const Default: Story = {
     heightLines: 3,
     maxHeightLines: 6,
     maxLength: 200,
+  },
+};
+
+export const Disabled: Story = {
+  render: args => <InteractiveTextArea {...args} />,
+  args: {
+    placeholder: '',
+    color: 'white',
+    heightLines: 3,
+    maxHeightLines: 6,
+    disabled: true,
+  },
+};
+
+export const Loading: Story = {
+  render: args => <InteractiveTextArea {...args} />,
+  args: {
+    placeholder: '로딩 중',
+    color: 'white',
+    heightLines: 3,
+    maxHeightLines: 6,
+    isLoading: true,
   },
 };
