@@ -4,6 +4,7 @@ export const MODAL_TYPE = {
   ADD_LINK: 'ADD_LINK',
   RE_SUMMARY: 'RE_SUMMARY',
   REPORT: 'REPORT',
+  DELETE_CHAT: 'DELETE_CHAT',
 } as const;
 
 export type ModalType = keyof typeof MODAL_TYPE | null;
