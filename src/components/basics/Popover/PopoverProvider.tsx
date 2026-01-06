@@ -1,11 +1,12 @@
 'use client';
 
 import { Placement } from '@floating-ui/react-dom';
-import { PropsWithChildren, useCallback, useMemo, useState } from 'react';
+import { PropsWithChildren, useCallback, useMemo, useRef, useState } from 'react';
 
 import { PopoverContext } from './PopoverContext';
 
 const PopoverProvider = ({ children, placement }: PropsWithChildren<{ placement: Placement }>) => {
+  const popoverRef = useRef<HTMLElement | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [activeKey, setActiveKey] = useState<string | null>(null);
 
@@ -29,6 +30,7 @@ const PopoverProvider = ({ children, placement }: PropsWithChildren<{ placement:
 
   const value = useMemo(
     () => ({
+      popoverRef,
       anchorEl,
       activeKey,
       placement,

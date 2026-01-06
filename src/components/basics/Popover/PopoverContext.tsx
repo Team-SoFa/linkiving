@@ -1,9 +1,10 @@
 'use client';
 
 import { Placement } from '@floating-ui/react-dom';
-import { createContext, useContext } from 'react';
+import { RefObject, createContext, useContext } from 'react';
 
 interface PopoverContextType {
+  popoverRef: RefObject<HTMLElement | null>;
   anchorEl?: HTMLElement | null;
   activeKey: string | null;
   placement: Placement;

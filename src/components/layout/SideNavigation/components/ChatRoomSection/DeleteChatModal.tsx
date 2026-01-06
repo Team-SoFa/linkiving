@@ -1,22 +1,22 @@
 import Button from '@/components/basics/Button/Button';
 import Modal from '@/components/basics/Modal/Modal';
+import { useDeleteChat } from '@/hooks/server/Chats/useDeleteChat';
 import { useModalStore } from '@/stores/modalStore';
-
-// import { useDeleteChat } from './hooks/useDeleteChat';
 
 const DeleteChatModal = ({ chatId }: { chatId: number }) => {
   const { close } = useModalStore();
-  // const deleteChatMutation = useDeleteChat();
+  const { mutate, isPending } = useDeleteChat();
 
   const handleDelete = () => {
-    // deleteChatMutation.mutate(chatId, {
-    // onSuccess: () => close(),
-    // onError: (error) => {
-    // TODO: 에러 처리
-    // },
-    // });
-    close();
+    mutate(chatId, {
+      onSuccess: () => close(),
+      onError: error => {
+        // TODO: error logic
+        console.error('채팅 삭제 실패: ', error);
+      },
+    });
   };
+
   return (
     <Modal type="DELETE_CHAT" className="m-10 max-w-130 min-w-100">
       <div className="m-4 flex flex-col gap-2">
@@ -28,7 +28,13 @@ const DeleteChatModal = ({ chatId }: { chatId: number }) => {
         </span>
         <div className="mt-30 flex w-full gap-2">
           <Button variant="secondary" label="취소하기" className="flex-1" onClick={close} />
-          <Button variant="primary" label="삭제하기" className="flex-1" onClick={handleDelete} />
+          <Button
+            variant="primary"
+            label={isPending ? '삭제 중...' : '삭제하기'}
+            className="flex-1"
+            onClick={handleDelete}
+            disabled={isPending}
+          />
         </div>
       </div>
     </Modal>

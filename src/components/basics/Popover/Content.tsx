@@ -2,14 +2,14 @@
 
 import { useOutsideClick } from '@/hooks/util/useOutsideClickHandler';
 import clsx from 'clsx';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 import { usePopover } from './PopoverContext';
 import { usePopoverPosition } from './hooks/usePopoverPosition';
 
 interface PopoverContentProps {
-  children: (close: () => void) => React.ReactNode;
+  children: (close: () => void) => React.ReactElement;
   popoverKey: string;
   className?: string;
 }
@@ -21,7 +21,10 @@ const PopoverContent = ({ children, popoverKey, className }: PopoverContentProps
 
   const contentRef = useRef<HTMLDivElement | null>(null);
   const anchorRef = useRef<HTMLElement | null>(null);
-  anchorRef.current = anchorEl ?? null;
+
+  useEffect(() => {
+    anchorRef.current = anchorEl ?? null;
+  }, [anchorEl]);
 
   const { refs, floatingStyles } = usePopoverPosition(anchorRef.current, isActive, placement);
 
