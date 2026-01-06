@@ -9,6 +9,7 @@ export function useDeleteChat() {
     mutationFn: id => deleteChat(id),
     onSuccess: (_data, id) => {
       qc.invalidateQueries({ queryKey: ['chats'] });
+      qc.removeQueries({ queryKey: ['chats', id] });
     },
   });
 }

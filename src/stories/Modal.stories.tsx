@@ -39,9 +39,22 @@ export const Default: Story = {
         close();
       }, [openType, close]);
 
+      const handleOpen = () => {
+        // 타입에 따라 적절한 props 전달
+        if (args.type === 'DELETE_CHAT') {
+          open('DELETE_CHAT', { chatId: 1 }); // DELETE_CHAT은 props 필수
+        } else if (args.type === 'ADD_LINK') {
+          open('ADD_LINK');
+        } else if (args.type === 'RE_SUMMARY') {
+          open('RE_SUMMARY');
+        } else if (args.type === 'REPORT') {
+          open('REPORT');
+        }
+      };
+
       return (
         <>
-          <Button label="모달 열기" onClick={() => open(args.type)} />
+          <Button label="모달 열기" onClick={handleOpen} />
           <Modal {...args} />
         </>
       );
