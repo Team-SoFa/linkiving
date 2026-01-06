@@ -6,5 +6,4 @@ const AllLinkButton = () => {
   );
 };
 
-AllLinkButton.displayName = 'AllLinkLinkButton';
 export default AllLinkButton;
