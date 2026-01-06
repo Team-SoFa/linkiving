@@ -7,8 +7,8 @@ import { motion } from 'framer-motion';
 import AddLinkButton from './components/AddLinkButton';
 import AddLinkModal from './components/AddLinkModal';
 import AllLinkButton from './components/AllLinkButton';
-import MypageButton from './components/MypageButton';
 import NewChatButton from './components/NewChatButton';
+import SideNavBottom from './components/SideNavBottom/SideNavBottom';
 import SideNavHeaderIconButton from './components/SideNavToggle';
 
 export default function SideNavigation() {
@@ -56,8 +56,8 @@ export default function SideNavigation() {
               </div>
             ))}
           </nav>
+          <SideNavBottom />
         </div>
-        <MypageButton />
       </motion.div>
       {type === 'ADD_LINK' && <AddLinkModal />}
     </>
