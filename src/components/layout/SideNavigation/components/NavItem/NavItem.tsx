@@ -9,7 +9,7 @@ interface NavItemProps extends Omit<ButtonProps, 'variant' | 'contextStyle' | 'r
   ariaLabel: string;
 }
 
-const NavItem = ({ children, icon, ariaLabel, ...props }: NavItemProps) => {
+const NavItem = ({ label, icon, ariaLabel, ...props }: NavItemProps) => {
   const { isOpen } = useSideNavStore();
   const { ref, onClick } = useBlurOnClick(props.onClick);
 
@@ -24,12 +24,11 @@ const NavItem = ({ children, icon, ariaLabel, ...props }: NavItemProps) => {
       {...commonProps}
       icon={icon}
       radius="full"
-      className="flex h-10 w-50 justify-start gap-2 pl-2"
+      className="flex h-10! w-50 justify-start gap-2 pl-2"
       ref={ref}
+      label={label}
       onClick={onClick}
-    >
-      {children}
-    </Button>
+    />
   ) : (
     <IconButton {...commonProps} icon={icon} ariaLabel={ariaLabel!} ref={ref} onClick={onClick} />
   );
