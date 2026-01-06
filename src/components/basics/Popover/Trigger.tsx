@@ -1,4 +1,5 @@
 import useEscKeyPress from '@/hooks/util/useEscKeyPress';
+import { useMergedRefs } from '@reactuses/core';
 import React, { ReactElement, cloneElement } from 'react';
 
 import Button from '../Button/Button';
@@ -8,8 +9,16 @@ import { usePopover } from './PopoverContext';
 type ButtonElement = ReactElement<React.ComponentPropsWithRef<typeof Button>>;
 type IconButtonElement = ReactElement<React.ComponentPropsWithRef<typeof IconButton>>;
 
+interface ButtonLikeProps {
+  ref?: React.Ref<HTMLButtonElement>;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  'aria-label'?: string;
+  'aria-haspopup'?: boolean;
+  'aria-expanded'?: boolean;
+}
+
 interface PopoverTriggerProps {
-  children: ButtonElement | IconButtonElement;
+  children: ButtonElement | IconButtonElement | ReactElement<ButtonLikeProps>;
   popoverKey: string;
   label?: string;
 }
@@ -27,23 +36,8 @@ const PopoverTrigger = ({ children, popoverKey, label }: PopoverTriggerProps) =>
     }
   };
 
-  // ref 병합
-  const mergeRefs = (
-    ...refs: Array<React.Ref<HTMLButtonElement> | undefined>
-  ): React.RefCallback<HTMLButtonElement> => {
-    return element => {
-      refs.forEach(ref => {
-        if (typeof ref === 'function') {
-          ref(element);
-        } else if (ref) {
-          (ref as React.MutableRefObject<HTMLButtonElement | null>).current = element;
-        }
-      });
-    };
-  };
-
   return cloneElement(children, {
-    ref: mergeRefs(triggerRef, children.props.ref),
+    ref: useMergedRefs(triggerRef, children.props.ref),
     onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
       children.props.onClick?.(e);
       handleClick();
@@ -51,6 +45,6 @@ const PopoverTrigger = ({ children, popoverKey, label }: PopoverTriggerProps) =>
     'aria-haspopup': true,
     'aria-expanded': isActive,
     'aria-label': label || children.props['aria-label'],
-  });
+  } as Partial<ButtonLikeProps>);
 };
 export default PopoverTrigger;

@@ -21,6 +21,7 @@ import IC_LandingIcLogo from './svgs/ic_landing_ic_logo.svg';
 import IC_LandingTextLogo from './svgs/ic_landing_text_logo.svg';
 import IC_LinkAdd from './svgs/ic_link_add.svg';
 import IC_LinkOpen from './svgs/ic_link_open.svg';
+import IC_Logo from './svgs/ic_logo.svg';
 import IC_Logout from './svgs/ic_logout.svg';
 import IC_MoreHori from './svgs/ic_more_hori.svg';
 import IC_MoreVert from './svgs/ic_more_vert.svg';
@@ -39,6 +40,7 @@ import IC_Up from './svgs/ic_up.svg';
 import IC_Warning from './svgs/ic_warning.svg';
 
 export const IconMap = {
+  IC_Account,
   IC_AllLink,
   IC_ArrowdropDown,
   IC_ArrowdropLeft,
@@ -56,8 +58,12 @@ export const IconMap = {
   IC_Forward,
   IC_Home,
   IC_Info,
+  IC_LandingBackground,
+  IC_LandingIcLogo,
+  IC_LandingTextLogo,
   IC_LinkAdd,
   IC_LinkOpen,
+  IC_Logo,
   IC_Logout,
   IC_MoreHori,
   IC_MoreVert,
@@ -74,10 +80,6 @@ export const IconMap = {
   IC_Undo,
   IC_Up,
   IC_Warning,
-  IC_Account,
-  IC_LandingBackground,
-  IC_LandingIcLogo,
-  IC_LandingTextLogo,
 } as const;
 
 export type IconMapTypes = keyof typeof IconMap;

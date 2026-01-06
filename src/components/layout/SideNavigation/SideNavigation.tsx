@@ -7,8 +7,8 @@ import { motion } from 'framer-motion';
 import AddLinkButton from './components/AddLinkButton';
 import AddLinkModal from './components/AddLinkModal';
 import AllLinkButton from './components/AllLinkButton';
-import MypageButton from './components/MypageButton';
 import NewChatButton from './components/NewChatButton';
+import SideNavBottom from './components/SideNavBottom/SideNavBottom';
 import SideNavHeaderIconButton from './components/SideNavToggle';
 
 export default function SideNavigation() {
@@ -27,37 +27,39 @@ export default function SideNavigation() {
         transition={{ type: 'spring', stiffness: 200, damping: 24 }}
         className="bg-gray50 flex h-screen flex-col justify-between overflow-hidden p-5 shadow-md"
       >
-        <div>
-          {/* 사이드 메뉴 헤더 */}
-          <div className="mb-10">
-            <SideNavHeaderIconButton isOpen={isOpen} onClick={toggle} />
-          </div>
+        <div className="flex h-full flex-col">
+          <div>
+            {/* 사이드 메뉴 헤더 */}
+            <div className="mb-10">
+              <SideNavHeaderIconButton isOpen={isOpen} onClick={toggle} />
+            </div>
 
-          {/* 메뉴 아이템*/}
-          <nav className="flex flex-col gap-4">
-            {MENU_ITEMS.map(item => (
-              <div key={item.id} className="relative h-10">
-                {/* 열렸을 때 */}
-                <motion.div
-                  initial={false}
-                  animate={{ opacity: isOpen ? 1 : 0 }}
-                  transition={{ duration: 0.2 }}
-                  style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
-                >
-                  {item.item}
-                </motion.div>
-
-                {/* 닫혔을 때 */}
-                {!isOpen && (
-                  <motion.div transition={{ duration: 1 }} className="absolute inset-0">
-                    {!isOpen && item.item}
+            {/* 메뉴 아이템*/}
+            <nav className="flex flex-col gap-4">
+              {MENU_ITEMS.map(item => (
+                <div key={item.id} className="relative h-10">
+                  {/* 열렸을 때 */}
+                  <motion.div
+                    initial={false}
+                    animate={{ opacity: isOpen ? 1 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
+                  >
+                    {item.item}
                   </motion.div>
-                )}
-              </div>
-            ))}
-          </nav>
+
+                  {/* 닫혔을 때 */}
+                  {!isOpen && (
+                    <motion.div transition={{ duration: 1 }} className="absolute inset-0">
+                      {!isOpen && item.item}
+                    </motion.div>
+                  )}
+                </div>
+              ))}
+            </nav>
+          </div>
+          <SideNavBottom />
         </div>
-        <MypageButton />
       </motion.div>
       {type === 'ADD_LINK' && <AddLinkModal />}
     </>
