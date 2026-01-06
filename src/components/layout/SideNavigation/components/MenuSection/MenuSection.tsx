@@ -35,11 +35,7 @@ const MenuSection = ({ isOpen }: Props) => {
             </motion.div>
 
             {/* 닫혔을 때 */}
-            {!isOpen && (
-              <motion.div transition={{ duration: 1 }} className="absolute inset-0">
-                {!isOpen && item.item}
-              </motion.div>
-            )}
+            {!isOpen && <div className="absolute inset-0">{item.item}</div>}
           </div>
         ))}
       </nav>

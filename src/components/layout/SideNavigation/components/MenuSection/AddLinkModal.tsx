@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import AddLinkUrlInput from '../AddLinkUrlInput';
+import AddLinkUrlInput from './AddLinkUrlInput';
 
 const addLinkSchema = z.object({
   url: z.string().url({ message: '유효하지 않은 링크 주소입니다. URL을 다시 확인해주세요.' }),
