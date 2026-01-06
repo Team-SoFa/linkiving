@@ -14,7 +14,7 @@ interface LinkNavItemProps extends Omit<
   ariaLabel: string; // LinkIconButton
 }
 
-const LinkNavItem = ({ children, href, icon, ariaLabel, ...props }: LinkNavItemProps) => {
+const LinkNavItem = ({ label, href, icon, ariaLabel, ...props }: LinkNavItemProps) => {
   const { isOpen } = useSideNavStore();
   const { ref, onClick } = useBlurOnClick(props.onClick);
 
@@ -31,12 +31,11 @@ const LinkNavItem = ({ children, href, icon, ariaLabel, ...props }: LinkNavItemP
       {...commonProps}
       icon={icon}
       radius="full"
-      className="flex h-10 w-50 justify-start gap-2 pl-2"
+      className="flex h-10! w-50 justify-start gap-2 pl-2"
       ref={ref}
+      label={label}
       onClick={onClick}
-    >
-      {children}
-    </LinkButton>
+    />
   ) : (
     <LinkIconButton
       {...commonProps}
