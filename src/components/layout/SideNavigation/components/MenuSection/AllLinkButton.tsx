@@ -1,4 +1,4 @@
-import LinkNavItem from './NavItem/LinkNavItem';
+import LinkNavItem from '../NavItem/LinkNavItem';
 
 const AllLinkButton = () => {
   return (
@@ -6,5 +6,4 @@ const AllLinkButton = () => {
   );
 };
 
-AllLinkButton.displayName = 'AllLinkLinkButton';
 export default AllLinkButton;
