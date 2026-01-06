@@ -39,9 +39,19 @@ export const Default: StoryObj<typeof Popover> = {
           <IconButton icon="IC_AllLink" ariaLabel="아이콘버튼" />
         </PopoverTrigger>
         <PopoverContent popoverKey="trigger1">
-          <div className="cursor-pointer hover:bg-gray-50">Popover Content</div>
-          <div className="cursor-pointer hover:bg-gray-50">Popover Content</div>
-          <div className="cursor-pointer hover:bg-gray-50">Popover Content</div>
+          {close => (
+            <div
+              onClick={() => {
+                alert('Clicked!');
+                close();
+              }}
+            >
+              Popover Content with Close
+              <div className="cursor-pointer hover:bg-gray-50">Popover Content</div>
+              <div className="cursor-pointer hover:bg-gray-50">Popover Content</div>
+              <div className="cursor-pointer hover:bg-gray-50">Popover Content</div>
+            </div>
+          )}
         </PopoverContent>
       </Popover>
     </div>
