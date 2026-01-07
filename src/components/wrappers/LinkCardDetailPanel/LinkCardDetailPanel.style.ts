@@ -15,6 +15,6 @@ export const styles = tv({
     imageWrapper:
       'border-gray100 relative h-[220px] w-full overflow-hidden border bg-white shadow-sm',
     summaryWrapper: 'flex flex-col gap-2',
-    memoWrapper: 'w-[480px]',
+    memoWrapper: 'w-full',
   },
 });
