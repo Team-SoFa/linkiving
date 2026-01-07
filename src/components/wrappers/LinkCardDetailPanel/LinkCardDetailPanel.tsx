@@ -169,8 +169,8 @@ const LinkCardDetailPanel = ({
           contextStyle="onPanel"
           ariaLabel="copy link"
           onClick={() => {
-            if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-              navigator.clipboard.writeText(safeUrl || url);
+            if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText && safeUrl) {
+              navigator.clipboard.writeText(safeUrl);
             }
           }}
         />

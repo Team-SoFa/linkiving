@@ -44,13 +44,20 @@ const AddLinkUrlInput = React.forwardRef<HTMLTextAreaElement, AddLinkUrlInputPro
     const inputId = id ?? name ?? 'add-link-url-input';
     const errorId = hasError ? `${inputId}-error` : undefined;
 
-    const handleCopyClick = () => {
+    const handleCopyClick = async () => {
       if (!trimmedValue) return;
-      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-        navigator.clipboard.writeText(trimmedValue);
+      if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) return;
+      try {
+        await navigator.clipboard.writeText(trimmedValue);
         showToast({
           message: '링크가 클립보드에 복사되었습니다.',
           variant: 'success',
+          showIcon: true,
+        });
+      } catch {
+        showToast({
+          message: '링크 복사에 실패했습니다.',
+          variant: 'error',
           showIcon: true,
         });
       }
