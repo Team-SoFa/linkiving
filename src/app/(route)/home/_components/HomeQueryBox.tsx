@@ -5,13 +5,29 @@ import SendButton from '@/components/wrappers/SendButton';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-const HomeQueryBox = () => {
+import { useCreateChatRoom } from './useCreateChatRoom';
+
+type CreateChatHook = ReturnType<typeof useCreateChatRoom>;
+
+interface Props {
+  createChat: CreateChatHook;
+  onRedirecting: () => void;
+}
+
+const HomeQueryBox = ({ createChat, onRedirecting }: Props) => {
   const [value, setValue] = useState('');
   const route = useRouter();
+  const { submit } = createChat;
 
   const handleSubmit = async () => {
-    if (!value) return;
-    route.push('/chat');
+    if (!value.trim()) return;
+
+    const trimmedValue = value.trim();
+    const chatRoom = await submit({ firstChat: trimmedValue });
+    if (!chatRoom) return;
+
+    onRedirecting();
+    if (chatRoom) route.push(`/chat/${chatRoom.id}?q=${encodeURIComponent(trimmedValue)}`);
   };
 
   return (
