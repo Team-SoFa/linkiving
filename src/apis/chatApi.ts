@@ -4,6 +4,7 @@ import type {
   ChatRoom,
   CreateChatApiResponse,
   CreateChatPayload,
+  DeleteChatApiResponse,
 } from '@/types/api/chatApi';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
@@ -71,4 +72,18 @@ export const createChat = async (payload: CreateChatPayload): Promise<ChatRoom> 
   }
 
   return body.data;
+};
+
+export const deleteChat = async (id: number): Promise<DeleteChatApiResponse> => {
+  const body = await safeFetch<DeleteChatApiResponse>(
+    `${CHATS_ENDPOINT}/${id}`,
+    withAuth({
+      method: 'DELETE',
+    })
+  );
+  if (!body || typeof body.success !== 'boolean' || !body.status || !body.message) {
+    throw new Error(body?.message ?? 'Invalid response');
+  }
+
+  return body;
 };
