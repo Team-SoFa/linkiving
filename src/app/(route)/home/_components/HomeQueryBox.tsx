@@ -1,34 +1,32 @@
 'use client';
 
-import TextArea from '@/components/basics/TextArea/TextArea';
-import SendButton from '@/components/wrappers/SendButton';
+import QueryBox from '@/components/wrappers/QueryBox';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-const HomeQueryBox = () => {
+import { useCreateChatRoom } from './useCreateChatRoom';
+
+type CreateChatHook = ReturnType<typeof useCreateChatRoom>;
+
+interface Props {
+  createChat: CreateChatHook;
+  onRedirecting: () => void;
+}
+
+export default function HomeQueryBox({ createChat, onRedirecting }: Props) {
   const [value, setValue] = useState('');
   const route = useRouter();
+  const { submit, creating } = createChat;
 
   const handleSubmit = async () => {
-    if (!value) return;
-    route.push('/chat');
+    const trimmedValue = value.trim();
+    if (!trimmedValue || creating) return;
+    const chatRoom = await submit({ firstChat: trimmedValue });
+    if (!chatRoom) return;
+
+    onRedirecting();
+    if (chatRoom) route.push(`/chat/${chatRoom.id}?q=${encodeURIComponent(trimmedValue)}`);
   };
 
-  return (
-    <div className="relative">
-      <TextArea
-        heightLines={2}
-        maxHeightLines={6}
-        placeholder="저장한 링크에 대해 질문해 보세요."
-        radius="lg"
-        value={value}
-        onChange={e => setValue(e.target.value)}
-        onSubmit={handleSubmit}
-        className="shadow-[0_2px_4px_rgba(0,0,0,0.04),0_4px_8px_rgba(0,0,0,0.04)]"
-      />
-      <SendButton disabled={!value} onClick={handleSubmit} />
-    </div>
-  );
-};
-
-export default HomeQueryBox;
+  return <QueryBox value={value} onChange={setValue} onSubmit={handleSubmit} />;
+}

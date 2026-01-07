@@ -17,12 +17,34 @@ export default function Landing() {
 
   // 개발용 가짜 로그인 TODO: 나중에 지우기(사실 랜딩을 다 갈아야하긴 하지만)
   const devLogin = () => {
-    setCookieUtil(COOKIES_KEYS.ACCESS_TOKEN, 'dev_token', { maxAge: 86400 });
+    const token = process.env.NEXT_PUBLIC_API_TOKEN;
+
+    if (!token) {
+      console.error('NEXT_PUBLIC_API_TOKEN is missing');
+      return;
+    }
+
+    // 백엔드 인증 토큰 저장
+    setCookieUtil(COOKIES_KEYS.ACCESS_TOKEN, token, {
+      maxAge: 60 * 60 * 24, // 1일
+      path: '/',
+    });
+
+    // 개발용 유저 정보 (UI용)
     setCookieUtil(
       COOKIES_KEYS.USER_INFO,
-      JSON.stringify({ id: 'dev', email: 'dev@test.com', name: '개발자', picture: '' }),
-      { maxAge: 86400 }
+      JSON.stringify({
+        id: 'dev',
+        email: 'dev@test.com',
+        name: '개발자',
+        picture: '',
+      }),
+      {
+        maxAge: 60 * 60 * 24,
+        path: '/',
+      }
     );
+
     router.push('/home');
   };
 

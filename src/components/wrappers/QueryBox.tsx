@@ -2,17 +2,16 @@
 
 import TextArea from '@/components/basics/TextArea/TextArea';
 import SendButton from '@/components/wrappers/SendButton';
-import { useState } from 'react';
 
-interface ChatQueryBoxProps {
-  onSubmit: (e?: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+interface Props {
+  value: string;
+  onChange: (value: string) => void;
+  onSubmit: () => void;
 }
 
-const ChatQueryBox = ({ onSubmit }: ChatQueryBoxProps) => {
-  const [value, setValue] = useState('');
-
+export default function QueryBox({ value, onChange, onSubmit }: Props) {
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <TextArea
         heightLines={2}
         maxHeightLines={6}
@@ -20,13 +19,11 @@ const ChatQueryBox = ({ onSubmit }: ChatQueryBoxProps) => {
         radius="lg"
         showMax
         value={value}
-        onChange={e => setValue(e.target.value)}
+        onChange={e => onChange(e.target.value)}
         onSubmit={onSubmit}
         className="shadow-[0_2px_4px_rgba(0,0,0,0.04),0_4px_8px_rgba(0,0,0,0.04)]"
       />
-      <SendButton disabled={!value} onClick={onSubmit} />
+      <SendButton disabled={!value.trim()} onClick={onSubmit} />
     </div>
   );
-};
-
-export default ChatQueryBox;
+}
