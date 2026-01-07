@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import AddLinkButton from './components/AddLinkButton';
 import AddLinkModal from './components/AddLinkModal';
 import AllLinkButton from './components/AllLinkButton';
+import ChatRoomSection from './components/ChatRoomSection/ChatRoomSection';
 import MypageButton from './components/MypageButton';
 import NewChatButton from './components/NewChatButton';
 import SideNavHeaderIconButton from './components/SideNavToggle';
@@ -57,6 +58,7 @@ export default function SideNavigation() {
             ))}
           </nav>
         </div>
+        <ChatRoomSection />
         <MypageButton />
       </motion.div>
       {type === 'ADD_LINK' && <AddLinkModal />}
