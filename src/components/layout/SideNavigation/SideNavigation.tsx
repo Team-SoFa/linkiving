@@ -1,25 +1,14 @@
 'use client';
 
-import { useModalStore } from '@/stores/modalStore';
 import { useSideNavStore } from '@/stores/sideNavStore';
 import { motion } from 'framer-motion';
 
-import AddLinkButton from './components/AddLinkButton';
-import AddLinkModal from './components/AddLinkModal';
-import AllLinkButton from './components/AllLinkButton';
-import MypageButton from './components/MypageButton';
-import NewChatButton from './components/NewChatButton';
-import SideNavHeaderIconButton from './components/SideNavToggle';
+import SideNavigationHeader from './components/Header/SideNavigationHeader';
+import MenuSection from './components/MenuSection/MenuSection';
 
 export default function SideNavigation() {
-  const { type, open } = useModalStore();
   const { isOpen, toggle } = useSideNavStore();
 
-  const MENU_ITEMS = [
-    { id: 'new-chat', item: <NewChatButton /> },
-    { id: 'add-link', item: <AddLinkButton onClick={() => open('ADD_LINK')} /> },
-    { id: 'all-link', item: <AllLinkButton /> },
-  ];
   return (
     <>
       <motion.div
@@ -28,38 +17,10 @@ export default function SideNavigation() {
         className="bg-gray50 flex h-screen flex-col justify-between overflow-hidden p-5 shadow-md"
       >
         <div>
-          {/* 사이드 메뉴 헤더 */}
-          <div className="mb-10">
-            <SideNavHeaderIconButton isOpen={isOpen} onClick={toggle} />
-          </div>
-
-          {/* 메뉴 아이템*/}
-          <nav className="flex flex-col gap-4">
-            {MENU_ITEMS.map(item => (
-              <div key={item.id} className="relative h-10">
-                {/* 열렸을 때 */}
-                <motion.div
-                  initial={false}
-                  animate={{ opacity: isOpen ? 1 : 0 }}
-                  transition={{ duration: 0.2 }}
-                  style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
-                >
-                  {item.item}
-                </motion.div>
-
-                {/* 닫혔을 때 */}
-                {!isOpen && (
-                  <motion.div transition={{ duration: 1 }} className="absolute inset-0">
-                    {!isOpen && item.item}
-                  </motion.div>
-                )}
-              </div>
-            ))}
-          </nav>
+          <SideNavigationHeader isOpen={isOpen} onClick={toggle} />
+          <MenuSection isOpen={isOpen} />
         </div>
-        <MypageButton />
       </motion.div>
-      {type === 'ADD_LINK' && <AddLinkModal />}
     </>
   );
 }

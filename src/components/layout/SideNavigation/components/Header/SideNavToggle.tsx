@@ -18,5 +18,4 @@ const SideNavToggle = ({ isOpen, onClick }: SideNavToggleProps) => {
   );
 };
 
-SideNavToggle.displayName = 'SideNavToggle';
 export default SideNavToggle;
