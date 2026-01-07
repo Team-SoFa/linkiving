@@ -4,7 +4,7 @@ import { createChat, fetchChats } from '@/apis/chatApi';
 import Button from '@/components/basics/Button/Button';
 import Label from '@/components/basics/Label/Label';
 import TextArea from '@/components/basics/TextArea/TextArea';
-import { useChatStream } from '@/hooks/useChatStream';
+import { useChatStream } from '@/hooks/server/Chats/useChatStream';
 import type { ChatRoom } from '@/types/api/chatApi';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 

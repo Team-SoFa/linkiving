@@ -18,6 +18,8 @@ export interface CreateChatPayload {
 
 export type CreateChatApiResponse = ApiResponseBase<ChatRoom>;
 
+export type DeleteChatApiResponse = ApiResponseBase<null>;
+
 export interface ChatMessageChunk {
   chatId: number;
   content: string;
