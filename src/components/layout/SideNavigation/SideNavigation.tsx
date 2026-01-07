@@ -3,6 +3,7 @@
 import { useSideNavStore } from '@/stores/sideNavStore';
 import { motion } from 'framer-motion';
 
+import ChatRoomSection from './components/ChatRoomSection/ChatRoomSection';
 import SideNavigationHeader from './components/Header/SideNavigationHeader';
 import MenuSection from './components/MenuSection/MenuSection';
 import SideNavigationBottom from './components/SideNavBottom/SideNavBottom';
@@ -21,6 +22,7 @@ export default function SideNavigation() {
           <div>
             <SideNavigationHeader isOpen={isOpen} onClick={toggle} />
             <MenuSection isOpen={isOpen} />
+            {isOpen && <ChatRoomSection />}
           </div>
           <SideNavigationBottom />
         </div>
