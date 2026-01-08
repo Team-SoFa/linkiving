@@ -1,5 +1,8 @@
 'use client';
 
+import ICLandingBackground from '@/components/Icons/svgs/ic_landing_background.svg';
+import ICLandingIcLogo from '@/components/Icons/svgs/ic_landing_ic_logo.svg';
+import ICLandingTextLogo from '@/components/Icons/svgs/ic_landing_text_logo.svg';
 import { setCookieUtil } from '@/hooks/useCookie';
 import { COOKIES_KEYS } from '@/lib/constants/cookies';
 import Image from 'next/image';
@@ -34,20 +37,29 @@ export default function Landing() {
   }, [error]);
 
   return (
-    <div className="from-blue500 flex min-h-screen items-center justify-center bg-linear-to-br to-purple-600">
-      <div className="w-full max-w-md rounded-2xl bg-white p-12 shadow-2xl">
-        <div className="mb-8 text-center">
-          <h1 className="mb-2 text-4xl font-bold">Welcome</h1>
-          <p className="text-gray600">로그인하여 서비스를 이용하세요</p>
+    <div className="relative flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="relative z-10 flex w-full max-w-md flex-col items-center px-6 text-center">
+        <div className="flex items-center gap-5">
+          <div className="h-[53px] w-[60px] [&>svg]:h-full [&>svg]:w-full" aria-hidden="true">
+            <ICLandingIcLogo />
+          </div>
+          <div className="h-[50px] w-[240px] [&>svg]:h-full [&>svg]:w-full" aria-label="Linkiving">
+            <ICLandingTextLogo />
+          </div>
         </div>
+        <h2 className="font-label-xl mt-4 text-gray-800">로그인</h2>
+        <p className="font-body-md mt-1 text-gray-600">
+          서비스 이용을 위해 구글 계정으로 로그인해 주세요.
+        </p>
+        <div className="my-8 h-px w-48 bg-gray-200" />
 
         {error && (
-          <div className="bg-red100 text-red700 mb-6 rounded-lg p-4 text-sm">
+          <div className="bg-red100 text-red700 mb-6 w-full rounded-lg p-4 text-sm">
             {error === 'auth_failed' && '로그인에 실패했습니다.'}
             {error === 'server_error' && '서버 오류가 발생했습니다.'}
             {!['auth_failed', 'server_error'].includes(error) && '오류가 발생했습니다.'}
             <br />
-            다시 시도해주세요.
+            잠시 후 다시 시도해주세요.
           </div>
         )}
 
@@ -55,7 +67,7 @@ export default function Landing() {
         {isDev && (
           <button
             onClick={devLogin}
-            className="bg-gray800 mb-3 flex w-full cursor-pointer items-center justify-center gap-3 rounded-full px-6 py-4 font-medium text-white transition hover:bg-gray-700"
+            className="bg-gray800 mb-3 flex w-full cursor-pointer items-center justify-center gap-3 rounded-full px-6 py-3 text-sm font-medium text-white transition hover:bg-gray-700"
           >
             🔧 개발 모드 로그인
           </button>
@@ -63,15 +75,14 @@ export default function Landing() {
 
         <button
           onClick={handleGoogleLogin}
-          className="flex w-full items-center justify-center gap-3 rounded-full border border-gray-300 bg-white px-6 py-4 font-medium text-gray-700 shadow-sm transition hover:border-gray-400 hover:bg-gray-50"
+          className="flex w-full items-center justify-center gap-3 rounded-full border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:border-gray-400 hover:bg-gray-50"
         >
           <Image src="/images/google-icon.png" alt="구글 로고" width={20} height={20} />
-          Google로 시작하기
+          Google 계정으로 계속하기
         </button>
-
-        <p className="text-gray500 mt-6 text-center text-xs">
-          로그인하면 서비스 이용약관 및 개인정보처리방침에 동의하게 됩니다.
-        </p>
+      </div>
+      <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-0 h-[320px] overflow-hidden [&>svg]:h-full [&>svg]:w-full">
+        <ICLandingBackground aria-hidden="true" />
       </div>
     </div>
   );
