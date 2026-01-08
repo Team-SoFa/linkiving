@@ -6,9 +6,10 @@ import { useState } from 'react';
 
 interface ChatQueryBoxProps {
   onSubmit: (e?: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  disabled?: boolean;
 }
 
-const ChatQueryBox = ({ onSubmit }: ChatQueryBoxProps) => {
+const ChatQueryBox = ({ onSubmit, disabled = false }: ChatQueryBoxProps) => {
   const [value, setValue] = useState('');
 
   return (
@@ -23,8 +24,9 @@ const ChatQueryBox = ({ onSubmit }: ChatQueryBoxProps) => {
         onChange={e => setValue(e.target.value)}
         onSubmit={onSubmit}
         className="shadow-[0_2px_4px_rgba(0,0,0,0.04),0_4px_8px_rgba(0,0,0,0.04)]"
+        disabled={disabled}
       />
-      <SendButton disabled={!value} onClick={onSubmit} />
+      <SendButton disabled={!value || disabled} onClick={onSubmit} />
     </div>
   );
 };
