@@ -1,32 +1,11 @@
-export class FetchError extends Error {
-  public status?: number;
-  public body?: string;
-  public contentType?: string | null;
-  constructor(
-    message: string,
-    opts?: { status?: number; body?: string; contentType?: string | null }
-  ) {
-    super(message);
-    this.name = 'FetchError';
-    this.status = opts?.status;
-    this.body = opts?.body;
-    this.contentType = opts?.contentType ?? null;
-  }
-}
-export class TimeoutError extends Error {
-  constructor(message = 'Request timed out') {
-    super(message);
-    this.name = 'TimeoutError';
-  }
-}
-export class ParseError extends Error {
-  public raw?: string;
-  constructor(message = 'Failed to parse response', raw?: string) {
-    super(message);
-    this.name = 'ParseError';
-    this.raw = raw;
-  }
-}
+import {
+  FetchError,
+  ParseError,
+  TimeoutError,
+  createFetchError,
+  createParseError,
+  createTimeoutError,
+} from '../error/errors';
 
 export interface SafeFetchOptions extends RequestInit {
   timeout?: number;
@@ -34,6 +13,11 @@ export interface SafeFetchOptions extends RequestInit {
   maxResponseBytes?: number;
   maxErrorBodyBytes?: number;
 }
+
+/**
+ * 외부 API 호출 fetch 래퍼. (timeout, status, content-type, parse 에러 통합 처리)
+ * @shared
+ */
 export async function safeFetch<T = unknown>(
   url: string,
   options: SafeFetchOptions = {}
@@ -65,7 +49,7 @@ export async function safeFetch<T = unknown>(
       } catch {
         bodyText = undefined;
       }
-      throw new FetchError(`Request failed with status ${res.status}`, {
+      throw createFetchError(`Request failed with status ${res.status}`, {
         status: res.status,
         body: bodyText,
         contentType: res.headers.get('content-type'),
@@ -76,7 +60,7 @@ export async function safeFetch<T = unknown>(
     if (typeof maxResponseBytes === 'number') {
       const cl = res.headers.get('content-length');
       if (cl && !isNaN(Number(cl)) && Number(cl) > maxResponseBytes) {
-        throw new FetchError(`Response too large: ${cl} bytes`, {
+        throw createFetchError(`Response too large: ${cl} bytes`, {
           contentType: res.headers.get('content-type'),
         });
       }
@@ -87,7 +71,7 @@ export async function safeFetch<T = unknown>(
     if (jsonContentTypeCheck) {
       if (!contentType || !contentType.includes('application/json')) {
         const snippet = await res.text().catch(() => undefined);
-        throw new FetchError('Invalid content-type, expected JSON', {
+        throw createFetchError('Invalid content-type, expected JSON', {
           contentType,
           body: snippet ? snippet.slice(0, maxErrorBodyBytes) : undefined,
         });
@@ -95,30 +79,27 @@ export async function safeFetch<T = unknown>(
     }
 
     // JSON 파싱
+    let text: string | undefined;
     try {
-      const json = (await res.json()) as T;
+      text = await res.text();
+      const json = JSON.parse(text) as T;
       return json;
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown JSON parse error';
-      let raw: string | undefined;
-      try {
-        raw = await res.text();
-      } catch {
-        raw = undefined;
-      }
-      throw new ParseError(
+
+      throw createParseError(
         `Failed to parse JSON response: ${msg}`,
-        raw?.slice(0, maxErrorBodyBytes)
+        text?.slice(0, maxErrorBodyBytes)
       );
     }
   } catch (err) {
     if (err instanceof Error && err.name === 'AbortError') {
-      throw new TimeoutError(`Request to ${url} aborted after ${timeout}ms`);
+      throw createTimeoutError(`Request to ${url} timed out`);
     }
     if (err instanceof FetchError || err instanceof ParseError || err instanceof TimeoutError) {
       throw err;
     }
-    throw new FetchError(String(err instanceof Error ? err.message : err), { contentType: null });
+    throw createFetchError('Unknown fetch error');
   } finally {
     clearTimeout(id);
   }

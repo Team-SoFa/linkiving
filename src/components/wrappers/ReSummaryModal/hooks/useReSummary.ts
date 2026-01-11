@@ -1,7 +1,7 @@
 'use client';
 
 import { fetchNewSummary } from '@/apis/summary';
-import { FetchError } from '@/hooks/util/server/safeFetch';
+import { FetchError } from '@/hooks/util/api/error/errors';
 import { showToast } from '@/stores/toastStore';
 import { ReSummaryRequest } from '@/types/api/summaryApi';
 import { useMutation } from '@tanstack/react-query';
