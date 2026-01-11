@@ -1,20 +1,19 @@
 import Button from '@/components/basics/Button/Button';
 import Modal from '@/components/basics/Modal/Modal';
+import { useDeleteChat } from '@/hooks/server/Chats/useDeleteChat';
 import { useModalStore } from '@/stores/modalStore';
-
-// import { useDeleteChat } from './hooks/useDeleteChat';
 
 const DeleteChatModal = ({ chatId }: { chatId: number }) => {
   const { close } = useModalStore();
-  // const deleteChatMutation = useDeleteChat();
+  const deleteChatMutation = useDeleteChat();
 
   const handleDelete = () => {
-    // deleteChatMutation.mutate(chatId, {
-    // onSuccess: () => close(),
-    // onError: (error) => {
-    // TODO: 에러 처리
-    // },
-    // });
+    deleteChatMutation.mutate(chatId, {
+      onSuccess: () => close(),
+      onError: err => {
+        // TODO: 에러 처리
+      },
+    });
     close();
   };
   return (
