@@ -94,6 +94,12 @@ export default function Landing() {
             🔧 개발 모드 로그인
           </button>
         )}
+        <button
+          onClick={() => router.push('/signup')}
+          className="mb-3 flex w-full items-center justify-center rounded-full border border-gray-300 bg-white px-6 py-4 font-medium text-gray-700 shadow-sm transition hover:border-gray-400 hover:bg-gray-50"
+        >
+          회원가입 하기
+        </button>
 
         <button
           onClick={handleGoogleLogin}

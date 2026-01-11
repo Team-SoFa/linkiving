@@ -1,4 +1,4 @@
-import { type SafeFetchOptions, safeFetch } from '@/hooks/util/server/safeFetch';
+import { type SafeFetchOptions, safeFetch } from '@/hooks/util/api/fetch/safeFetch';
 import { SummaryData, SummaryResponse } from '@/types/api/summaryApi';
 
 const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
