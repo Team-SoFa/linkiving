@@ -1,4 +1,4 @@
-import { type SafeFetchOptions, safeFetch } from '@/hooks/util/server/safeFetch';
+import { type SafeFetchOptions, safeFetch } from '@/hooks/util/api/fetch/safeFetch';
 import type {
   DeleteLinkApiResponse,
   DuplicateLinkApiResponse,

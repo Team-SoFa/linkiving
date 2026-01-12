@@ -7,7 +7,7 @@ interface InputProps extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   'size' | 'value' | 'onChange'
 > {
-  value: string;
+  value?: string;
   placeholder?: string;
   size?: 'sm' | 'md' | 'lg';
   radius?: 'none' | 'sm' | 'md' | 'lg';
@@ -63,7 +63,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
       <input
         ref={ref}
         type="text"
-        value={value}
+        value={value ?? ''}
         placeholder={placeholder}
         disabled={disabled}
         className="min-w-0 flex-1 bg-transparent outline-none"
