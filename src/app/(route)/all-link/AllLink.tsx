@@ -1,13 +1,26 @@
 'use client';
 
+import InfiniteScroll from '@/components/basics/InfiniteScroll/InfiniteScroll';
 import LinkCard from '@/components/basics/LinkCard/LinkCard';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
+import { mockLinks } from '@/mocks';
 import { useLinkStore } from '@/stores/linkStore';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+const PAGE_SIZE = 12;
 
 export default function AllLink() {
-  const { links, selectedLinkId, selectLink } = useLinkStore();
+  const { links, selectedLinkId, selectLink, setLinks } = useLinkStore();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  // TODO: API 연결 시 useGetLinks로 데이터 연동
+  // const { data, isLoading, isError, error } = useGetLinks({ size: 20 });
+
+  useEffect(() => {
+    setLinks(mockLinks.slice(0, PAGE_SIZE));
+  }, [setLinks]);
+
+  const hasMore = links.length < mockLinks.length;
 
   const selectedLink = links.find(link => link.id === selectedLinkId) ?? null;
 
@@ -16,33 +29,46 @@ export default function AllLink() {
     setIsPanelOpen(true);
   };
 
+  const handleLoadMore = async () => {
+    if (!hasMore) return;
+    setIsLoadingMore(true);
+    const nextCount = Math.min(links.length + PAGE_SIZE, mockLinks.length);
+    setLinks(mockLinks.slice(0, nextCount));
+    setIsLoadingMore(false);
+  };
+
   return (
-    <div className="min-h-screen min-w-0">
-      <div className="min-h-screen min-w-0 xl:flex">
+    <div className="h-screen min-w-0">
+      <div className="h-screen min-w-0 xl:flex">
         <div className="min-w-0 flex-1 px-6 py-8 lg:px-10">
-          <div className="mx-auto flex w-full max-w-200 flex-col gap-6">
+          <div className="mx-auto flex h-full w-full max-w-200 flex-col gap-5">
             <header>
-              <h1 className="text-2xl font-semibold">전체 링크</h1>
-              <p className="text-gray600 text-sm">
-                저장된 링크를 모아보고, 우측 패널에서 상세 정보를 확인할 수 있어요.
-              </p>
+              <h1 className="font-title-md">전체 링크</h1>
             </header>
-            {links.length === 0 ? (
-              <p className="text-gray600">표시할 링크가 없습니다.</p>
-            ) : (
-              <div className="grid min-w-0 grid-cols-2 justify-center justify-items-center gap-4 md:grid-cols-3 xl:grid-cols-4">
-                {links.map(link => (
-                  <LinkCard
-                    key={link.id}
-                    title={link.title}
-                    link={link.url}
-                    summary={link.summary ?? ''}
-                    imageUrl={link.imageUrl ?? ''}
-                    onClick={() => handleSelectLink(link.id)}
-                  />
-                ))}
-              </div>
-            )}
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              {links.length === 0 ? (
+                <p className="text-gray600">표시할 링크가 없습니다.</p>
+              ) : (
+                <InfiniteScroll
+                  onLoadMore={handleLoadMore}
+                  hasMore={hasMore}
+                  isLoading={isLoadingMore}
+                >
+                  <div className="grid min-w-0 grid-cols-2 justify-center justify-items-center gap-5 md:grid-cols-3 xl:grid-cols-4">
+                    {links.map(link => (
+                      <LinkCard
+                        key={link.id}
+                        title={link.title}
+                        link={link.url}
+                        summary={link.summary ?? ''}
+                        imageUrl={link.imageUrl ?? ''}
+                        onClick={() => handleSelectLink(link.id)}
+                      />
+                    ))}
+                  </div>
+                </InfiniteScroll>
+              )}
+            </div>
           </div>
         </div>
         {isPanelOpen && (
