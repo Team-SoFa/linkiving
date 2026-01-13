@@ -24,7 +24,7 @@ export default function LinkApiDemo() {
   const [createForm, setCreateForm] = useState(defaultCreate);
   const [duplicateUrl, setDuplicateUrl] = useState('');
   const [duplicateQueryUrl, setDuplicateQueryUrl] = useState<string | undefined>();
-  const { data, isLoading, isError, refetch } = useGetLinks({ page: 0, size: 20 });
+  const { data, isLoading, isError, refetch } = useGetLinks({ size: 20 });
   const createMut = usePostLinks();
   const deleteMut = useDeleteLink();
   const updateTitleMut = useUpdateLinkTitle();

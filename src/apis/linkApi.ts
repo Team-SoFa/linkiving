@@ -22,20 +22,17 @@ if (!API_TOKEN) {
 const LINKS_ENDPOINT = `${API_URL}/v1/links`;
 
 export type LinkListParams = {
-  page?: number;
+  lastId?: number | null;
   size?: number;
-  sort?: string[] | string;
 };
 
 function buildQuery(params?: LinkListParams) {
   if (!params) return '';
   const usp = new URLSearchParams();
-  if (params.page !== undefined) usp.set('page', String(params.page));
-  if (params.size !== undefined) usp.set('size', String(params.size));
-  if (params.sort) {
-    const sorts = Array.isArray(params.sort) ? params.sort : [params.sort];
-    sorts.forEach(s => usp.append('sort', s));
+  if (params.lastId !== undefined && params.lastId !== null) {
+    usp.set('lastId', String(params.lastId));
   }
+  if (params.size !== undefined) usp.set('size', String(params.size));
   const qs = usp.toString();
   return qs ? `?${qs}` : '';
 }
