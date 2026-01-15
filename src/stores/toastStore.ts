@@ -12,6 +12,7 @@ export interface ToastItem {
   actionLabel?: string;
   actionLabelIcon?: IconMapTypes;
   onAction?: () => void;
+  placement?: 'modal-bottom';
 }
 
 interface ToastStore {

@@ -47,3 +47,22 @@ export type DuplicateLinkApiResponse = ApiResponseBase<{
   exists: boolean;
   linkId?: number;
 }>;
+
+export interface LinkMetaScrapeData {
+  title: string;
+  description: string;
+  image: string;
+  url: string;
+}
+
+export type LinkMetaScrapeApiResponse = ApiResponseBase<LinkMetaScrapeData>;
+
+export type LinkSummaryFormat = 'CONCISE' | 'DETAILED';
+
+export interface LinkSummaryRegenerateData {
+  existingSummary: string;
+  newSummary: string;
+  comparison: string;
+}
+
+export type LinkSummaryRegenerateApiResponse = ApiResponseBase<LinkSummaryRegenerateData>;
