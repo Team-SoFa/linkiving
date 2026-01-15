@@ -11,11 +11,11 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
   const showSideNav = pathname !== '/';
 
   return (
-    <div className="flex min-h-screen bg-white">
-      {showSideNav && <SideNavigation />}
-      <main className="min-h-screen flex-1 overflow-x-hidden">
-        <ReactQueryProvider>{children}</ReactQueryProvider>
-      </main>
-    </div>
+    <ReactQueryProvider>
+      <div className="flex min-h-screen bg-white">
+        {showSideNav && <SideNavigation />}
+        <main className="min-h-screen flex-1 overflow-x-hidden">{children}</main>
+      </div>
+    </ReactQueryProvider>
   );
 }
