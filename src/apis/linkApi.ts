@@ -5,6 +5,9 @@ import type {
   LinkApiResponse,
   LinkListApiResponse,
   LinkListViewData,
+  LinkMetaScrapeApiResponse,
+  LinkSummaryFormat,
+  LinkSummaryRegenerateApiResponse,
 } from '@/types/api/linkApi';
 import type { CreateLinkPayload, Link, UpdateLinkPayload } from '@/types/link';
 
@@ -193,4 +196,35 @@ export const checkDuplicateLink = async (
   }
 
   return { exists: body.data.exists, linkId: body.data.linkId };
+};
+
+export const scrapeLinkMeta = async (url: string) => {
+  const body = await safeFetch<LinkMetaScrapeApiResponse>(
+    `${LINKS_ENDPOINT}/meta-scrape`,
+    withAuth({
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    })
+  );
+
+  if (!body?.data || !body.success) {
+    throw new Error(body?.message ?? 'Invalid response');
+  }
+
+  return body.data;
+};
+
+export const regenerateLinkSummary = async (id: number, format: LinkSummaryFormat) => {
+  const usp = new URLSearchParams({ format });
+  const body = await safeFetch<LinkSummaryRegenerateApiResponse>(
+    `${LINKS_ENDPOINT}/${id}/summary?${usp.toString()}`,
+    withAuth({ cache: 'no-store' })
+  );
+
+  if (!body?.data || !body.success) {
+    throw new Error(body?.message ?? 'Invalid response');
+  }
+
+  return body.data;
 };
