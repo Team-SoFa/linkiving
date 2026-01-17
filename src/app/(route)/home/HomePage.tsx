@@ -1,9 +1,29 @@
 'use client';
 
+import { useState } from 'react';
+
+import ChatQueryBox from '../chat/_components/ChatQueryBox';
 import GreetingBlock from './_components/GreetingBlock/GreetingBlock';
 import HomeQueryBox from './_components/HomeQueryBox';
+import { useCreateChatRoom } from './_components/useCreateChatRoom';
 
 export default function Home() {
+  const createChat = useCreateChatRoom();
+  const { creating, form, error } = createChat;
+  const [redirecting, setRedirecting] = useState(false);
+
+  if (creating || redirecting) {
+    return (
+      <div className="relative flex h-screen w-full items-center">
+        <span className="absolute top-0 right-0">{form.firstChat}</span>
+        {error && <p className="absolute top-0 left-0 text-red-500">문제가 발생했습니다.</p>}
+        <div className="absolute bottom-10 left-1/2 flex -translate-x-1/2">
+          <ChatQueryBox onSubmit={() => {}} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center">
       <div className="mb-7 ml-4 flex w-full max-w-184 flex-col">
@@ -14,7 +34,7 @@ export default function Home() {
         <GreetingBlock context="default" />
       </div>
       <div className="w-full max-w-184 px-4">
-        <HomeQueryBox />
+        <HomeQueryBox createChat={createChat} onRedirecting={() => setRedirecting(true)} />
       </div>
     </div>
   );
