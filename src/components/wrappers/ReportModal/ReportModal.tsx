@@ -1,40 +1,38 @@
 import Button from '@/components/basics/Button/Button';
 import Modal from '@/components/basics/Modal/Modal';
 import TextArea from '@/components/basics/TextArea/TextArea';
+import usePostReport from '@/hooks/usePostReport';
 import { useModalStore } from '@/stores/modalStore';
-// import usePostReport from '@/hooks/usePostReport';
 import { FormEvent, useState } from 'react';
 
 const ReportModal = () => {
   const { close } = useModalStore();
   const [content, setContent] = useState('');
-  const [validationError] = useState(''); // TODO: api 작업 후 setValidationError 추가
-  // const { submit, isLoading } = usePostReport(() => {
-  //   setValidationError('');
-  //   close();
-  // });
+  const [validationError, setValidationError] = useState('');
+  const { submit, isLoading } = usePostReport(() => {
+    setValidationError('');
+    close();
+  });
 
-  // const validate = (value: string): boolean => {
-  //   if (value.length < 5) {
-  //     setValidationError('최소 5자 이상 입력해주세요.');
-  //     return false;
-  //   }
-  //   if (value.length > 500) {
-  //     setValidationError('500자 이내로 입력해주세요.');
-  //     return false;
-  //   }
-  //   setValidationError('');
-  //   return true;
-  // };
+  const validate = (value: string): boolean => {
+    if (value.length < 5) {
+      setValidationError('최소 5자 이상 입력해주세요.');
+      return false;
+    }
+    if (value.length > 500) {
+      setValidationError('500자 이내로 입력해주세요.');
+      return false;
+    }
+    setValidationError('');
+    return true;
+  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // if (isLoading) return;
-    // if (!validate(content)) return;
+    if (isLoading) return;
+    if (!validate(content)) return;
 
-    // submit({ content });
-    close(); // TODO: api 연결 후 제거
-    console.log('submitted'); // TODO: api 연결 후 반영
+    submit({ content });
   };
 
   return (
@@ -65,7 +63,7 @@ const ReportModal = () => {
             onChange={e => {
               const next = e.target.value;
               setContent(next);
-              // validate(next);
+              validate(next);
             }}
           />
 
@@ -78,7 +76,7 @@ const ReportModal = () => {
         <Button
           type="submit"
           label="제출하기"
-          disabled={content.length < 5 || content.length > 500} // TODO: isLoading 추가
+          disabled={content.length < 5 || content.length > 500 || isLoading}
         />
       </form>
     </Modal>
