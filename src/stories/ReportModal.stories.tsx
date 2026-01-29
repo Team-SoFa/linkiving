@@ -2,11 +2,28 @@ import Button from '@/components/basics/Button/Button';
 import ReportModal from '@/components/wrappers/ReportModal/ReportModal';
 import { useModalStore } from '@/stores/modalStore';
 import { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const meta = {
   title: 'Components/Wrappers/ReportModal',
   component: ReportModal,
   tags: ['autodocs'],
+  decorators: [
+    Story => {
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+          },
+        },
+      });
+      return (
+        <QueryClientProvider client={queryClient}>
+          <Story />
+        </QueryClientProvider>
+      );
+    },
+  ],
 } satisfies Meta<typeof ReportModal>;
 
 export default meta;

@@ -18,7 +18,7 @@ const ChatQueryBox = ({ onSubmit }: ChatQueryBoxProps) => {
         maxHeightLines={6}
         placeholder="저장한 링크에 대해 질문해 보세요."
         radius="lg"
-        setBottomPlace
+        showMax
         value={value}
         onChange={e => setValue(e.target.value)}
         onSubmit={onSubmit}

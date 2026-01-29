@@ -18,7 +18,7 @@ const meta = {
       control: 'number',
       description: '최대 글자 수 지정',
     },
-    setBottomPlace: { control: 'boolean', description: '최대 글자 수 보임 여부' },
+    showMax: { control: 'boolean', description: '최대 글자 수 보임 여부' },
     radius: { control: 'inline-radio' },
     color: { control: 'inline-radio' },
     textSize: { control: 'inline-radio' },
