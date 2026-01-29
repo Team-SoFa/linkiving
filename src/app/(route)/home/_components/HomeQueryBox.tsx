@@ -21,7 +21,6 @@ const HomeQueryBox = () => {
         maxHeightLines={6}
         placeholder="저장한 링크에 대해 질문해 보세요."
         radius="lg"
-        setBottomPlace
         value={value}
         onChange={e => setValue(e.target.value)}
         onSubmit={handleSubmit}

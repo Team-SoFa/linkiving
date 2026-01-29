@@ -12,7 +12,7 @@ export const wholeBoxStyle = tv({
       white: 'border-gray100 focus-within:border-gray300 border bg-white',
       blue: 'bg-blue50',
     },
-    setBottomPlace: {
+    showMax: {
       true: 'pb-8',
       false: '',
     },

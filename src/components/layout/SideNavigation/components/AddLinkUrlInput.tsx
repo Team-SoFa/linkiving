@@ -16,7 +16,7 @@ interface AddLinkUrlInputProps extends Omit<
   | 'radius'
   | 'color'
   | 'textSize'
-  | 'setBottomPlace'
+  | 'showMax'
 > {
   value: string;
   errorMessage?: string;

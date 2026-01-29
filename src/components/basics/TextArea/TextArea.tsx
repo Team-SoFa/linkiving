@@ -19,7 +19,7 @@ export interface TextAreaProps extends Omit<
   maxHeightLines?: number; // 줄 수
   radius?: 'md' | 'lg' | 'full';
   maxLength?: number;
-  setBottomPlace?: boolean;
+  showMax?: boolean;
   placeholder?: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -32,7 +32,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
     className,
     color = 'white',
     maxLength = 0,
-    setBottomPlace = false,
+    showMax = false,
     placeholder = '무엇이든 물어보세요',
     value,
     textSize = 'md',
@@ -50,7 +50,9 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
   const lineHeight = LINE_HEIGHTS[textSize];
   const minHeight = lineHeight * heightLines;
   const maxPxHeight = maxHeightLines ? lineHeight * maxHeightLines : undefined;
-  const skeletonHeight = minHeight + 8 + (setBottomPlace ? 32 : 0);
+
+  const canShowMax = showMax && maxLength > 0;
+  const skeletonHeight = minHeight + 8 + (canShowMax ? 32 : 0);
 
   const internalRef = useAutoResizeTextArea({ value, maxHeight: maxPxHeight });
 
@@ -92,7 +94,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
 
   return (
     <div
-      className={clsx(wholeBoxStyle({ radius, color, setBottomPlace, disabled }), className)}
+      className={clsx(wholeBoxStyle({ radius, color, showMax: canShowMax, disabled }), className)}
       aria-disabled={disabled}
     >
       <textarea
@@ -111,7 +113,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(function T
         onKeyDown={handleKeyDown}
         {...rest}
       />
-      {maxLength > 0 && setBottomPlace && (
+      {maxLength > 0 && showMax && (
         <div
           className={clsx(
             'font-detail absolute right-2 bottom-2 select-none',
