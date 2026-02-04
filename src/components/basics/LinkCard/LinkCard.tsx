@@ -27,7 +27,7 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
   return (
     <div
       ref={ref}
-      className="border-gray200 hover:bg-gray50 active:bg-blue50 focus:border-blue500 relative flex h-58 w-47 cursor-pointer flex-col overflow-hidden rounded-2xl border transition-colors"
+      className="border-gray200 hover:bg-gray50 active:bg-blue50 focus:border-blue500 relative flex aspect-47/58 w-full cursor-pointer flex-col overflow-hidden rounded-2xl border transition-colors"
       tabIndex={0}
       onClick={onClick}
       onKeyDown={handleKeyDown}
@@ -42,7 +42,7 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
         />
       )}
 
-      <div className="bg-gray900 relative h-22 w-full shrink-0">
+      <div className="bg-gray900 relative aspect-94/47 w-full max-w-94 shrink-0">
         <Image
           src={imageUrl ? imageUrl : '/images/default_linkcard_image.png'}
           alt={title}
@@ -50,7 +50,7 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
           className="border-gray200 border-b object-cover"
         />
       </div>
-      <div className="flex flex-1 flex-col justify-between p-3">
+      <div className="flex w-full flex-1 flex-col justify-between p-3">
         <div className="flex flex-col gap-1">
           <span className="truncate text-sm font-semibold">{title}</span>
           <div className="flex items-center gap-1">

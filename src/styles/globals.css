@@ -51,6 +51,10 @@
   scrollbar-width: none; /* Firefox */
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* ========== DIVIDER FALLBACK ========== */
 /* Ensure divider colors render even if Tailwind layers are unavailable (e.g., Storybook). */
 .divider-gray100 {

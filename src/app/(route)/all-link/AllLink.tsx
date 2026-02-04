@@ -1,5 +1,6 @@
 'use client';
 
+import CardList from '@/components/basics/CardList/CardList';
 import InfiniteScroll from '@/components/basics/InfiniteScroll/InfiniteScroll';
 import LinkCard from '@/components/basics/LinkCard/LinkCard';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
@@ -45,7 +46,7 @@ export default function AllLink() {
             <header>
               <h1 className="font-title-md">전체 링크</h1>
             </header>
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-1">
               {links.length === 0 ? (
                 <p className="text-gray600">표시할 링크가 없습니다.</p>
               ) : (
@@ -54,7 +55,7 @@ export default function AllLink() {
                   hasMore={hasMore}
                   isLoading={isLoadingMore}
                 >
-                  <div className="grid min-w-0 grid-cols-2 justify-center justify-items-center gap-5 md:grid-cols-3 xl:grid-cols-4">
+                  <CardList>
                     {links.map(link => (
                       <LinkCard
                         key={link.id}
@@ -65,7 +66,7 @@ export default function AllLink() {
                         onClick={() => handleSelectLink(link.id)}
                       />
                     ))}
-                  </div>
+                  </CardList>
                 </InfiniteScroll>
               )}
             </div>
