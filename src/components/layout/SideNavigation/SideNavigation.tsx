@@ -1,15 +1,17 @@
 'use client';
 
+import { getUserInfoFromCookie } from '@/hooks/useUserInfo';
 import { useSideNavStore } from '@/stores/sideNavStore';
 import { motion } from 'framer-motion';
 
+import SideNavigationBottom from './components/Bottom/SideNavigationBottom';
 import ChatRoomSection from './components/ChatRoomSection/ChatRoomSection';
 import SideNavigationHeader from './components/Header/SideNavigationHeader';
 import MenuSection from './components/MenuSection/MenuSection';
-import SideNavigationBottom from './components/SideNavBottom/SideNavBottom';
 
 export default function SideNavigation() {
   const { isOpen, toggle } = useSideNavStore();
+  const userInfo = getUserInfoFromCookie();
 
   return (
     <>
