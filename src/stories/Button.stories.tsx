@@ -1,6 +1,6 @@
 import { IconMap } from '@/components/Icons/icons';
 import Button from '@/components/basics/Button/Button';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 
 const ICONS = Object.keys(IconMap);
 

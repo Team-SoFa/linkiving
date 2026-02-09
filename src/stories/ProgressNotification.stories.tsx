@@ -1,6 +1,6 @@
 import { IconMap } from '@/components/Icons/icons';
 import ProgressNotification from '@/components/basics/ProgressNotification/ProgressNotification';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 
 const meta = {
   title: 'Components/Basics/ProgressNotification',

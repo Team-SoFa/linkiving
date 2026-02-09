@@ -1,7 +1,7 @@
 import Button from '@/components/basics/Button/Button';
 import ReportModal from '@/components/wrappers/ReportModal/ReportModal';
 import { useModalStore } from '@/stores/modalStore';
-import { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const meta = {

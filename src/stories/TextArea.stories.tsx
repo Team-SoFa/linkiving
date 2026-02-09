@@ -1,6 +1,6 @@
 // TextArea.stories.tsx
 import TextArea, { TextAreaProps } from '@/components/basics/TextArea/TextArea';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
 
 const meta = {

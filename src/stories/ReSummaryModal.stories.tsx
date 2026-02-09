@@ -1,7 +1,7 @@
 import Button from '@/components/basics/Button/Button';
 import ReSummaryModal from '@/components/wrappers/ReSummaryModal/ReSummaryModal';
 import { useModalStore } from '@/stores/modalStore';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();

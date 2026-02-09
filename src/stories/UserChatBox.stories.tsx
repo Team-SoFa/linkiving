@@ -1,5 +1,5 @@
 import UserChatBox, { UserChatBoxProps } from '@/components/wrappers/UserChatBox/UserChatBox';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
 
 const meta = {

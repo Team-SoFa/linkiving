@@ -1,6 +1,6 @@
 import SVGIcon from '@/components/Icons/SVGIcon';
 import Input from '@/components/basics/Input/Input';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import React, { useState } from 'react';
 
 const meta = {

@@ -1,5 +1,5 @@
 import Dropdown, { DropdownOption } from '@/components/basics/Dropdown/Dropdown';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { type ComponentProps, useState } from 'react';
 
 const options: DropdownOption[] = [
