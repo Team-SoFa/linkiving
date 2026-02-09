@@ -1,5 +1,4 @@
 import { usePostLinkMetaScrape } from '@/hooks/usePostLinkMetaScrape';
-import { FetchError } from '@/hooks/util/server/safeFetch';
 import { useEffect, useRef, useState } from 'react';
 import type {
   FieldValues,
@@ -8,6 +7,8 @@ import type {
   UseFormGetValues,
   UseFormSetValue,
 } from 'react-hook-form';
+
+import { FetchError } from './util/api/error/errors';
 
 type MetaData = {
   title: string;

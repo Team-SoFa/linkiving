@@ -1,6 +1,6 @@
 import { IconMap } from '@/components/Icons/icons';
 import LinkIconButton from '@/components/wrappers/LinkIconButton/LinkIconButton';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 
 const meta = {
   title: 'Components/Wrappers/LinkIconButton',

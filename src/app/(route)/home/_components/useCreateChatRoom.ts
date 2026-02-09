@@ -1,5 +1,5 @@
 import { createChat } from '@/apis/chatApi';
-import { FetchError, ParseError, TimeoutError } from '@/hooks/util/server/safeFetch';
+import { FetchError, ParseError, TimeoutError } from '@/hooks/util/api/error/errors';
 import type { ChatRoom } from '@/types/api/chatApi';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';

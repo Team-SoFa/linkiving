@@ -1,4 +1,4 @@
-import { type SafeFetchOptions, safeFetch } from '@/hooks/util/server/safeFetch';
+import { SafeFetchOptions, safeFetch } from '@/hooks/util/api/fetch/safeFetch';
 import type { ReportApiResponse, ReportRequest } from '@/types/api/report';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL;

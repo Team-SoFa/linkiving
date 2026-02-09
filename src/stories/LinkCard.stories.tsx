@@ -1,5 +1,5 @@
 import LinkCard from '@/components/basics/LinkCard/LinkCard';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 
 const meta = {
   title: 'Components/Basics/LinkCard',

@@ -1,5 +1,5 @@
 import FilterChips from '@/components/basics/FilterChip/FilterChips';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 
 const metaChips = {
   title: 'Components/Basics/FilterChips',

@@ -1,4 +1,4 @@
-import type { Preview } from '@storybook/nextjs-vite';
+import type { Preview } from '@storybook/nextjs';
 
 import '../src/styles/globals.css';
 
@@ -13,6 +13,14 @@ if (!process.env.NEXT_PUBLIC_API_TOKEN) {
 
 const preview: Preview = {
   parameters: {
+    nextjs: {
+      appDirectory: true, // App Router 사용 시 필수
+      navigation: {
+        pathname: '/',
+        query: {},
+        asPath: '/',
+      },
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,

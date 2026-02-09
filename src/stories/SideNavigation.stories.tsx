@@ -1,5 +1,5 @@
 import SideNavigation from '@/components/layout/SideNavigation/SideNavigation';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 
 const meta: Meta<typeof SideNavigation> = {
   title: 'Components/Layout/SideNavigation',

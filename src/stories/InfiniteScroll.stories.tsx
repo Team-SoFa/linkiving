@@ -1,7 +1,7 @@
 import InfiniteScroll, {
   type InfiniteScrollProps,
 } from '@/components/basics/InfiniteScroll/InfiniteScroll';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import clsx from 'clsx';
 import React from 'react';
 

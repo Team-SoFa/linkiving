@@ -1,5 +1,5 @@
 import Tag from '@/components/basics/Tag/Tag';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 
 const meta = {
   title: 'Components/Basics/Tag',

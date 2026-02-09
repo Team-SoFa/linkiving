@@ -1,5 +1,5 @@
 import Divider from '@/components/basics/Divider/Divider';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import React from 'react';
 
 const meta = {

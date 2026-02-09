@@ -1,5 +1,5 @@
 import LinkButton from '@/components/wrappers/LinkButton/LinkButton';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 
 const meta: Meta<typeof LinkButton> = {
   title: 'Components/Wrappers/LinkButton',

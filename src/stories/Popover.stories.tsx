@@ -2,7 +2,7 @@ import IconButton from '@/components/basics/IconButton/IconButton';
 import PopoverContent from '@/components/basics/Popover/Content';
 import Popover from '@/components/basics/Popover/Popover';
 import PopoverTrigger from '@/components/basics/Popover/Trigger';
-import { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 
 const meta = {
   title: 'Components/Basics/Popover',
