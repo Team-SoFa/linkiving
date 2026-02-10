@@ -1,6 +1,7 @@
 'use client';
 
 import InfiniteScroll from '@/components/basics/InfiniteScroll/InfiniteScroll';
+import AnswerTap from '@/components/wrappers/AnswerTap/AnswerTap';
 import { useChatStream } from '@/hooks/server/Chats/useChatStream';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -20,6 +21,7 @@ export default function Chat() {
   const chatId = useMemo(() => (typeof params?.id === 'string' ? params.id : ''), [params]);
   const initialQuestion = useMemo(() => searchParams.get('q')?.trim() ?? '', [searchParams]);
   const initialSentRef = useRef(false);
+  const streamBufferRef = useRef('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [streamBuffer, setStreamBuffer] = useState('');
   const [streamError, setStreamError] = useState<string | null>(null);
@@ -27,24 +29,31 @@ export default function Chat() {
   const [isLoadingMore] = useState(false);
   const [hasMore] = useState(false);
 
-  const finalizeStream = () => {
-    setStreamBuffer(prev => {
-      if (!prev) return '';
-      const text = prev;
-      setMessages(prevMessages => [
-        ...prevMessages,
-        { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'ai', text },
-      ]);
-      return '';
+  const finalizeStream = useCallback(() => {
+    const text = streamBufferRef.current;
+    if (!text) {
+      setStreamBuffer('');
+      return;
+    }
+    setMessages(prevMessages => {
+      const lastMessage = prevMessages[prevMessages.length - 1];
+      if (lastMessage?.role === 'ai' && lastMessage.text === text) return prevMessages;
+      return [...prevMessages, { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'ai', text }];
     });
-  };
+    streamBufferRef.current = '';
+    setStreamBuffer('');
+  }, []);
 
   const { connected, send } = useChatStream({
     chatId,
     enabled: Boolean(chatId),
     onChunk: (chunk: string) => {
       if (chunk === 'END_OF_STREAM') return;
-      setStreamBuffer(prev => prev + chunk);
+      setStreamBuffer(prev => {
+        const next = prev + chunk;
+        streamBufferRef.current = next;
+        return next;
+      });
     },
     onEnd: () => finalizeStream(),
     onConnect: () => {
@@ -56,6 +65,7 @@ export default function Chat() {
         ...prev,
         { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'user', text: initialQuestion },
       ]);
+      streamBufferRef.current = '';
       setStreamBuffer('');
       send(initialQuestion);
       router.replace(`/chat/${chatId}`);
@@ -81,6 +91,7 @@ export default function Chat() {
       ...prev,
       { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'user', text: trimmedValue },
     ]);
+    streamBufferRef.current = '';
     setStreamBuffer('');
     try {
       send(trimmedValue);
@@ -128,17 +139,16 @@ export default function Chat() {
                     {message.text}
                   </div>
                 ) : (
-                  <div className="text-gray700 max-w-[70%] px-1 py-1 whitespace-pre-wrap">
-                    {message.text}
+                  <div className="w-full max-w-[70%]">
+                    <AnswerTap answer={message.text} />
                   </div>
                 )}
               </div>
             ))}
             {streamBuffer && (
               <div className="flex justify-start text-sm">
-                <div className="text-gray900 max-w-[70%] px-1 py-1 whitespace-pre-wrap">
-                  {streamBuffer}
-                  <span className="ml-1 animate-pulse">▍</span>
+                <div className="w-full max-w-[70%]">
+                  <AnswerTap answer={`${streamBuffer} ▍`} />
                 </div>
               </div>
             )}
