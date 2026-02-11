@@ -103,7 +103,7 @@ export default function Chat() {
         )}
         <div
           ref={handleSetScrollRoot}
-          className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pb-[10.5rem]"
+          className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pb-42"
         >
           <InfiniteScroll
             root={scrollRoot}
@@ -145,8 +145,8 @@ export default function Chat() {
           </InfiniteScroll>
         </div>
       </div>
-      <div className="fixed bottom-10 left-1/2 z-10 flex w-full max-w-[816px] -translate-x-1/2 justify-center px-4">
-        <div className="h-[5.625rem] w-[45rem] shrink-0">
+      <div className="relative z-10 mb-15 flex w-full justify-center px-4">
+        <div className="w-full max-w-[816px] shrink-0">
           <ChatQueryBox onSubmit={handleSubmit} disabled={!connected} />
         </div>
       </div>
