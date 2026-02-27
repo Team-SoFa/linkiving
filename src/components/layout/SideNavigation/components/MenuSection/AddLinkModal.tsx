@@ -155,6 +155,7 @@ const AddLinkModal = () => {
     };
     try {
       const createdLink = await createLink.mutateAsync(lastSubmitPayloadRef.current);
+
       handleCreateSuccess(createdLink);
     } catch {
       // handled by createLink error state

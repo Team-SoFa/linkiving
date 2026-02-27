@@ -2,17 +2,18 @@ import { Client, type IFrame, type IMessage, type StompSubscription } from '@sto
 import SockJS from 'sockjs-client';
 
 const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE_URL;
-const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
 
 if (!WS_BASE_URL) {
   throw new Error('Missing environment variable: NEXT_PUBLIC_WS_BASE_URL');
 }
 
-if (!API_TOKEN) {
-  throw new Error('Missing environment variable: NEXT_PUBLIC_API_TOKEN');
-}
-
-const authHeaderValue = () => `Bearer ${API_TOKEN}`;
+const authHeaderValue = () => {
+  const tokenEntry = document.cookie.split('; ').find(row => row.startsWith('accessToken='));
+  const token = tokenEntry
+    ? decodeURIComponent(tokenEntry.substring('accessToken='.length))
+    : undefined;
+  return `Bearer ${token ?? ''}`;
+};
 
 type Callback = () => void;
 
@@ -68,7 +69,11 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
   const client = new Client({
     webSocketFactory: () =>
       useSockJS ? new SockJS(socketEndpoint) : new WebSocket(socketEndpoint),
-    connectHeaders: { Authorization: authHeaderValue() },
+    connectHeaders: {},
+    beforeConnect: stompClient => {
+      // 소켓 연결 시도마다 최신 토큰 사용하도록 함
+      stompClient.connectHeaders = { Authorization: authHeaderValue() };
+    },
     reconnectDelay: 5000,
     onStompError: (frame: IFrame) => onError?.(frame),
     onWebSocketError: err => onError?.(err),

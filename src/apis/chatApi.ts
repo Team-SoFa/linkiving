@@ -1,5 +1,5 @@
 // 백엔드 직접 호출
-import { backendApiClient } from '@/lib/client/backendClient';
+import { clientApiClient } from '@/lib/client/apiClient';
 import type {
   ChatListApiResponse,
   ChatRoom,
@@ -9,7 +9,7 @@ import type {
 } from '@/types/api/chatApi';
 
 export const fetchChats = async (): Promise<ChatRoom[]> => {
-  const response = await backendApiClient<ChatListApiResponse>('/v1/chats');
+  const response = await clientApiClient<ChatListApiResponse>('/api/chats');
 
   if (!response.success || !response.data) {
     throw new Error(response.message ?? 'Failed to fetch chats');
@@ -25,7 +25,7 @@ export const fetchChats = async (): Promise<ChatRoom[]> => {
 };
 
 export const createChat = async (payload: CreateChatPayload): Promise<ChatRoom> => {
-  const response = await backendApiClient<CreateChatApiResponse>('/v1/chats', {
+  const response = await clientApiClient<CreateChatApiResponse>('/api/chats', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
@@ -38,7 +38,7 @@ export const createChat = async (payload: CreateChatPayload): Promise<ChatRoom> 
 };
 
 export const deleteChat = async (id: number): Promise<DeleteChatApiResponse> => {
-  const response = await backendApiClient<DeleteChatApiResponse>(`/v1/chats/${id}`, {
+  const response = await clientApiClient<DeleteChatApiResponse>(`/api/chats/${id}`, {
     method: 'DELETE',
   });
 

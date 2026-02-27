@@ -93,6 +93,7 @@ export default function Chat() {
   const handleSetScrollRoot = useCallback((node: HTMLDivElement | null) => {
     setScrollRoot(node);
   }, []);
+
   return (
     <div className="relative flex h-screen w-full flex-col overflow-hidden bg-white">
       <div className="mx-auto flex w-full max-w-[816px] flex-1 flex-col px-4 pt-6">
