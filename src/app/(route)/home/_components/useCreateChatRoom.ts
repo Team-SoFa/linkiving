@@ -1,5 +1,5 @@
 import { createChat } from '@/apis/chatApi';
-import { BackendApiError } from '@/lib/client/backendClient';
+import { ApiError } from '@/lib/errors/ApiError';
 import type { ChatRoom } from '@/types/api/chatApi';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
@@ -36,12 +36,12 @@ export function useCreateChatRoom() {
         const created: ChatRoom = await createChat(submitData);
 
         // 채팅방 목록 갱신
-        qc.invalidateQueries({ queryKey: ['chats'] });
+        await qc.invalidateQueries({ queryKey: ['chats'] });
 
         resetForm();
         return created;
       } catch (err) {
-        if (err instanceof BackendApiError) {
+        if (err instanceof ApiError) {
           switch (err.status) {
             case 401:
               setError('로그인이 필요합니다.');

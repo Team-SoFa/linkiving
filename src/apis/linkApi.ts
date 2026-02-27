@@ -179,20 +179,20 @@ export const deleteLink = async (id: number): Promise<DeleteLinkApiResponse> => 
   return body;
 };
 
-export const checkDuplicateLink = async (
-  url: string
-): Promise<{ exists: boolean; linkId?: number }> => {
+// 중복 체크
+export const checkDuplicateLink = async (url: string) => {
   const usp = new URLSearchParams({ url });
+
   const body = await safeFetch<DuplicateLinkApiResponse>(
-    `${LINKS_ENDPOINT}/duplicate?${usp.toString()}`,
+    `${LINKS_ENDPOINT}/duplicate?${usp}`,
     withAuth({ cache: 'no-store' })
   );
 
-  if (!body?.data || typeof body.data.exists !== 'boolean') {
-    throw new Error(body?.message ?? 'Invalid response');
+  if (!body?.data) {
+    throw new Error(body?.message ?? 'Failed to check duplicate');
   }
 
-  return { exists: body.data.exists, linkId: body.data.linkId };
+  return body.data;
 };
 
 export const scrapeLinkMeta = async (url: string) => {

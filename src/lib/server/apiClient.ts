@@ -1,3 +1,4 @@
+import { createFetchError } from '@/hooks/util/api/error/errors';
 import { COOKIES_KEYS } from '@/lib/constants/cookies';
 import { cookies } from 'next/headers';
 
@@ -32,11 +33,9 @@ export async function serverApiClient<T>(endpoint: string, options: RequestInit 
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new ApiError(
-      response.status,
-      errorData.message || `Request failed with status ${response.status}`,
-      errorData
-    );
+    throw createFetchError(errorData.message || `Request failed`, {
+      status: response.status,
+    });
   }
 
   return response.json();

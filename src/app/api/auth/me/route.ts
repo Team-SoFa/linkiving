@@ -1,9 +1,17 @@
+import { handleApiError } from '@/hooks/util/api';
 import { COOKIES_KEYS } from '@/lib/constants/cookies';
+import { User } from '@/types/user';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-const API_BASE = process.env.NEXT_PUBLIC_BASE_API_URL;
-
+/* TODO: 백 유저 정보 추가 이후 수정 필요
+const res = await fetch(`${API_BASE}/v1/member/me`, {
+  headers: { Authorization: `Bearer ${token}` },
+  cache: 'no-store',
+});
+const user = await res.json();
+return NextResponse.json({ success: true, data: user });
+*/
 export async function GET() {
   try {
     const cookieStore = await cookies();
@@ -13,24 +21,20 @@ export async function GET() {
       return NextResponse.json({ error: 'No authentication token' }, { status: 401 });
     }
 
-    const res = await fetch(`${API_BASE}/v1/auth/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      cache: 'no-store',
-    });
-
-    if (!res.ok) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: res.status });
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      return NextResponse.json({ error: 'Invalid token format' }, { status: 401 });
     }
+    const decoded = Buffer.from(parts[1], 'base64').toString();
+    const payload = JSON.parse(decoded);
 
-    const user = await res.json();
+    const user: User = {
+      id: payload.sub,
+      name: '',
+    };
 
-    return NextResponse.json({
-      success: true,
-      data: user,
-    });
-  } catch (e) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ success: true, data: user });
+  } catch (err) {
+    return handleApiError(err);
   }
 }
