@@ -1,15 +1,17 @@
 import { checkDuplicateLink } from '@/apis/linkApi';
-import { useQuery } from '@tanstack/react-query';
+import type { DuplicateLinkApiResponse } from '@/types/api/linkApi';
+import { useMutation } from '@tanstack/react-query';
 
-type DuplicateResult = { exists: boolean; linkId?: number };
+type DuplicateResult = NonNullable<DuplicateLinkApiResponse['data']>;
 
-export function useCheckDuplicateLink(url: string | undefined) {
-  return useQuery<DuplicateResult, Error, DuplicateResult, ['duplicate-link', string | undefined]>({
-    queryKey: ['duplicate-link', url],
-    queryFn: () => {
-      if (!url) throw new Error('url is required');
-      return checkDuplicateLink(url);
+export const useDuplicateLinkMutation = () => {
+  return useMutation<DuplicateResult, Error, string>({
+    mutationFn: async (url: string) => {
+      const normalizedUrl = url.trim();
+      if (!normalizedUrl) {
+        throw new Error('URL is required');
+      }
+      return checkDuplicateLink(normalizedUrl);
     },
-    enabled: Boolean(url),
   });
-}
+};

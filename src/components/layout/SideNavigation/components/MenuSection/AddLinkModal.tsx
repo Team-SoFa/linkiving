@@ -19,7 +19,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
-import AddLinkUrlInput from './AddLinkUrlInput';
+import AddLinkUrlInput from './AddLink/AddLinkUrlInput';
 
 const addLinkSchema = z.object({
   url: z
