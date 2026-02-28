@@ -23,6 +23,7 @@ type LinkMetaScrapeOptions<T extends FieldValues & { title?: string; memo?: stri
   dirtyFields: Partial<Record<keyof T, boolean>>;
   getValues: UseFormGetValues<T>;
   setValue: UseFormSetValue<T>;
+  skipAutoFill?: boolean; // 추가
 };
 
 export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo?: string }>({
@@ -31,6 +32,7 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
   dirtyFields,
   getValues,
   setValue,
+  skipAutoFill,
 }: LinkMetaScrapeOptions<T>) {
   const metaScrape = usePostLinkMetaScrape();
   const [metaData, setMetaData] = useState<MetaData | null>(null);
@@ -40,6 +42,20 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
   const metaRequestId = useRef(0);
   const titlePath = 'title' as Path<T>;
   const memoPath = 'memo' as Path<T>;
+
+  const dirtyTitleRef = useRef(false);
+  const dirtyMemoRef = useRef(false);
+
+  // 수정된 title, memo 참조하도록
+  useEffect(() => {
+    dirtyTitleRef.current = Boolean(dirtyFields.title);
+    dirtyMemoRef.current = Boolean(dirtyFields.memo);
+  }, [dirtyFields.title, dirtyFields.memo]);
+
+  const skipAutoFillRef = useRef(skipAutoFill);
+  useEffect(() => {
+    skipAutoFillRef.current = skipAutoFill;
+  }, [skipAutoFill]);
 
   useEffect(() => {
     if (!url || !isValidUrl) {
@@ -56,10 +72,10 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
       if (metaErrorMessage) {
         setMetaErrorMessage(null);
       }
-      if (!dirtyFields.title && getValues(titlePath)) {
+      if (!dirtyTitleRef.current && !skipAutoFillRef.current) {
         setValue(titlePath, '' as PathValue<T, typeof titlePath>, { shouldValidate: true });
       }
-      if (!dirtyFields.memo && getValues(memoPath)) {
+      if (!dirtyMemoRef.current && !skipAutoFillRef.current) {
         setValue(memoPath, '' as PathValue<T, typeof memoPath>, { shouldValidate: true });
       }
       lastScrapedUrl.current = null;
@@ -93,12 +109,14 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
           if (requestId !== metaRequestId.current) return;
           setMetaData(data);
           setMetaLoading(false);
-          if (!dirtyFields.title) {
+          if (!dirtyTitleRef.current && !skipAutoFillRef.current && getValues(titlePath)) {
+            // skipAutoFill 조건 추가
             setValue(titlePath, (data.title ?? '') as PathValue<T, typeof titlePath>, {
               shouldValidate: true,
             });
           }
-          if (!dirtyFields.memo) {
+          if (!dirtyMemoRef.current && !skipAutoFillRef.current && getValues(memoPath)) {
+            // skipAutoFill 조건 추가
             setValue(memoPath, (data.description ?? '') as PathValue<T, typeof memoPath>, {
               shouldValidate: true,
             });
@@ -119,18 +137,8 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [
-    url,
-    isValidUrl,
-    metaScrape,
-    metaData,
-    metaLoading,
-    metaErrorMessage,
-    setValue,
-    getValues,
-    dirtyFields.title,
-    dirtyFields.memo,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url, isValidUrl, setValue, getValues, dirtyFields.title, dirtyFields.memo]);
 
   return { metaData, metaLoading, metaErrorMessage };
 }
