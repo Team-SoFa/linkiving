@@ -1,8 +1,8 @@
 import { useModalStore } from '@/stores/modalStore';
 import { motion } from 'framer-motion';
 
-import AddLinkButton from './AddLinkButton';
-import AddLinkModal from './AddLinkModal';
+import AddLinkModal from './AddLink';
+import AddLinkButton from './AddLink/AddLinkButton';
 import AllLinkButton from './AllLinkButton';
 import NewChatButton from './NewChatButton';
 

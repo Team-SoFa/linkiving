@@ -1,4 +1,5 @@
 import type { Link, PageSort, Pageable } from '@/types/link';
+import z from 'zod';
 
 export interface ApiResponseBase<T> {
   success: boolean;
@@ -42,6 +43,14 @@ export type LinkListViewData = Omit<LinkListApiData, 'content'> & {
 };
 
 export type DeleteLinkApiResponse = ApiResponseBase<string> & { timestamp: string };
+
+// 중복 링크
+
+export const DuplicateLinkQuerySchema = z.object({
+  url: z.string().url(),
+});
+
+export type DuplicateLinkQuery = z.infer<typeof DuplicateLinkQuerySchema>;
 
 export type DuplicateLinkApiResponse = ApiResponseBase<{
   exists: boolean;

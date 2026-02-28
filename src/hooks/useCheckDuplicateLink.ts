@@ -1,15 +1,15 @@
 import { checkDuplicateLink } from '@/apis/linkApi';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
-type DuplicateResult = { exists: boolean; linkId?: number };
-
-export function useCheckDuplicateLink(url: string | undefined) {
-  return useQuery<DuplicateResult, Error, DuplicateResult, ['duplicate-link', string | undefined]>({
-    queryKey: ['duplicate-link', url],
-    queryFn: () => {
-      if (!url) throw new Error('url is required');
-      return checkDuplicateLink(url);
-    },
-    enabled: Boolean(url),
-  });
+interface DuplicateResult {
+  exists: boolean;
+  linkId?: number;
 }
+
+export const useDuplicateLinkMutation = () => {
+  return useMutation<DuplicateResult, Error, string>({
+    mutationFn: async (url: string) => {
+      return await checkDuplicateLink(url);
+    },
+  });
+};
