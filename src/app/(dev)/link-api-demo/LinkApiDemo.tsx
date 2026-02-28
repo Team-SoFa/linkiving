@@ -4,7 +4,7 @@ import Button from '@/components/basics/Button/Button';
 import Input from '@/components/basics/Input/Input';
 import Label from '@/components/basics/Label/Label';
 import TextArea from '@/components/basics/TextArea/TextArea';
-import { useCheckDuplicateLink } from '@/hooks/useCheckDuplicateLink';
+import { useDuplicateLinkMutation } from '@/hooks/useCheckDuplicateLink';
 import { useDeleteLink } from '@/hooks/useDeleteLink';
 import { useGetLinks } from '@/hooks/useGetLinks';
 import { usePostLinks } from '@/hooks/usePostLinks';
@@ -31,9 +31,10 @@ export default function LinkApiDemo() {
   const updateMemoMut = useUpdateLinkMemo();
   const {
     data: duplicateResult,
-    isFetching: isCheckingDuplicate,
+    isPending: isCheckingDuplicate,
     error: duplicateError,
-  } = useCheckDuplicateLink(duplicateQueryUrl);
+    mutate: checkDuplicate,
+  } = useDuplicateLinkMutation();
 
   useEffect(() => {
     if (createMut.isSuccess) {
@@ -70,7 +71,7 @@ export default function LinkApiDemo() {
 
   const handleCheckDuplicate = (e: React.FormEvent) => {
     e.preventDefault();
-    setDuplicateQueryUrl(duplicateUrl);
+    checkDuplicate(duplicateUrl);
   };
 
   const renderStatus = () => {
@@ -151,11 +152,8 @@ export default function LinkApiDemo() {
           />
           <Button type="submit" label={isCheckingDuplicate ? '확인 중...' : '중복 확인'} />
           {duplicateError && <span className="text-red500 text-sm">{duplicateError.message}</span>}
-          {duplicateQueryUrl && !isCheckingDuplicate && !duplicateError && duplicateResult && (
-            <span
-              className={`text-sm ${duplicateResult.exists ? 'text-red600' : 'text-green600'}`}
-              data-testid="duplicate-result"
-            >
+          {!isCheckingDuplicate && !duplicateError && duplicateResult && (
+            <span className={`text-sm ${duplicateResult.exists ? 'text-red600' : 'text-green600'}`}>
               {duplicateResult.exists
                 ? `이미 존재하는 URL입니다${duplicateResult.linkId ? ` (id: ${duplicateResult.linkId})` : ''}.`
                 : '사용 가능한 URL입니다.'}

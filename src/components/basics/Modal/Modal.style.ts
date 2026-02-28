@@ -14,5 +14,5 @@ export const modalHeaderStyle = tv({
 });
 
 export const modalBodyStyle = tv({
-  base: 'p-3',
+  base: '',
 });

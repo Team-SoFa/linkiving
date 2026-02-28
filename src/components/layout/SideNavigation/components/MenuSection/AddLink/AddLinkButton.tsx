@@ -1,4 +1,4 @@
-import NavItem from '../NavItem/NavItem';
+import NavItem from '../../NavItem/NavItem';
 
 interface AddLinkButtonProps {
   onClick: () => void;

@@ -23,6 +23,7 @@ type LinkMetaScrapeOptions<T extends FieldValues & { title?: string; memo?: stri
   dirtyFields: Partial<Record<keyof T, boolean>>;
   getValues: UseFormGetValues<T>;
   setValue: UseFormSetValue<T>;
+  skipAutoFill?: boolean; // 추가
 };
 
 export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo?: string }>({
@@ -31,6 +32,7 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
   dirtyFields,
   getValues,
   setValue,
+  skipAutoFill,
 }: LinkMetaScrapeOptions<T>) {
   const metaScrape = usePostLinkMetaScrape();
   const [metaData, setMetaData] = useState<MetaData | null>(null);
@@ -40,6 +42,11 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
   const metaRequestId = useRef(0);
   const titlePath = 'title' as Path<T>;
   const memoPath = 'memo' as Path<T>;
+
+  const skipAutoFillRef = useRef(skipAutoFill);
+  useEffect(() => {
+    skipAutoFillRef.current = skipAutoFill;
+  }, [skipAutoFill]);
 
   useEffect(() => {
     if (!url || !isValidUrl) {
@@ -93,12 +100,14 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
           if (requestId !== metaRequestId.current) return;
           setMetaData(data);
           setMetaLoading(false);
-          if (!dirtyFields.title) {
+          if (!dirtyFields.title && !skipAutoFillRef.current) {
+            // skipAutoFill 조건 추가
             setValue(titlePath, (data.title ?? '') as PathValue<T, typeof titlePath>, {
               shouldValidate: true,
             });
           }
-          if (!dirtyFields.memo) {
+          if (!dirtyFields.memo && !skipAutoFillRef.current) {
+            // skipAutoFill 조건 추가
             setValue(memoPath, (data.description ?? '') as PathValue<T, typeof memoPath>, {
               shouldValidate: true,
             });
@@ -119,18 +128,8 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [
-    url,
-    isValidUrl,
-    metaScrape,
-    metaData,
-    metaLoading,
-    metaErrorMessage,
-    setValue,
-    getValues,
-    dirtyFields.title,
-    dirtyFields.memo,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url, isValidUrl, setValue, getValues, dirtyFields.title, dirtyFields.memo]);
 
   return { metaData, metaLoading, metaErrorMessage };
 }

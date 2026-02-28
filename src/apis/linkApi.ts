@@ -1,4 +1,5 @@
 import { type SafeFetchOptions, safeFetch } from '@/hooks/util/api/fetch/safeFetch';
+import { clientApiClient } from '@/lib/client/apiClient';
 import type {
   DeleteLinkApiResponse,
   DuplicateLinkApiResponse,
@@ -70,10 +71,7 @@ const normalizeLink = (data: Partial<Link>): Link => {
 };
 
 export const fetchLinks = async (params?: LinkListParams): Promise<LinkListViewData> => {
-  const body = await safeFetch<LinkListApiResponse>(
-    `${LINKS_ENDPOINT}${buildQuery(params)}`,
-    withAuth({ cache: 'no-store' })
-  );
+  const body = await clientApiClient<LinkListApiResponse>(`/api/links${buildQuery(params)}`);
 
   if (!body?.data || !body.success) {
     throw new Error(body?.message ?? 'Invalid response');
@@ -85,15 +83,12 @@ export const fetchLinks = async (params?: LinkListParams): Promise<LinkListViewD
   };
 };
 
+// 링크 추가
 export const createLink = async (payload: CreateLinkPayload): Promise<Link> => {
-  const body = await safeFetch<LinkApiResponse>(
-    LINKS_ENDPOINT,
-    withAuth({
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-  );
+  const body = await clientApiClient<LinkApiResponse>('/api/links', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
 
   if (!body?.data || !body.success) {
     throw new Error(body?.message ?? 'Invalid response');
@@ -103,10 +98,7 @@ export const createLink = async (payload: CreateLinkPayload): Promise<Link> => {
 };
 
 export const fetchLink = async (id: number): Promise<Link> => {
-  const body = await safeFetch<LinkApiResponse>(
-    `${LINKS_ENDPOINT}/${id}`,
-    withAuth({ cache: 'no-store' })
-  );
+  const body = await clientApiClient<LinkApiResponse>(`/api/links/${id}`);
 
   if (!body?.data || !body.success) {
     throw new Error(body?.message ?? 'Invalid response');
@@ -116,14 +108,10 @@ export const fetchLink = async (id: number): Promise<Link> => {
 };
 
 export const updateLink = async (id: number, payload: UpdateLinkPayload): Promise<Link> => {
-  const body = await safeFetch<LinkApiResponse>(
-    `${LINKS_ENDPOINT}/${id}`,
-    withAuth({
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-  );
+  const body = await clientApiClient<LinkApiResponse>(`/api/links/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
 
   if (!body?.data || !body.success) {
     throw new Error(body?.message ?? 'Invalid response');
@@ -183,9 +171,8 @@ export const checkDuplicateLink = async (
   url: string
 ): Promise<{ exists: boolean; linkId?: number }> => {
   const usp = new URLSearchParams({ url });
-  const body = await safeFetch<DuplicateLinkApiResponse>(
-    `${LINKS_ENDPOINT}/duplicate?${usp.toString()}`,
-    withAuth({ cache: 'no-store' })
+  const body = await clientApiClient<DuplicateLinkApiResponse>(
+    `/api/links/duplicate?${usp.toString()}`
   );
 
   if (!body?.data || typeof body.data.exists !== 'boolean') {
@@ -196,20 +183,16 @@ export const checkDuplicateLink = async (
 };
 
 export const scrapeLinkMeta = async (url: string) => {
-  const body = await safeFetch<LinkMetaScrapeApiResponse>(
-    `${LINKS_ENDPOINT}/meta-scrape`,
-    withAuth({
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url }),
-    })
-  );
+  const response = await clientApiClient<LinkMetaScrapeApiResponse>('/api/links/meta-scrape', {
+    method: 'POST',
+    body: JSON.stringify({ url }),
+  });
 
-  if (!body?.data || !body.success) {
-    throw new Error(body?.message ?? 'Invalid response');
+  if (!response?.data || !response.success) {
+    throw new Error(response?.message ?? 'Invalid response');
   }
 
-  return body.data;
+  return response.data;
 };
 
 export const regenerateLinkSummary = async (id: number, format: LinkSummaryFormat) => {
