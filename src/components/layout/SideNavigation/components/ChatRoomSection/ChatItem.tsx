@@ -26,7 +26,7 @@ const ChatItem = ({ id, label }: Props) => {
   return (
     <>
       <div
-        className="group bg-btn-tertiary-subtle-onpanel flex h-9 w-50 cursor-pointer items-center justify-between rounded-full pr-3 pl-3 transition-colors hover:pr-1"
+        className="group bg-btn-tertiary-subtle-onpanel flex h-9 w-48.5 cursor-pointer items-center justify-between rounded-full pr-3 pl-3 transition-colors hover:pr-1"
         onClick={handleItemClick}
         onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
