@@ -21,7 +21,7 @@ export default function SideNavigation() {
         className="bg-gray50 sticky top-0 flex h-screen flex-col justify-between overflow-hidden p-5 shadow-md"
       >
         <div className="flex h-full flex-col justify-between">
-          <div>
+          <div className="flex min-h-0 flex-1 flex-col">
             <SideNavigationHeader isOpen={isOpen} onClick={toggle} />
             <MenuSection isOpen={isOpen} />
             {isOpen && <ChatRoomSection />}
