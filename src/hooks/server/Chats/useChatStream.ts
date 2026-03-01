@@ -1,11 +1,10 @@
-import { type ChatSocket, createChatSocket } from '@/apis/chatSocket';
+import { type ChatSocket, type ChatSocketMessage, createChatSocket } from '@/apis/chatSocket';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type UseChatStreamOptions = {
   chatId: string | number;
   enabled?: boolean;
-  onChunk?: (chunk: string) => void;
-  onEnd?: () => void;
+  onMessage?: (payload: ChatSocketMessage) => void;
   onError?: (err: unknown) => void;
   onConnect?: () => void;
   onDisconnect?: () => void;
@@ -15,8 +14,7 @@ export type UseChatStreamOptions = {
 export const useChatStream = ({
   chatId,
   enabled = true,
-  onChunk,
-  onEnd,
+  onMessage,
   onError,
   onConnect,
   onDisconnect,
@@ -24,19 +22,14 @@ export const useChatStream = ({
 }: UseChatStreamOptions) => {
   const socketRef = useRef<ChatSocket | null>(null);
   const [connected, setConnected] = useState(false);
-  const onChunkRef = useRef(onChunk);
-  const onEndRef = useRef(onEnd);
+  const onMessageRef = useRef(onMessage);
   const onErrorRef = useRef(onError);
   const onConnectRef = useRef(onConnect);
   const onDisconnectRef = useRef(onDisconnect);
 
   useEffect(() => {
-    onChunkRef.current = onChunk;
-  }, [onChunk]);
-
-  useEffect(() => {
-    onEndRef.current = onEnd;
-  }, [onEnd]);
+    onMessageRef.current = onMessage;
+  }, [onMessage]);
 
   useEffect(() => {
     onErrorRef.current = onError;
@@ -61,10 +54,7 @@ export const useChatStream = ({
     const socket = createChatSocket({
       chatId,
       useSockJS,
-      onMessage: chunk => onChunkRef.current?.(chunk),
-      onEnd: () => {
-        onEndRef.current?.();
-      },
+      onMessage: payload => onMessageRef.current?.(payload),
       onError: err => onErrorRef.current?.(err),
       onConnect: () => {
         setConnected(true);
@@ -94,5 +84,10 @@ export const useChatStream = ({
     [enabled]
   );
 
-  return { send, connected };
+  const cancel = useCallback(() => {
+    if (!enabled) return;
+    socketRef.current?.cancel();
+  }, [enabled]);
+
+  return { send, cancel, connected };
 };

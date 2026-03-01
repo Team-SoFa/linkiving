@@ -1,6 +1,7 @@
 'use client';
 
 import { createChat, fetchChats } from '@/apis/chatApi';
+import type { ChatSocketMessage } from '@/apis/chatSocket';
 import Button from '@/components/basics/Button/Button';
 import Label from '@/components/basics/Label/Label';
 import TextArea from '@/components/basics/TextArea/TextArea';
@@ -12,6 +13,26 @@ const defaultForm = { firstChat: '' };
 
 type StreamLogItem = { id: string; role: 'system' | 'ai'; text: string };
 
+const formatPayload = (payload: ChatSocketMessage) => {
+  const stepText = Array.isArray(payload.step) ? payload.step.join(' > ') : payload.step;
+  const lines = [
+    `success: ${payload.success}`,
+    `chatId: ${payload.chatId}`,
+    `messageId: ${payload.messageId ?? 'null'}`,
+    `content: ${payload.content}`,
+  ];
+
+  if (stepText) {
+    lines.push(`step: ${stepText}`);
+  }
+
+  if (payload.links && payload.links.length > 0) {
+    lines.push(`links: ${payload.links.length}`);
+  }
+
+  return lines.join('\n');
+};
+
 export default function ChatApiDemo() {
   const [form, setForm] = useState(defaultForm);
   const [chats, setChats] = useState<ChatRoom[]>([]);
@@ -21,7 +42,6 @@ export default function ChatApiDemo() {
   const [createError, setCreateError] = useState<string | null>(null);
 
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
-  const [streamBuffer, setStreamBuffer] = useState('');
   const [streamLog, setStreamLog] = useState<StreamLogItem[]>([]);
   const [question, setQuestion] = useState('');
   const [streamEnabled, setStreamEnabled] = useState(false);
@@ -29,43 +49,46 @@ export default function ChatApiDemo() {
 
   const chatIdForSocket = selectedChatId ?? '';
 
-  const { connected, send } = useChatStream({
+  const { connected, send, cancel } = useChatStream({
     chatId: chatIdForSocket,
     enabled: streamEnabled && Boolean(chatIdForSocket),
-    onChunk: chunk => {
-      if (chunk === 'END_OF_STREAM') {
-        setStreamBuffer(prevBuffer => {
-          if (!prevBuffer) return '';
-          setStreamLog(prev => [
-            ...prev,
-            { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'ai', text: prevBuffer },
-          ]);
-          return '';
-        });
-        return;
+    onMessage: payload => {
+      if (payload.chatId !== selectedChatId) return;
+
+      setStreamLog(prev => [
+        ...prev,
+        {
+          id: `${Date.now()}-${crypto.randomUUID()}`,
+          role: payload.success ? 'ai' : 'system',
+          text: formatPayload(payload),
+        },
+      ]);
+
+      if (!payload.success) {
+        setStreamError(payload.content || '답변 생성 실패');
+      } else {
+        setStreamError(null);
       }
-      setStreamBuffer(prev => prev + chunk);
     },
     onConnect: () => {
       setStreamLog(prev => [
         ...prev,
-        { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'system', text: '✅ 소켓 연결됨' },
+        { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'system', text: '소켓 연결됨' },
       ]);
       setStreamError(null);
     },
     onDisconnect: () => {
       setStreamLog(prev => [
         ...prev,
-        { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'system', text: '연결 해제됨' },
+        { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'system', text: '소켓 연결 해제됨' },
       ]);
-      setStreamBuffer('');
     },
     onError: err => {
       const message = (err as Error).message;
       setStreamError(message);
       setStreamLog(prev => [
         ...prev,
-        { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'system', text: `에러: ${message}` },
+        { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'system', text: `오류: ${message}` },
       ]);
     },
   });
@@ -107,14 +130,13 @@ export default function ChatApiDemo() {
   const handleSelectChat = (chat: ChatRoom) => {
     setSelectedChatId(chat.id);
     setStreamEnabled(true);
-    setStreamBuffer('');
     setStreamError(null);
     setStreamLog(prev => [
       ...prev,
       {
         id: `${Date.now()}-${crypto.randomUUID()}`,
         role: 'system',
-        text: `채팅방 #${chat.id}에 연결을 시도합니다.`,
+        text: `채팅방 #${chat.id} 연결 시도`,
       },
     ]);
   };
@@ -124,24 +146,31 @@ export default function ChatApiDemo() {
     if (!text || !selectedChatId) return;
     if (!connected) {
       setStreamError('소켓이 연결되지 않았습니다.');
-      setStreamLog(prev => [
-        ...prev,
-        {
-          id: `${Date.now()}-${crypto.randomUUID()}`,
-          role: 'system',
-          text: '❌ 소켓이 미연결 상태입니다.',
-        },
-      ]);
       return;
     }
-    setStreamBuffer('');
+
     setStreamLog(prev => [
       ...prev,
       { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'system', text: `질문 전송: ${text}` },
     ]);
     setQuestion('');
+
     try {
       send(text);
+    } catch (err) {
+      setStreamError((err as Error).message);
+    }
+  };
+
+  const handleCancel = () => {
+    if (!selectedChatId || !connected) return;
+
+    try {
+      cancel();
+      setStreamLog(prev => [
+        ...prev,
+        { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'system', text: '취소 요청 전송' },
+      ]);
     } catch (err) {
       setStreamError((err as Error).message);
     }
@@ -152,8 +181,8 @@ export default function ChatApiDemo() {
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold">Chat API 데모</h1>
         <p className="text-gray600">
-          GET `/v1/chats` 목록 조회와 POST `/v1/chats` 첫 메시지 생성을 확인하고, 선택한 채팅방으로
-          소켓 스트리밍을 테스트합니다.
+          GET `/v1/chats`, POST `/v1/chats`를 확인하고 선택한 채팅방으로 소켓 전송(`/send`)과 취소
+          (`/cancel`)를 테스트합니다.
         </p>
       </header>
 
@@ -164,7 +193,7 @@ export default function ChatApiDemo() {
             <Label htmlFor="firstChat">firstChat</Label>
             <TextArea
               id="firstChat"
-              placeholder="예) AI 관련된 자료가 없어요?"
+              placeholder="첫 질문"
               value={form.firstChat}
               onChange={e => setForm({ firstChat: e.target.value })}
               heightLines={3}
@@ -176,12 +205,9 @@ export default function ChatApiDemo() {
             <Button
               type="submit"
               label={creating ? '생성 중...' : '채팅 생성'}
-              disabled={!form.firstChat || creating}
+              disabled={creating}
             />
-            {createError && <span className="text-red500 text-sm">에러: {createError}</span>}
-            {!createError && !creating && form.firstChat === '' && (
-              <span className="text-gray500 text-sm">firstChat 필수</span>
-            )}
+            {createError && <span className="text-red500 text-sm">오류: {createError}</span>}
           </div>
         </form>
       </section>
@@ -199,13 +225,7 @@ export default function ChatApiDemo() {
             disabled={listLoading}
           />
         </div>
-        {listError && <p className="text-red500 text-sm">에러: {listError}</p>}
-        {listLoading && <p className="text-gray500 text-sm">불러오는 중...</p>}
-        {!listLoading && chats.length === 0 && (
-          <p className="text-gray600 text-sm">
-            채팅방이 없습니다. firstChat을 입력해 생성해 보세요.
-          </p>
-        )}
+        {listError && <p className="text-red500 text-sm">오류: {listError}</p>}
         <div className="mt-2 grid gap-3">
           {chats.map(chat => (
             <div
@@ -233,9 +253,9 @@ export default function ChatApiDemo() {
       <section className="border-gray200 rounded-xl border bg-white p-4 shadow-sm">
         <div className="mb-2 flex items-center justify-between gap-2">
           <div>
-            <h2 className="text-lg font-semibold">선택한 채팅 스트리밍</h2>
+            <h2 className="text-lg font-semibold">선택 채팅 소켓</h2>
             <p className="text-gray600 text-sm">
-              {selectedChatId ? `채팅방 #${selectedChatId}` : '채팅방을 선택하세요.'}{' '}
+              {selectedChatId ? `채팅방 #${selectedChatId}` : '채팅방을 선택하세요'}{' '}
               {connected ? '(연결됨)' : streamEnabled ? '(연결 중/해제됨)' : '(미연결)'}
             </p>
           </div>
@@ -251,12 +271,12 @@ export default function ChatApiDemo() {
         {selectedChatId && (
           <>
             <div className="mb-3 flex flex-col gap-2">
-              <Label htmlFor="question">질문 전송 (/app/send/{selectedChatId})</Label>
+              <Label htmlFor="question">질문 전송 (/send)</Label>
               <TextArea
                 id="question"
                 value={question}
                 onChange={e => setQuestion(e.target.value)}
-                placeholder="AI에게 질문을 입력하세요"
+                placeholder="질문 입력"
                 heightLines={3}
                 maxHeightLines={6}
                 disabled={!streamEnabled}
@@ -267,26 +287,28 @@ export default function ChatApiDemo() {
                   onClick={handleSend}
                   disabled={!streamEnabled || !connected || !question.trim()}
                 />
+                <Button
+                  variant="secondary"
+                  label="취소(/cancel)"
+                  onClick={handleCancel}
+                  disabled={!streamEnabled || !connected}
+                />
               </div>
             </div>
 
-            {streamError && <p className="text-red500 text-sm">에러: {streamError}</p>}
+            {streamError && <p className="text-red500 text-sm">오류: {streamError}</p>}
 
             <div className="border-gray200 flex min-h-[200px] flex-col gap-2 rounded-lg border p-3">
               {streamLog.map(item => (
                 <div
                   key={item.id}
-                  className={`text-sm ${item.role === 'ai' ? 'text-gray-900' : 'text-gray-600'}`}
+                  className={`text-sm whitespace-pre-wrap ${
+                    item.role === 'ai' ? 'text-gray-900' : 'text-gray-600'
+                  }`}
                 >
                   {item.text}
                 </div>
               ))}
-              {streamBuffer && (
-                <div className="text-sm text-gray-900">
-                  {streamBuffer}
-                  <span className="ml-1 animate-pulse">▍</span>
-                </div>
-              )}
             </div>
           </>
         )}
