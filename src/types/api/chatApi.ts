@@ -25,3 +25,28 @@ export interface ChatMessageChunk {
   content: string;
   isEnd: boolean;
 }
+
+export interface ChatHistoryLink {
+  id: number;
+  url: string;
+  title: string;
+  imageUrl?: string | null;
+  summary?: string | null;
+}
+
+export interface ChatHistoryMessage {
+  id: number;
+  content: string;
+  type: string;
+  feedback?: string | null;
+  time?: string | null;
+  links?: ChatHistoryLink[] | null;
+}
+
+export interface ChatHistoryData {
+  messages: ChatHistoryMessage[];
+  hasNext: boolean;
+  lastId: number | null;
+}
+
+export type ChatHistoryApiResponse = ApiResponseBase<ChatHistoryData>;
