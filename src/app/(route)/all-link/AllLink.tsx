@@ -1,27 +1,24 @@
 'use client';
 
+import Button from '@/components/basics/Button/Button';
 import CardList from '@/components/basics/CardList/CardList';
 import InfiniteScroll from '@/components/basics/InfiniteScroll/InfiniteScroll';
 import LinkCard from '@/components/basics/LinkCard/LinkCard';
+import Spinner from '@/components/basics/Spinner/Spinner';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
-import { mockLinks } from '@/mocks';
+import { useGetInfiniteLinks } from '@/hooks/useGetInfiniteLinks';
 import { useLinkStore } from '@/stores/linkStore';
-import { useEffect, useState } from 'react';
-
-const PAGE_SIZE = 12;
+import { useState } from 'react';
 
 export default function AllLink() {
-  const { links, selectedLinkId, selectLink, setLinks } = useLinkStore();
+  const { selectedLinkId, selectLink } = useLinkStore();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  // TODO: API 연결 시 useGetLinks로 데이터 연동
-  // const { data, isLoading, isError, error } = useGetLinks({ size: 20 });
 
-  useEffect(() => {
-    setLinks(mockLinks.slice(0, PAGE_SIZE));
-  }, [setLinks]);
+  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+    useGetInfiniteLinks();
 
-  const hasMore = links.length < mockLinks.length;
+  // 전체 페이지 평탄화
+  const links = data?.pages.flatMap(page => page.content) ?? [];
 
   const selectedLink = links.find(link => link.id === selectedLinkId) ?? null;
 
@@ -30,13 +27,19 @@ export default function AllLink() {
     setIsPanelOpen(true);
   };
 
-  const handleLoadMore = async () => {
-    if (!hasMore) return;
-    setIsLoadingMore(true);
-    const nextCount = Math.min(links.length + PAGE_SIZE, mockLinks.length);
-    setLinks(mockLinks.slice(0, nextCount));
-    setIsLoadingMore(false);
-  };
+  if (isLoading)
+    return (
+      <div className="flex w-full items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  if (isError && !data)
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-gray600">링크를 불러오지 못했습니다.</p>
+        <Button onClick={() => refetch()} label="다시 시도" />
+      </div>
+    );
 
   return (
     <div className="h-screen min-w-0">
@@ -51,9 +54,11 @@ export default function AllLink() {
                 <p className="text-gray600">표시할 링크가 없습니다.</p>
               ) : (
                 <InfiniteScroll
-                  onLoadMore={handleLoadMore}
-                  hasMore={hasMore}
-                  isLoading={isLoadingMore}
+                  onLoadMore={() => {
+                    fetchNextPage();
+                  }}
+                  hasMore={hasNextPage ?? false}
+                  isLoading={isFetchingNextPage}
                 >
                   <CardList>
                     {links.map(link => (
