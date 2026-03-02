@@ -363,17 +363,9 @@ export const mockLinks: LinkApiData[] = [
 ];
 
 export const mockLinkListData: LinkListApiData = {
-  totalPages: 1,
-  totalElements: mockLinks.length,
-  pageable,
-  numberOfElements: mockLinks.length,
-  size: pageable.pageSize,
-  content: mockLinks,
-  number: pageable.pageNumber,
-  sort: pageSort,
-  first: true,
-  last: true,
-  empty: mockLinks.length === 0,
+  links: mockLinks,
+  hasNext: false,
+  lastId: mockLinks[mockLinks.length - 1]?.id ?? null,
 };
 
 export const mockLinkListResponse: LinkListApiResponse = buildResponse(mockLinkListData);

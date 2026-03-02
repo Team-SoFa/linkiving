@@ -169,7 +169,7 @@ export default function LinkApiDemo() {
         <div className="mb-3 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold">링크 목록</h2>
-            <p className="text-gray600 text-sm">총 {data?.totalElements ?? 0}개</p>
+            <p className="text-gray600 text-sm">총 {links.length}개</p>
           </div>
           <Button variant="secondary" label="새로고침" onClick={() => refetch()} />
         </div>

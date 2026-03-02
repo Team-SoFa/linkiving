@@ -15,6 +15,9 @@ import type { CreateLinkPayload, Link, UpdateLinkPayload } from '@/types/link';
 const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
 
+// BFF를 통하는 내부 엔드포인트
+const LINKS_BFF = '/api/links';
+
 if (!API_URL) {
   throw new Error('Missing environment variable: NEXT_PUBLIC_BASE_API_URL');
 }
@@ -70,6 +73,7 @@ const normalizeLink = (data: Partial<Link>): Link => {
   };
 };
 
+// 전체 링크 fetch
 export const fetchLinks = async (params?: LinkListParams): Promise<LinkListViewData> => {
   const body = await clientApiClient<LinkListApiResponse>(`/api/links${buildQuery(params)}`);
 
@@ -79,7 +83,7 @@ export const fetchLinks = async (params?: LinkListParams): Promise<LinkListViewD
 
   return {
     ...body.data,
-    content: body.data.content.map(normalizeLink),
+    content: body.data.links.map(normalizeLink),
   };
 };
 

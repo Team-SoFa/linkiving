@@ -1,4 +1,4 @@
-import type { Link, PageSort, Pageable } from '@/types/link';
+import type { Link } from '@/types/link';
 import { z } from 'zod';
 
 export interface ApiResponseBase<T> {
@@ -22,23 +22,16 @@ export type LinkApiData = LinkRes;
 
 export type LinkApiResponse = ApiResponseBase<LinkApiData>;
 
+// 링크 리스트 (커서 기반)
 export interface LinkListApiData {
-  totalPages: number;
-  totalElements: number;
-  pageable: Pageable;
-  numberOfElements: number;
-  size: number;
-  content: LinkApiData[];
-  number: number;
-  sort: PageSort;
-  first: boolean;
-  last: boolean;
-  empty: boolean;
+  links: LinkApiData[];
+  hasNext: boolean;
+  lastId: number | null;
 }
 
 export type LinkListApiResponse = ApiResponseBase<LinkListApiData>;
 
-export type LinkListViewData = Omit<LinkListApiData, 'content'> & {
+export type LinkListViewData = Omit<LinkListApiData, 'links'> & {
   content: Link[];
 };
 
