@@ -30,11 +30,11 @@ export default meta;
 type Story = StoryObj<typeof ReportModal>;
 
 const StoryWrapper = () => {
-  const { type, open } = useModalStore();
+  const { modal, open } = useModalStore();
   return (
     <>
       <Button label="모달 열기" variant="primary" onClick={() => open('REPORT')} />
-      {type === 'REPORT' && <ReportModal />}
+      {modal.type === 'REPORT' && <ReportModal />}
     </>
   );
 };

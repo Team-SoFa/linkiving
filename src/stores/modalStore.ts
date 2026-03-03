@@ -7,31 +7,27 @@ export const MODAL_TYPE = {
   DELETE_CHAT: 'DELETE_CHAT',
 } as const;
 
-type ModalProps = {
-  ADD_LINK?: Record<string, unknown>;
-  RE_SUMMARY?: Record<string, unknown>;
-  REPORT?: Record<string, unknown>;
-  DELETE_CHAT: { chatId: number; title: string };
-};
-
 export type ModalType = keyof typeof MODAL_TYPE | null;
+type ModalState =
+  | { type: null; props?: undefined }
+  | { type: 'ADD_LINK'; props?: Record<string, unknown> }
+  | { type: 'RE_SUMMARY'; props: { linkId: number } }
+  | { type: 'REPORT'; props?: Record<string, unknown> }
+  | { type: 'DELETE_CHAT'; props: { chatId: number; title: string } };
 
 interface ModalStore {
-  type: ModalType;
-  props?: ModalProps[keyof ModalProps];
-  // 함수 오버로딩
-  open(type: 'ADD_LINK', props?: ModalProps['ADD_LINK']): void;
-  open(type: 'RE_SUMMARY', props?: ModalProps['RE_SUMMARY']): void;
-  open(type: 'REPORT', props?: ModalProps['REPORT']): void;
-  open(type: 'DELETE_CHAT', props: ModalProps['DELETE_CHAT']): void;
+  modal: ModalState;
+  open(type: 'ADD_LINK', props?: Record<string, unknown>): void;
+  open(type: 'RE_SUMMARY', props: { linkId: number }): void;
+  open(type: 'REPORT', props?: Record<string, unknown>): void;
+  open(type: 'DELETE_CHAT', props: { chatId: number; title: string }): void;
   close: () => void;
 }
 
 export const useModalStore = create<ModalStore>(set => ({
-  type: null,
-  props: undefined,
-  open: ((type: keyof typeof MODAL_TYPE, props?: ModalProps[keyof ModalProps]) => {
-    set({ type, props });
+  modal: { type: null },
+  open: ((type: ModalType, props?: unknown) => {
+    set({ modal: { type, props } as ModalState });
   }) as ModalStore['open'],
-  close: () => set({ type: null, props: undefined }),
+  close: () => set({ modal: { type: null } }),
 }));

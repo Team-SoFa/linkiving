@@ -24,7 +24,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
   { className, children, type, ...rest },
   ref
 ) {
-  const { type: openType, close } = useModalStore();
+  const { modal, close } = useModalStore();
   const [portalElement, setPortalElement] = useState<HTMLElement | null>(null);
 
   // 포털 렌더링을 위한 div 체크
@@ -40,7 +40,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
     }
   }, []);
 
-  if (openType !== type) return null;
+  if (modal.type !== type) return null;
   if (!portalElement) return null;
 
   return createPortal(

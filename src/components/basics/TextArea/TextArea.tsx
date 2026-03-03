@@ -7,7 +7,7 @@ import React from 'react';
 import { textAreaStyle, wholeBoxStyle } from './TextArea.style';
 import { useAutoResizeTextArea } from './hooks/useAutoResizeTextArea';
 
-const LINE_HEIGHTS = { sm: 19, md: 26, lg: 29 };
+export const LINE_HEIGHTS = { sm: 19, md: 26, lg: 29 };
 export interface TextAreaProps extends Omit<
   React.TextareaHTMLAttributes<HTMLTextAreaElement>,
   'value' | 'onChange' | 'onSubmit'

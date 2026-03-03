@@ -8,6 +8,7 @@ import Spinner from '@/components/basics/Spinner/Spinner';
 import TextArea from '@/components/basics/TextArea/TextArea';
 import { useLinkMetaScrape } from '@/hooks/useLinkMetaScrape';
 import { usePostLinks } from '@/hooks/usePostLinks';
+import { MAX_MEMO_LENGTH, MAX_TITLE_LENGTH } from '@/lib/constants/link';
 import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
 import { hideToast, showToast } from '@/stores/toastStore';
@@ -26,8 +27,14 @@ const addLinkSchema = z.object({
     .string()
     .trim()
     .url({ message: '유효하지 않은 링크 주소입니다. URL을 다시 확인해 주세요.' }),
-  title: z.string().min(1, { message: '제목을 입력해 주세요.' }),
-  memo: z.string().optional(),
+  title: z
+    .string()
+    .min(1, { message: '제목을 입력해 주세요.' })
+    .max(MAX_TITLE_LENGTH, { message: `제목은 ${MAX_TITLE_LENGTH}자 이하로 입력해 주세요.` }),
+  memo: z
+    .string()
+    .max(MAX_MEMO_LENGTH, { message: `메모는 ${MAX_MEMO_LENGTH}자 이하로 입력해 주세요.` })
+    .optional(),
 });
 type AddLinkForm = z.infer<typeof addLinkSchema>;
 
@@ -223,7 +230,7 @@ const AddLinkModal = () => {
                     radius="lg"
                     heightLines={2}
                     maxHeightLines={2}
-                    maxLength={100}
+                    maxLength={MAX_TITLE_LENGTH}
                     isLoading={metaLoading && isValidUrl}
                     disabled={shouldDisableDetails}
                     value={field.value ?? ''}
@@ -250,7 +257,7 @@ const AddLinkModal = () => {
                 radius="lg"
                 heightLines={3}
                 maxHeightLines={3}
-                maxLength={600}
+                maxLength={MAX_MEMO_LENGTH}
                 isLoading={metaLoading && isValidUrl}
                 disabled={shouldDisableDetails}
                 value={field.value ?? ''}

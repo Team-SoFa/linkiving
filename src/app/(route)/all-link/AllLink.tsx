@@ -81,6 +81,7 @@ export default function AllLink() {
           <aside className="hidden h-screen shrink-0 xl:block xl:w-130">
             {selectedLink ? (
               <LinkCardDetailPanel
+                id={selectedLink.id}
                 url={selectedLink.url}
                 title={selectedLink.title}
                 summary={selectedLink.summary ?? ''}

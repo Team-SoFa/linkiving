@@ -1,4 +1,3 @@
-import { mockLinks } from '@/mocks';
 import type { LinkApiData } from '@/types/api/linkApi';
 import { create } from 'zustand';
 
@@ -10,10 +9,8 @@ type LinkStoreState = {
   updateLink: (id: number, updates: Partial<LinkApiData>) => void;
 };
 
-const useMockData = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
-
 export const useLinkStore = create<LinkStoreState>(set => ({
-  links: useMockData ? mockLinks : [],
+  links: [],
   selectedLinkId: null,
   setLinks: links => set({ links }),
   selectLink: id => set({ selectedLinkId: id }),

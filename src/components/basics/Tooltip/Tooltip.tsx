@@ -92,7 +92,7 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip
   return (
     <span
       ref={ref}
-      className="relative inline-flex"
+      className="relative flex"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onFocus={handleFocus}
