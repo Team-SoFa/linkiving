@@ -11,7 +11,7 @@ type ModalProps = {
   ADD_LINK?: Record<string, unknown>;
   RE_SUMMARY?: Record<string, unknown>;
   REPORT?: Record<string, unknown>;
-  DELETE_CHAT: { chatId: number };
+  DELETE_CHAT: { chatId: number; title: string };
 };
 
 export type ModalType = keyof typeof MODAL_TYPE | null;
