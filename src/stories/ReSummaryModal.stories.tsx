@@ -18,12 +18,16 @@ export default meta;
 type Story = StoryObj<typeof ReSummaryModal>;
 
 const StoryWrapper = () => {
-  const { type, open } = useModalStore();
+  const { modal, open } = useModalStore();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Button label="모달 열기" variant="primary" onClick={() => open('RE_SUMMARY')} />
-      {type === 'RE_SUMMARY' && <ReSummaryModal summaryId={123} />}
+      <Button
+        label="모달 열기"
+        variant="primary"
+        onClick={() => open('RE_SUMMARY', { linkId: 123 })}
+      />
+      {modal.type === 'RE_SUMMARY' && <ReSummaryModal linkId={123} />}
     </QueryClientProvider>
   );
 };

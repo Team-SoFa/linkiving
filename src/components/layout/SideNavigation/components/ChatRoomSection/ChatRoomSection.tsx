@@ -8,7 +8,7 @@ import DeleteChatModal from './DeleteChatModal';
 
 const ChatRoomSection = () => {
   const { data: chats = [], isLoading, isError } = useChatList();
-  const { type, props } = useModalStore();
+  const { modal } = useModalStore();
 
   return (
     <>
@@ -27,11 +27,9 @@ const ChatRoomSection = () => {
         </div>
       </div>
 
-      {type === 'DELETE_CHAT' &&
-        typeof props?.chatId === 'number' &&
-        typeof props?.title === 'string' && (
-          <DeleteChatModal chatId={props.chatId} title={props.title} />
-        )}
+      {modal.type === 'DELETE_CHAT' && (
+        <DeleteChatModal chatId={modal.props.chatId} title={modal.props.title} />
+      )}
     </>
   );
 };

@@ -1,9 +1,7 @@
 'use client';
 
-import IconButton from '@/components/basics/IconButton/IconButton';
 import TextArea, { type TextAreaProps } from '@/components/basics/TextArea/TextArea';
-import Tooltip from '@/components/basics/Tooltip/Tooltip';
-import { showToast } from '@/stores/toastStore';
+import CopyButton from '@/components/wrappers/CopyButton';
 import clsx from 'clsx';
 import React from 'react';
 
@@ -44,25 +42,6 @@ const AddLinkUrlInput = React.forwardRef<HTMLTextAreaElement, AddLinkUrlInputPro
     const inputId = id ?? name ?? 'add-link-url-input';
     const errorId = hasError ? `${inputId}-error` : undefined;
 
-    const handleCopyClick = async () => {
-      if (!trimmedValue) return;
-      if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) return;
-      try {
-        await navigator.clipboard.writeText(trimmedValue);
-        showToast({
-          message: '링크가 클립보드에 복사되었습니다.',
-          variant: 'success',
-          showIcon: true,
-        });
-      } catch {
-        showToast({
-          message: '링크 복사에 실패했습니다.',
-          variant: 'error',
-          showIcon: true,
-        });
-      }
-    };
-
     const handleKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = e => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -98,18 +77,12 @@ const AddLinkUrlInput = React.forwardRef<HTMLTextAreaElement, AddLinkUrlInputPro
             {...rest}
           />
           <div className="absolute inset-y-0 right-2 flex items-center">
-            <Tooltip content="URL 복사하기" side="bottom">
-              <IconButton
-                icon="IC_Copy"
-                size="sm"
-                variant="tertiary_subtle"
-                contextStyle="onMain"
-                ariaLabel="URL 복사하기"
-                disabled={!trimmedValue}
-                className="pointer-events-auto"
-                onClick={handleCopyClick}
-              />
-            </Tooltip>
+            <CopyButton
+              value={trimmedValue}
+              successMsg="링크가 클립보드에 복사되었습니다."
+              failMsg="링크 복사에 실패했습니다."
+              tooltipMsg="링크 복사하기"
+            />
           </div>
         </div>
         {hasError && (

@@ -10,6 +10,7 @@ const meta = {
     layout: 'centered',
   },
   argTypes: {
+    id: { control: 'number' },
     url: { control: 'text' },
     title: { control: 'text' },
     summary: { control: 'text' },
@@ -23,19 +24,20 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const ControlledPanel = (props: Story['args']) => {
+  const [id, setId] = useState(props?.id ?? 1);
   const [title, setTitle] = useState(props?.title ?? '');
   const [memo, setMemo] = useState(props?.memo ?? '');
 
   return (
     <LinkCardDetailPanel
       {...props}
+      id={id}
       title={title}
       memo={memo}
       onTitleChange={setTitle}
       onMemoChange={setMemo}
       onClose={() => console.log('close panel')}
       onRetrySummary={props?.onRetrySummary ?? (() => console.log('retry summary'))}
-      onRegenerateSummary={props?.onRegenerateSummary ?? (() => console.log('regenerate summary'))}
     />
   );
 };
@@ -54,6 +56,7 @@ export const SummaryError: Story = {
   render: args => <ControlledPanel {...args} />,
   args: {
     ...baseArgs,
+    id: 1,
     summary: '',
     summaryState: 'error',
     summaryErrorMessage: '일시적 오류로 요약을 생성하지 못했습니다.',
@@ -65,6 +68,7 @@ export const SummaryLoading: Story = {
   render: args => <ControlledPanel {...args} />,
   args: {
     ...baseArgs,
+    id: 1,
     summary: '',
     summaryState: 'loading',
   },
@@ -75,6 +79,7 @@ export const SummaryReady: Story = {
   render: args => <ControlledPanel {...args} />,
   args: {
     ...baseArgs,
+    id: 1,
     summaryState: 'ready',
   },
 };

@@ -149,6 +149,7 @@ export default function MockChatPage() {
       {selectedLink && (
         <aside className="border-gray200 hidden h-screen shrink-0 border-l xl:block xl:w-130">
           <LinkCardDetailPanel
+            id={selectedLink.linkId}
             url={selectedLink.url}
             title={selectedLink.title}
             summary={selectedLink.summary ?? ''}

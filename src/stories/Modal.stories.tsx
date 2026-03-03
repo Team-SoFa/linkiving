@@ -31,13 +31,13 @@ type Story = StoryObj<typeof Modal>;
 export const Default: Story = {
   render: args => {
     const StoryWrapper = () => {
-      const { type: openType, open, close } = useModalStore();
+      const { modal, open, close } = useModalStore();
 
       // args.type과 store 연동
       useEffect(() => {
-        if (openType === args.type) return;
+        if (modal.type === args.type) return;
         close();
-      }, [openType, close]);
+      }, [modal.type, close]);
 
       const handleOpen = () => {
         // 타입에 따라 적절한 props 전달
@@ -46,7 +46,7 @@ export const Default: Story = {
         } else if (args.type === 'ADD_LINK') {
           open('ADD_LINK');
         } else if (args.type === 'RE_SUMMARY') {
-          open('RE_SUMMARY');
+          open('RE_SUMMARY', { linkId: 123 });
         } else if (args.type === 'REPORT') {
           open('REPORT');
         }
