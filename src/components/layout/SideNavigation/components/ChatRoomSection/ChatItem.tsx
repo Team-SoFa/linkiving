@@ -13,7 +13,7 @@ interface Props {
 
 const ChatItem = ({ id, label }: Props) => {
   const router = useRouter();
-  const { type, open } = useModalStore();
+  const { open } = useModalStore();
 
   const handleItemClick = () => {
     router.push(`/chat/${id}`);
@@ -65,7 +65,7 @@ const ChatItem = ({ id, label }: Props) => {
                 onClick={e => {
                   e.stopPropagation();
                   close();
-                  open('DELETE_CHAT', { chatId: id });
+                  open('DELETE_CHAT', { chatId: id, title: label });
                 }}
               />
             )}

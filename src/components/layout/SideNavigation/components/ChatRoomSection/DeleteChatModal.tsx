@@ -2,17 +2,35 @@ import Button from '@/components/basics/Button/Button';
 import Modal from '@/components/basics/Modal/Modal';
 import { useDeleteChat } from '@/hooks/server/Chats/useDeleteChat';
 import { useModalStore } from '@/stores/modalStore';
+import { showToast } from '@/stores/toastStore';
 
-const DeleteChatModal = ({ chatId }: { chatId: number }) => {
+interface Props {
+  chatId: number;
+  title: string;
+}
+
+const DeleteChatModal = ({ chatId, title }: Props) => {
   const { close } = useModalStore();
   const { mutate, isPending } = useDeleteChat();
 
   const handleDelete = () => {
     mutate(chatId, {
-      onSuccess: () => close(),
+      onSuccess: () => {
+        showToast({
+          id: `delete_chatroom${chatId}_success`,
+          message: `"${title}" 채팅을 삭제했습니다.`,
+          variant: 'success',
+          duration: 2000,
+        });
+        close();
+      },
       onError: error => {
-        // TODO: error logic
-        console.error('채팅 삭제 실패: ', error);
+        showToast({
+          id: `delete_chatroom${chatId}_fail`,
+          message: '삭제에 실패했습니다. 잠시 후 다시 시도해주세요.',
+          variant: 'error',
+          duration: 2000,
+        });
       },
     });
   };
@@ -30,10 +48,11 @@ const DeleteChatModal = ({ chatId }: { chatId: number }) => {
           <Button variant="secondary" label="취소하기" className="flex-1" onClick={close} />
           <Button
             variant="primary"
-            label={isPending ? '삭제 중...' : '삭제하기'}
+            label="삭제하기"
             className="flex-1"
             onClick={handleDelete}
             disabled={isPending}
+            loading={isPending}
           />
         </div>
       </div>

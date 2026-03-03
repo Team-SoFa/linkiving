@@ -6,6 +6,7 @@ import React from 'react';
 
 import SVGIcon from '../../Icons/SVGIcon';
 import { IconMapTypes, buttonSizeMap } from '../../Icons/icons';
+import Spinner from '../Spinner/Spinner';
 import { style } from './Button.style';
 
 export interface ButtonProps extends Omit<
@@ -21,6 +22,7 @@ export interface ButtonProps extends Omit<
   radius?: 'md' | 'full';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
+  loading?: boolean;
   onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
@@ -38,12 +40,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       radius = 'md',
       size = 'md',
       disabled = false,
+      loading = false,
       onClick,
       ...rest
     },
     ref
   ) => {
     // STYLES
+    const isDisabled = disabled || loading;
     const classes = style({
       variant,
       radius,
@@ -58,13 +62,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         ref={ref}
         className={clsx(classes, className)}
-        disabled={disabled}
+        disabled={isDisabled}
         type={type}
-        aria-disabled={disabled}
-        onClick={onClick}
+        aria-disabled={isDisabled}
+        aria-busy={loading || undefined}
+        onClick={isDisabled ? undefined : onClick}
         {...rest}
       >
-        {asChild ? (
+        {loading ? (
+          <div className="flex h-full w-full items-center justify-center">
+            <Spinner size={size} />
+            {label && <span className="sr-only">{label}</span>}
+          </div>
+        ) : asChild ? (
           children
         ) : (
           <div className="flex items-center gap-x-1">

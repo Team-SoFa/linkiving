@@ -27,9 +27,11 @@ const ChatRoomSection = () => {
         </div>
       </div>
 
-      {type === 'DELETE_CHAT' && typeof props?.chatId === 'number' && (
-        <DeleteChatModal chatId={props.chatId} />
-      )}
+      {type === 'DELETE_CHAT' &&
+        typeof props?.chatId === 'number' &&
+        typeof props?.title === 'string' && (
+          <DeleteChatModal chatId={props.chatId} title={props.title} />
+        )}
     </>
   );
 };
