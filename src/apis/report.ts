@@ -2,7 +2,7 @@ import { backendApiClient } from '@/lib/client/backendClient';
 import type { ReportApiResponse, ReportRequest } from '@/types/api/report';
 
 export const createReport = async (payload: ReportRequest) => {
-  const res = await backendApiClient<ReportApiResponse>('/v1/report', {
+  const res = await backendApiClient<ReportApiResponse>('/api/report', {
     method: 'POST',
     body: JSON.stringify(payload),
   });

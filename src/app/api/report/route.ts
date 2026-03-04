@@ -1,33 +1,33 @@
-// app/api/report/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { handleApiError } from '@/hooks/util/api';
+import { MIN_REPORT_LENGTH } from '@/lib/constants/report';
+import { serverApiClient } from '@/lib/server/apiClient';
+import { NextResponse } from 'next/server';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
-const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN; // TODO: 추후 API_TOKEN으로 수정
-
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json();
-
-    if (!body.content || typeof body.content !== 'string') {
-      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    let body;
+    try {
+      body = await req.json(); // JSON 파싱 시도
+    } catch {
+      return NextResponse.json({ success: false, message: 'Invalid JSON body' }, { status: 400 });
     }
 
-    const response = await fetch(`${API_BASE_URL}/v1/report`, {
+    const content =
+      body && typeof body === 'object' ? (body as { content?: unknown }).content : undefined;
+    if (typeof content !== 'string' || content.trim().length < MIN_REPORT_LENGTH) {
+      return NextResponse.json(
+        { success: false, message: `최소 ${MIN_REPORT_LENGTH}자 이상 입력해주세요.` },
+        { status: 400 }
+      );
+    }
+
+    const data = await serverApiClient('/v1/report', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${API_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(body),
     });
 
-    if (!response.ok) {
-      return NextResponse.json({ error: 'Failed to submit report' }, { status: response.status });
-    }
-
-    const data = await response.json();
     return NextResponse.json(data);
-  } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } catch (err) {
+    return handleApiError(err);
   }
 }
