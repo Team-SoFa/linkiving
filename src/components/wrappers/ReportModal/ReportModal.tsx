@@ -2,6 +2,7 @@ import Button from '@/components/basics/Button/Button';
 import Modal from '@/components/basics/Modal/Modal';
 import TextArea from '@/components/basics/TextArea/TextArea';
 import usePostReport from '@/hooks/usePostReport';
+import { MIN_REPORT_LENGTH } from '@/lib/constants/report';
 import { useModalStore } from '@/stores/modalStore';
 import { FormEvent, useState } from 'react';
 
@@ -15,8 +16,8 @@ const ReportModal = () => {
   });
 
   const validate = (value: string): boolean => {
-    if (value.length < 5) {
-      setValidationError('최소 5자 이상 입력해주세요.');
+    if (value.trim().length < MIN_REPORT_LENGTH) {
+      setValidationError(`최소 ${MIN_REPORT_LENGTH}자 이상 입력해주세요.`);
       return false;
     }
     if (value.length > 500) {
@@ -76,7 +77,8 @@ const ReportModal = () => {
         <Button
           type="submit"
           label="제출하기"
-          disabled={content.length < 5 || content.length > 500 || isLoading}
+          disabled={content.trim().length < MIN_REPORT_LENGTH || content.length > 500 || isLoading}
+          // TODO: isLoading props 추가
         />
       </form>
     </Modal>
