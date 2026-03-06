@@ -1,20 +1,30 @@
+import { COOKIES_KEYS } from '@/lib/constants/cookies';
 import { useChatStore } from '@/stores/chatStore';
-import { Client, type StompSubscription } from '@stomp/stompjs';
+import { Client, type StompHeaders, type StompSubscription } from '@stomp/stompjs';
 import { useEffect, useRef } from 'react';
 import SockJS from 'sockjs-client';
 
 const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE_URL;
-const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
 
 if (!WS_BASE_URL) {
   throw new Error('Missing environment variable: NEXT_PUBLIC_WS_BASE_URL');
 }
 
-if (!API_TOKEN) {
-  throw new Error('Missing environment variable: NEXT_PUBLIC_API_TOKEN');
-}
+const resolveAuthorization = (token?: string) => {
+  if (token) return `Bearer ${token}`;
 
-const authHeaderValue = () => `Bearer ${API_TOKEN}`;
+  if (typeof document !== 'undefined') {
+    const tokenEntry = document.cookie
+      .split('; ')
+      .find(row => row.startsWith(`${COOKIES_KEYS.ACCESS_TOKEN}=`));
+    const cookieToken = tokenEntry
+      ? decodeURIComponent(tokenEntry.substring(`${COOKIES_KEYS.ACCESS_TOKEN}=`.length))
+      : '';
+    if (cookieToken) return `Bearer ${cookieToken}`;
+  }
+
+  return null;
+};
 
 const WS_CHAT_ENDPOINT = `${WS_BASE_URL}/ws/chat`;
 const SUBSCRIBE_DEST = process.env.NEXT_PUBLIC_WS_SUBSCRIBE_DEST ?? '/user/queue/chat';
@@ -64,6 +74,9 @@ const parseIncoming = (rawBody: string): IncomingMessage => {
   };
 };
 
+const toStompHeaders = (authorization: string | null): StompHeaders =>
+  authorization ? { Authorization: authorization } : {};
+
 export const useStompChat = () => {
   const clientRef = useRef<Client | null>(null);
   const subscriptionRef = useRef<StompSubscription | null>(null);
@@ -98,7 +111,10 @@ export const useStompChat = () => {
     const client = new Client({
       webSocketFactory: () =>
         useSockJS ? new SockJS(socketEndpoint) : new WebSocket(socketEndpoint),
-      connectHeaders: { Authorization: token ? `Bearer ${token}` : authHeaderValue() },
+      connectHeaders: {},
+      beforeConnect: stompClient => {
+        stompClient.connectHeaders = toStompHeaders(resolveAuthorization(tokenRef.current));
+      },
       debug: () => {},
       reconnectDelay: 5000,
     });
@@ -159,23 +175,21 @@ export const useStompChat = () => {
     addMessage({ id: `${Date.now() + 1}`, role: 'ai', content: '...' });
     setGenerating(true);
 
+    const authorization = resolveAuthorization(tokenRef.current);
     clientRef.current.publish({
       destination: SEND_DEST,
       body: JSON.stringify({ chatId: Number(chatId), message: content }),
-      headers: {
-        Authorization: tokenRef.current ? `Bearer ${tokenRef.current}` : authHeaderValue(),
-      },
+      headers: toStompHeaders(authorization),
     });
   };
 
   const cancelGeneration = (chatId: string | number) => {
     if (!clientRef.current?.connected) return;
+    const authorization = resolveAuthorization(tokenRef.current);
     clientRef.current.publish({
       destination: CANCEL_DEST,
       body: JSON.stringify({ chatId: Number(chatId) }),
-      headers: {
-        Authorization: tokenRef.current ? `Bearer ${tokenRef.current}` : authHeaderValue(),
-      },
+      headers: toStompHeaders(authorization),
     });
   };
 

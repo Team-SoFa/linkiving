@@ -21,6 +21,7 @@ export async function POST() {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   } finally {
     cookieStore.delete(COOKIES_KEYS.ACCESS_TOKEN);
+    cookieStore.delete(COOKIES_KEYS.REFRESH_TOKEN);
     cookieStore.delete(COOKIES_KEYS.USER_INFO);
   }
 }
