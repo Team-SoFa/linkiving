@@ -15,15 +15,21 @@ export const menuGroupStyle = tv({
 });
 
 export const textStyle = tv({
-  base: 'text-gray500 hover:text-gray700 focus:text-blue400 px-1 text-[20px]',
+  base: 'px-1 text-[20px]',
+  variants: {
+    active: {
+      true: 'text-blue400',
+      false: 'text-gray500 hover:text-gray700 focus:text-blue400',
+    },
+  },
 });
 
 export const tabMenuDividerStyle = tv({
   base: `transition-opacity duration-200`,
   variants: {
     active: {
-      true: 'bg-blue400 opacity-100',
-      false: 'bg-gray400 opacity-0 group-focus-within:opacity-100',
+      true: '!bg-blue400 opacity-100',
+      false: '!bg-gray400 opacity-0 group-focus-within:opacity-100',
     },
   },
 });
