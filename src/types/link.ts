@@ -27,6 +27,7 @@ export type CreateLinkPayload = Pick<Link, 'url' | 'title'> & Partial<OptionalLi
 type UpdatableLinkFields = {
   title?: string | null;
   memo?: string | null;
+  imageUrl?: string | null;
 };
 
 export type UpdateLinkPayload = AtLeastOne<UpdatableLinkFields>;
