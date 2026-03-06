@@ -13,7 +13,7 @@ interface Props {
 
 const ChatItem = ({ id, label }: Props) => {
   const router = useRouter();
-  const { open } = useModalStore();
+  const open = useModalStore(state => state.open);
 
   const handleItemClick = () => {
     router.push(`/chat/${id}`);

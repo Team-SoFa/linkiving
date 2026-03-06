@@ -13,15 +13,15 @@ import PrevSummary from './PrevSummary';
 import useReSummary from './hooks/useReSummary';
 
 interface ReSummaryProps {
-  summaryId: number;
+  linkId: number;
 }
 
-export default function ReSummaryModal({ summaryId }: ReSummaryProps) {
-  const { mutate, isLoading, error, data } = useReSummary(summaryId);
+export default function ReSummaryModal({ linkId }: ReSummaryProps) {
+  const { mutate, isLoading, error, data } = useReSummary(linkId);
 
   useEffect(() => {
     mutate();
-  }, [mutate, summaryId]);
+  }, [mutate, linkId]);
 
   const prevContent = data?.existingSummary ?? '';
   const newContent = data?.newSummary ?? '';

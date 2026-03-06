@@ -11,7 +11,7 @@ interface Props {
 }
 
 const MenuSection = ({ isOpen }: Props) => {
-  const { type, open } = useModalStore();
+  const { modal, open } = useModalStore();
 
   const MENU_ITEMS = [
     { id: 'new-chat', item: <NewChatButton /> },
@@ -39,7 +39,7 @@ const MenuSection = ({ isOpen }: Props) => {
           </div>
         ))}
       </nav>
-      {type === 'ADD_LINK' && <AddLinkModal />}
+      {modal.type === 'ADD_LINK' && <AddLinkModal />}
     </>
   );
 };
