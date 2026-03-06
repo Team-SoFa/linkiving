@@ -1,5 +1,6 @@
 import { type SafeFetchOptions, safeFetch } from '@/hooks/util/api/fetch/safeFetch';
 import { clientApiClient } from '@/lib/client/apiClient';
+import { COOKIES_KEYS } from '@/lib/constants/cookies';
 import type {
   DeleteLinkApiResponse,
   DuplicateLinkApiResponse,
@@ -12,21 +13,14 @@ import type {
 } from '@/types/api/linkApi';
 import type { CreateLinkPayload, Link, UpdateLinkPayload } from '@/types/link';
 
-const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
-const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
-
-// BFF를 통하는 내부 엔드포인트
 const LINKS_BFF = '/api/links';
-
-if (!API_URL) {
-  throw new Error('Missing environment variable: NEXT_PUBLIC_BASE_API_URL');
-}
-
-if (!API_TOKEN) {
-  throw new Error('Missing environment variable: NEXT_PUBLIC_API_TOKEN');
-}
-
-const LINKS_ENDPOINT = `${API_URL}/v1/links`;
+const getLinksEndpoint = () => {
+  const apiUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
+  if (!apiUrl) {
+    throw new Error('Missing environment variable: NEXT_PUBLIC_BASE_API_URL');
+  }
+  return `${apiUrl}/v1/links`;
+};
 
 export type LinkListParams = {
   lastId?: number | null;
@@ -44,20 +38,6 @@ function buildQuery(params?: LinkListParams) {
   return qs ? `?${qs}` : '';
 }
 
-const withAuth = (init?: SafeFetchOptions): SafeFetchOptions => {
-  const headers: HeadersInit = {
-    Authorization: `Bearer ${API_TOKEN}`,
-    ...(init?.headers ?? {}),
-  };
-
-  return {
-    timeout: 15_000,
-    jsonContentTypeCheck: true,
-    ...init,
-    headers,
-  };
-};
-
 const normalizeLink = (data: Partial<Link>): Link => {
   const now = new Date().toISOString();
 
@@ -70,6 +50,32 @@ const normalizeLink = (data: Partial<Link>): Link => {
     imageUrl: data.imageUrl ?? '',
     createdAt: data.createdAt ?? now,
     updatedAt: data.updatedAt ?? now,
+  };
+};
+
+const authHeaderValue = () => {
+  if (typeof document === 'undefined') return '';
+  const tokenEntry = document.cookie
+    .split('; ')
+    .find(row => row.startsWith(`${COOKIES_KEYS.ACCESS_TOKEN}=`));
+  const token = tokenEntry
+    ? decodeURIComponent(tokenEntry.substring(`${COOKIES_KEYS.ACCESS_TOKEN}=`.length))
+    : '';
+  return token ? `Bearer ${token}` : '';
+};
+
+const withAuth = (init?: SafeFetchOptions): SafeFetchOptions => {
+  const authorization = authHeaderValue();
+  const headers: HeadersInit = {
+    ...(authorization ? { Authorization: authorization } : {}),
+    ...(init?.headers ?? {}),
+  };
+
+  return {
+    timeout: 15_000,
+    jsonContentTypeCheck: true,
+    ...init,
+    headers,
   };
 };
 
@@ -125,8 +131,9 @@ export const updateLink = async (id: number, payload: UpdateLinkPayload): Promis
 };
 
 export const updateLinkTitle = async (id: number, title: string): Promise<Link> => {
+  const linksEndpoint = getLinksEndpoint();
   const body = await safeFetch<LinkApiResponse>(
-    `${LINKS_ENDPOINT}/${id}/title`,
+    `${linksEndpoint}/${id}/title`,
     withAuth({
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -142,8 +149,9 @@ export const updateLinkTitle = async (id: number, title: string): Promise<Link> 
 };
 
 export const updateLinkMemo = async (id: number, memo: string): Promise<Link> => {
+  const linksEndpoint = getLinksEndpoint();
   const body = await safeFetch<LinkApiResponse>(
-    `${LINKS_ENDPOINT}/${id}/memo`,
+    `${linksEndpoint}/${id}/memo`,
     withAuth({
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -159,8 +167,9 @@ export const updateLinkMemo = async (id: number, memo: string): Promise<Link> =>
 };
 
 export const deleteLink = async (id: number): Promise<DeleteLinkApiResponse> => {
+  const linksEndpoint = getLinksEndpoint();
   const body = await safeFetch<DeleteLinkApiResponse>(
-    `${LINKS_ENDPOINT}/${id}`,
+    `${linksEndpoint}/${id}`,
     withAuth({ method: 'DELETE' })
   );
 
@@ -199,9 +208,10 @@ export const scrapeLinkMeta = async (url: string) => {
 };
 
 export const regenerateLinkSummary = async (id: number, format: LinkSummaryFormat) => {
+  const linksEndpoint = getLinksEndpoint();
   const usp = new URLSearchParams({ format });
   const body = await safeFetch<LinkSummaryRegenerateApiResponse>(
-    `${LINKS_ENDPOINT}/${id}/summary?${usp.toString()}`,
+    `${linksEndpoint}/${id}/summary?${usp.toString()}`,
     withAuth({ cache: 'no-store' })
   );
 

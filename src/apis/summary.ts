@@ -1,16 +1,25 @@
 import { type SafeFetchOptions, safeFetch } from '@/hooks/util/api/fetch/safeFetch';
 import { SummaryData, SummaryResponse } from '@/types/api/summaryApi';
 
-const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
-const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
+const getSummaryEndpoint = () => {
+  const apiUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
+  if (!apiUrl) {
+    throw new Error('Missing environment variable: NEXT_PUBLIC_BASE_API_URL');
+  }
+  return `${apiUrl}/v1/links`;
+};
 
-const SUMMARY_ENDPOINT = `${API_URL}/v1/links`;
-
-const authHeaderValue = () => `Bearer ${API_TOKEN}`;
+const authHeaderValue = () => {
+  if (typeof document === 'undefined') return '';
+  const tokenEntry = document.cookie.split('; ').find(row => row.startsWith('accessToken='));
+  const token = tokenEntry ? decodeURIComponent(tokenEntry.substring('accessToken='.length)) : '';
+  return token ? `Bearer ${token}` : '';
+};
 
 const withAuth = (init?: SafeFetchOptions): SafeFetchOptions => {
+  const authorization = authHeaderValue();
   const headers: HeadersInit = {
-    Authorization: authHeaderValue(),
+    ...(authorization ? { Authorization: authorization } : {}),
     ...(init?.headers ?? {}),
   };
 
@@ -28,13 +37,16 @@ type Params = {
 };
 
 export const fetchNewSummary = async (params: Params): Promise<SummaryData> => {
-  const url = new URL(`${SUMMARY_ENDPOINT}/${params.id}/summary`);
+  const summaryEndpoint = getSummaryEndpoint();
+  const url = `${summaryEndpoint}/${params.id}/summary`;
+  const searchParams = new URLSearchParams();
   if (params.format) {
-    url.searchParams.set('format', params.format);
+    searchParams.set('format', params.format);
   }
+  const endpoint = searchParams.toString() ? `${url}?${searchParams.toString()}` : url;
 
   const body = await safeFetch<SummaryResponse>(
-    url.toString(),
+    endpoint,
     withAuth({
       method: 'GET',
       timeout: 15_000,
