@@ -1,4 +1,11 @@
-import { Client, type IFrame, type IMessage, type StompSubscription } from '@stomp/stompjs';
+import { COOKIES_KEYS } from '@/lib/constants/cookies';
+import {
+  Client,
+  type IFrame,
+  type IMessage,
+  type StompHeaders,
+  type StompSubscription,
+} from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
 const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE_URL;
@@ -7,13 +14,18 @@ if (!WS_BASE_URL) {
   throw new Error('Missing environment variable: NEXT_PUBLIC_WS_BASE_URL');
 }
 
-const authHeaderValue = () => {
-  const tokenEntry = document.cookie.split('; ').find(row => row.startsWith('accessToken='));
+const authHeaderValue = (): string | null => {
+  const tokenEntry = document.cookie
+    .split('; ')
+    .find(row => row.startsWith(`${COOKIES_KEYS.ACCESS_TOKEN}=`));
   const token = tokenEntry
-    ? decodeURIComponent(tokenEntry.substring('accessToken='.length))
-    : undefined;
-  return `Bearer ${token ?? ''}`;
+    ? decodeURIComponent(tokenEntry.substring(`${COOKIES_KEYS.ACCESS_TOKEN}=`.length))
+    : '';
+  return token ? `Bearer ${token}` : null;
 };
+
+const withAuthorizationHeader = (authorization: string | null): StompHeaders =>
+  authorization ? { Authorization: authorization } : {};
 
 type Callback = () => void;
 
@@ -165,7 +177,7 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
     connectHeaders: {},
     beforeConnect: stompClient => {
       // 소켓 연결 시도마다 최신 토큰 사용하도록 함
-      stompClient.connectHeaders = { Authorization: authHeaderValue() };
+      stompClient.connectHeaders = withAuthorizationHeader(authHeaderValue());
     },
     reconnectDelay: 5000,
     onStompError: (frame: IFrame) => onError?.(frame),
@@ -216,7 +228,7 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
     client.publish({
       destination: SEND_DEST,
       body,
-      headers: { Authorization: authHeaderValue() },
+      headers: withAuthorizationHeader(authHeaderValue()),
     });
   };
 
@@ -231,7 +243,7 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
     client.publish({
       destination: CANCEL_DEST,
       body,
-      headers: { Authorization: authHeaderValue() },
+      headers: withAuthorizationHeader(authHeaderValue()),
     });
   };
 
