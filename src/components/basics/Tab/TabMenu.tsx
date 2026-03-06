@@ -20,7 +20,7 @@ const TabMenu = React.forwardRef<HTMLDivElement, TabMenuProps>(function TabMenu(
       {menus.map((menu, index) => (
         <div key={`${menu}-${index}`} className={menuGroupStyle()}>
           <button
-            className={textStyle()}
+            className={textStyle({ active: activeTab === menu })}
             onClick={onClick}
             role="tab"
             aria-selected={activeTab === menu}

@@ -292,13 +292,29 @@ export default function Chat() {
                     {message.text}
                   </div>
                 ) : (
-                  <div className="max-w-[92%] rounded-xl border border-gray-200 bg-white p-3">
+                  <div className="w-full rounded-xl border border-gray-200 bg-white p-3">
                     <Tab
                       tabs={['답변', '링크']}
                       contents={{
                         답변: (
                           <div className="text-gray700 text-sm whitespace-pre-wrap">
-                            {message.text}
+                            <div>{message.text}</div>
+                            {message.links && message.links.length > 0 && (
+                              <div className="mt-4">
+                                <CardList>
+                                  {message.links.map(link => (
+                                    <LinkCard
+                                      key={link.linkId}
+                                      title={link.title}
+                                      link={link.url}
+                                      summary=""
+                                      imageUrl={link.imageUrl ?? ''}
+                                      onClick={() => setSelectedLink(link)}
+                                    />
+                                  ))}
+                                </CardList>
+                              </div>
+                            )}
                           </div>
                         ),
                         링크: (
@@ -310,7 +326,7 @@ export default function Chat() {
                                     key={link.linkId}
                                     title={link.title}
                                     link={link.url}
-                                    summary={link.summary ?? ''}
+                                    summary=""
                                     imageUrl={link.imageUrl ?? ''}
                                     onClick={() => setSelectedLink(link)}
                                   />
