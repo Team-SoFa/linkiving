@@ -7,18 +7,33 @@ import React from 'react';
 
 import Anchor from '../Anchor/Anchor';
 import Badge from '../Badge/Badge';
+import IconButton from '../IconButton/IconButton';
 
 const SUMMARY_FAIL_TEXT = '요약 생성에 실패했습니다. 상세 패널에서 다시 시도해보세요.';
 
-interface LinkCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick'> {
+interface LinkCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick' | 'onSelect'> {
   imageUrl: string;
   link: string;
   summary: string;
   title: string;
+  isSelected?: boolean;
+  selectable?: boolean;
   onClick?: () => void;
+  onSelect?: (e: React.MouseEvent) => void;
 }
+
 const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCard(
-  { imageUrl, link, summary, title, onClick, ...rest },
+  {
+    imageUrl,
+    link,
+    summary,
+    title,
+    onClick,
+    isSelected = false,
+    onSelect,
+    selectable = false,
+    ...rest
+  },
   ref
 ) {
   const handleKeyDown = useInteractiveKeyBlock({ onClick });
@@ -27,12 +42,44 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
   return (
     <div
       ref={ref}
-      className="border-gray200 hover:bg-gray50 active:bg-blue50 focus:border-blue500 relative flex aspect-47/58 w-full cursor-pointer flex-col overflow-hidden rounded-2xl border transition-colors"
+      className="border-gray200 hover:bg-gray50 active:bg-blue50 focus:border-blue500 group relative flex aspect-47/58 w-full cursor-pointer flex-col overflow-hidden rounded-2xl border transition-colors"
       tabIndex={0}
       onClick={onClick}
       onKeyDown={handleKeyDown}
       {...rest}
     >
+      {/* 호버/선택 오버레이 */}
+      {selectable && (
+        <div
+          className={`pointer-events-none absolute inset-0 z-10 rounded-2xl transition-colors ${
+            isSelected ? 'bg-blue500/20' : 'bg-transparent group-hover:bg-black/20'
+          }`}
+        />
+      )}
+
+      {/* 체크 버튼 */}
+      {selectable && (
+        <div
+          className={`absolute top-2 right-2 z-20 transition-opacity ${
+            isSelected
+              ? 'opacity-100'
+              : 'pointer-events-none opacity-0 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100'
+          }`}
+        >
+          <IconButton
+            icon="IC_Check"
+            size="sm"
+            variant={isSelected ? 'primary' : 'secondary'}
+            ariaLabel={isSelected ? '링크 선택 해제' : '링크 선택'}
+            aria-pressed={isSelected}
+            onClick={e => {
+              e.stopPropagation();
+              onSelect?.(e);
+            }}
+          />
+        </div>
+      )}
+
       {!summary && (
         <Badge
           label="요약 실패"

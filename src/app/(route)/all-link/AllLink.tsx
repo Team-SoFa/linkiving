@@ -4,28 +4,64 @@ import Button from '@/components/basics/Button/Button';
 import CardList from '@/components/basics/CardList/CardList';
 import InfiniteScroll from '@/components/basics/InfiniteScroll/InfiniteScroll';
 import LinkCard from '@/components/basics/LinkCard/LinkCard';
+import DeleteLinkModal from '@/components/basics/LinkCard/components/DeleteLinkModal';
 import Spinner from '@/components/basics/Spinner/Spinner';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
 import { useGetInfiniteLinks } from '@/hooks/useGetInfiniteLinks';
 import { useLinkStore } from '@/stores/linkStore';
-import { useState } from 'react';
+import { useModalStore } from '@/stores/modalStore';
+import { useEffect, useRef, useState } from 'react';
 
 export default function AllLink() {
   const { selectedLinkId, selectLink } = useLinkStore();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const { modal, open } = useModalStore();
+
+  const listRef = useRef<HTMLDivElement>(null);
+  const deleteButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modal.type === 'DELETE_LINK') return; // 모달 열려있으면 스킵
+
+      if (
+        listRef.current &&
+        !listRef.current.contains(e.target as Node) &&
+        !deleteButtonRef.current?.contains(e.target as Node)
+      ) {
+        setSelectedIds(new Set());
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [modal.type]); // type을 의존성 배열에 추가하여 모달이 열렸을 때 외부 클릭 핸들러 실행 막음
 
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
     useGetInfiniteLinks();
 
-  // 전체 페이지 평탄화
   const links = data?.pages.flatMap(page => page.content) ?? [];
-
   const selectedLink = links.find(link => link.id === selectedLinkId) ?? null;
 
   const handleSelectLink = (id: number) => {
     selectLink(id);
     setIsPanelOpen(true);
   };
+
+  const handleToggleSelect = (id: number) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const selectedLinks = links.filter(link => selectedIds.has(link.id));
+  const hasSelection = selectedIds.size > 0;
 
   if (isLoading)
     return (
@@ -46,10 +82,17 @@ export default function AllLink() {
       <div className="h-screen min-w-0 xl:flex">
         <div className="min-w-0 flex-1 px-6 py-8 lg:px-10">
           <div className="mx-auto flex h-full w-full max-w-200 flex-col gap-5">
-            <header>
+            <header className="flex items-center justify-between">
               <h1 className="font-title-md">전체 링크</h1>
+              {hasSelection && (
+                <Button
+                  ref={deleteButtonRef}
+                  label={`${selectedIds.size}개 삭제`}
+                  onClick={() => open('DELETE_LINK', { linkIds: [...selectedIds] })}
+                />
+              )}
             </header>
-            <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-1">
+            <div ref={listRef} className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-1">
               {links.length === 0 ? (
                 <p className="text-gray600">표시할 링크가 없습니다.</p>
               ) : (
@@ -69,6 +112,9 @@ export default function AllLink() {
                         summary={link.summary ?? ''}
                         imageUrl={link.imageUrl ?? ''}
                         onClick={() => handleSelectLink(link.id)}
+                        selectable
+                        isSelected={selectedIds.has(link.id)}
+                        onSelect={() => handleToggleSelect(link.id)}
                       />
                     ))}
                   </CardList>
@@ -97,6 +143,24 @@ export default function AllLink() {
           </aside>
         )}
       </div>
+
+      {modal.type === 'DELETE_LINK' && (
+        <DeleteLinkModal
+          links={links
+            .filter(l => modal.props.linkIds.includes(l.id))
+            .map(l => ({ id: l.id, title: l.title, url: l.url }))}
+          onSuccess={succeededIds => {
+            // 삭제 성공한 id만 선택 해제
+            setSelectedIds(prev => {
+              const next = new Set(prev);
+              succeededIds.forEach(id => {
+                next.delete(id);
+              });
+              return next;
+            });
+          }}
+        />
+      )}
     </div>
   );
 }

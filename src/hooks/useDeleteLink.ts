@@ -6,10 +6,9 @@ export function useDeleteLink() {
   const qc = useQueryClient();
 
   return useMutation<DeleteLinkApiResponse, Error, number>({
-    mutationFn: id => deleteLink(id),
-    onSuccess: (_data, id) => {
+    mutationFn: deleteLink,
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['links'] });
-      qc.invalidateQueries({ queryKey: ['links', id] });
     },
   });
 }

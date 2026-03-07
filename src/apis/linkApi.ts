@@ -126,7 +126,7 @@ export const deleteLink = async (id: number): Promise<DeleteLinkApiResponse> => 
     method: 'DELETE',
   });
 
-  if (!body || typeof body.success !== 'boolean' || !body.status || !body.message) {
+  if (!body || typeof body.success !== 'boolean' || !body.success) {
     throw new Error(body?.message ?? 'Invalid response');
   }
 
