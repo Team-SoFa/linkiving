@@ -1,12 +1,7 @@
 import { clientApiClient } from '@/lib/client/apiClient';
 import { ApiError } from '@/lib/errors/ApiError';
+import { UserInfoResponse } from '@/types/api/authApi';
 import { User } from '@/types/user';
-
-interface UserInfoResponse {
-  success: boolean;
-  data?: User;
-  message?: string;
-}
 
 export const fetchUserInfo = async (): Promise<User> => {
   const response = await clientApiClient<UserInfoResponse>('/api/member/me');
