@@ -6,6 +6,7 @@ import IC_ArrowdropRight from './svgs/ic_arrowdrop_right.svg';
 import IC_ArrowdropUp from './svgs/ic_arrowdrop_up.svg';
 import IC_Backward from './svgs/ic_backward.svg';
 import IC_Chat from './svgs/ic_chat.svg';
+import IC_Check from './svgs/ic_check.svg';
 import IC_Close from './svgs/ic_close.svg';
 import IC_Complete from './svgs/ic_complete.svg';
 import IC_Copy from './svgs/ic_copy.svg';
@@ -48,6 +49,7 @@ export const IconMap = {
   IC_ArrowdropUp,
   IC_Backward,
   IC_Chat,
+  IC_Check,
   IC_Close,
   IC_Complete,
   IC_Copy,
