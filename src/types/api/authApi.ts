@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { User } from '../user';
 import { ApiResponseBase } from './linkApi';
 
 export const Email = z
@@ -39,3 +40,6 @@ export const SignupRequestSchema = z.object({
   password: Password,
 });
 export type SignupRequest = z.infer<typeof SignupRequestSchema>;
+
+// ========== USER INFO ==========
+export type UserInfoResponse = ApiResponseBase<User>;

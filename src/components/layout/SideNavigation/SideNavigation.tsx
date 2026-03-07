@@ -1,6 +1,5 @@
 'use client';
 
-import { getUserInfoFromCookie } from '@/hooks/useUserInfo';
 import { useSideNavStore } from '@/stores/sideNavStore';
 import { motion } from 'framer-motion';
 
@@ -11,7 +10,6 @@ import MenuSection from './components/MenuSection/MenuSection';
 
 export default function SideNavigation() {
   const { isOpen, toggle } = useSideNavStore();
-  const userInfo = getUserInfoFromCookie();
 
   return (
     <>

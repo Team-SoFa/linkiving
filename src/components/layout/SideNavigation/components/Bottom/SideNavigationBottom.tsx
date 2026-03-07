@@ -12,15 +12,15 @@ const SideNavigationBottom = () => {
     return <div className="bg-gray50 mt-auto shrink-0 p-5">로딩 중...</div>;
   }
 
-  if (!user) {
-    return <div className="bg-gray50 mt-auto shrink-0" />;
-  }
-
   return (
     <div className="bg-gray50 mt-auto shrink-0">
       <Popover placement="top-end">
         <PopoverTrigger popoverKey="user">
-          <NavItem label={user.name ?? 'User'} icon="IC_Logo" ariaLabel="사용자 메뉴 버튼" />
+          {user ? (
+            <NavItem label={user.email ?? 'User'} icon="IC_Logo" ariaLabel="사용자 메뉴 버튼" />
+          ) : (
+            <NavItem label="User" icon="IC_Logo" ariaLabel="사용자 메뉴 버튼" />
+          )}
         </PopoverTrigger>
         <PopoverContent popoverKey="user">
           {close => (
