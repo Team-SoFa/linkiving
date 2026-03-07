@@ -110,6 +110,7 @@ const AddLinkModal = () => {
         await updateLink(duplicateLinkId, {
           title: data.title,
           memo: data.memo?.trim() || undefined,
+          imageUrl: metaData?.image?.trim() || undefined,
         });
         await qc.invalidateQueries({ queryKey: ['links'], exact: false });
         close();
