@@ -159,12 +159,11 @@ export const updateLinkMemo = async (id: number, memo: string): Promise<Link> =>
 };
 
 export const deleteLink = async (id: number): Promise<DeleteLinkApiResponse> => {
-  const body = await safeFetch<DeleteLinkApiResponse>(
-    `${LINKS_ENDPOINT}/${id}`,
-    withAuth({ method: 'DELETE' })
-  );
+  const body = await clientApiClient<DeleteLinkApiResponse>(`/api/links/${id}`, {
+    method: 'DELETE',
+  });
 
-  if (!body || typeof body.success !== 'boolean' || !body.status || !body.message) {
+  if (!body || typeof body.success !== 'boolean') {
     throw new Error(body?.message ?? 'Invalid response');
   }
 

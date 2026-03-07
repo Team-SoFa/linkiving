@@ -25,3 +25,15 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     return handleApiError(err);
   }
 }
+
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const data = await serverApiClient(`/v1/links/${id}`, {
+      method: 'DELETE',
+    });
+    return NextResponse.json(data);
+  } catch (err) {
+    return handleApiError(err);
+  }
+}
