@@ -3,12 +3,10 @@
 import { fetchNewSummary } from '@/apis/summary';
 import { FetchError } from '@/hooks/util/api/error/errors';
 import { showToast } from '@/stores/toastStore';
-import { ReSummaryRequest } from '@/types/api/summaryApi';
+import type { LinkSummaryFormat } from '@/types/api/linkApi';
 import { useMutation } from '@tanstack/react-query';
 
-type Format = ReSummaryRequest['format'];
-
-export default function useReSummary(id: number, format: Format = 'DETAILED') {
+export default function useReSummary(id: number, format: LinkSummaryFormat = 'CONCISE') {
   const mutation = useMutation({
     mutationFn: () =>
       fetchNewSummary({
@@ -16,15 +14,8 @@ export default function useReSummary(id: number, format: Format = 'DETAILED') {
         format,
       }),
 
-    onSuccess: () => {
-      showToast({
-        id: 'resummary-success',
-        message: '요약이 업데이트 되었습니다.',
-        variant: 'success',
-      });
-    },
     onError: err => {
-      let errorMessage = '요약 업데이트에 실패했습니다.';
+      let errorMessage = '요약 재생성에 실패했습니다.';
 
       if (err instanceof FetchError) {
         errorMessage = err.status === 500 ? '서버 오류가 발생했습니다.' : err.message;
@@ -33,7 +24,6 @@ export default function useReSummary(id: number, format: Format = 'DETAILED') {
       }
 
       showToast({
-        id: 'resummary-failed',
         message: errorMessage,
         variant: 'error',
       });

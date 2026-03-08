@@ -4,21 +4,26 @@ import { showToast } from '@/stores/toastStore';
 
 interface Props {
   disabled: boolean;
+  loading?: boolean;
   type: 'prev' | 'new';
   onClick?: () => void;
 }
 
-export default function PostReSummaryButton({ type, disabled, onClick }: Props) {
+export default function PostReSummaryButton({ type, disabled, loading, onClick }: Props) {
   const { close } = useModalStore();
 
   const handleClick = async () => {
-    await onClick?.();
-    close();
-    showToast({
-      id: type === 'prev' ? 'save-prev' : 'save-new',
-      message: type === 'prev' ? '기존 요약을 유지했습니다.' : '새로운 요약을 저장했습니다.',
-      variant: 'success',
-    });
+    if (type === 'prev') {
+      await onClick?.();
+      close();
+      showToast({
+        id: 'save-prev',
+        message: '기존 요약을 유지했습니다.',
+        variant: 'success',
+      });
+    } else {
+      await onClick?.();
+    }
   };
 
   return (
@@ -27,6 +32,7 @@ export default function PostReSummaryButton({ type, disabled, onClick }: Props) 
       label={type === 'prev' ? '기존 요약 유지하기' : '재생성된 요약 덮어쓰기'}
       disabled={disabled}
       className="w-full"
+      loading={type === 'new' && loading}
       onClick={handleClick}
     />
   );

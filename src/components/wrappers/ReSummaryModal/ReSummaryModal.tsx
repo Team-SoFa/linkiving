@@ -4,13 +4,14 @@ import Badge from '@/components/basics/Badge/Badge';
 import IconButton from '@/components/basics/IconButton/IconButton';
 import Modal from '@/components/basics/Modal/Modal';
 import ProgressNotification from '@/components/basics/ProgressNotification/ProgressNotification';
+import useReSummary from '@/hooks/useReSummary';
+import useSelectSummary from '@/hooks/useSelectSummary';
 import clsx from 'clsx';
 import { useEffect } from 'react';
 
 import NewSummary from './NewSummary';
 import PostReSummaryButton from './PostReSummaryButton';
 import PrevSummary from './PrevSummary';
-import useReSummary from './hooks/useReSummary';
 
 interface ReSummaryProps {
   linkId: number;
@@ -18,24 +19,35 @@ interface ReSummaryProps {
 
 export default function ReSummaryModal({ linkId }: ReSummaryProps) {
   const { mutate, isLoading, error, data } = useReSummary(linkId);
+  const { mutate: selectSummary, isPending: isSaving } = useSelectSummary();
 
   useEffect(() => {
     mutate();
-  }, [mutate, linkId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linkId]);
 
   const prevContent = data?.existingSummary ?? '';
   const newContent = data?.newSummary ?? '';
   const comparison = data?.comparison ?? '';
+
+  const handleSelectNew = () => {
+    if (!data) return;
+    selectSummary({
+      id: linkId,
+      summary: newContent,
+      format: 'CONCISE',
+    });
+  };
 
   return (
     <Modal
       type="RE_SUMMARY"
       className={clsx('m-10 max-w-240 min-w-150', error && 'border-red500 border')}
     >
-      <div className="p-2">
+      <div className="gap-2 p-6">
         <span className="font-title-md">요약 비교</span>
         {isLoading && (
-          <div className="text-gray500 flex gap-2">
+          <div className="text-gray500 mb-63.5">
             <ProgressNotification animated={isLoading} />
           </div>
         )}
@@ -47,14 +59,15 @@ export default function ReSummaryModal({ linkId }: ReSummaryProps) {
               size="sm"
               variant="tertiary_subtle"
               ariaLabel="요약 재생성 재시도"
+              onClick={() => mutate()}
             />
           </div>
         )}
         {!isLoading && !error && (
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <span className="relative flex items-center gap-2 rounded-lg bg-white p-2">
-                <Badge icon="IC_SumGenerate" label="변화 지점" className="h-fit" />
+                <Badge icon="IC_SumGenerate" label="어떻게 바뀌었나요?" className="h-fit" />
                 <span className="font-label-md w-full truncate">{comparison}</span>
               </span>
             </div>
@@ -64,12 +77,13 @@ export default function ReSummaryModal({ linkId }: ReSummaryProps) {
             </div>
           </div>
         )}
-        <div className="flex gap-2">
-          <PostReSummaryButton type="prev" disabled={isLoading} />
+        <div className="mt-4 flex gap-2">
+          <PostReSummaryButton type="prev" disabled={isLoading || isSaving} />
           <PostReSummaryButton
             type="new"
-            disabled={!!error || isLoading}
-            onClick={() => console.log('new')} // TODO: 재생성된 요약 저장 api 구현 후 연결
+            disabled={!!error || isLoading || isSaving}
+            loading={isLoading || isSaving}
+            onClick={handleSelectNew}
           />
         </div>
       </div>
