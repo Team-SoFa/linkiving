@@ -31,14 +31,14 @@ export default function SummarySection({
   const summaryRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
-  const [displayedSummary, setDisplayedSummary] = useState(summary);
+  const [displayedSummary, setDisplayedSummary] = useState(summary ?? '');
 
   const { open } = useModalStore();
 
   // 타자 애니메이션
   useEffect(() => {
     if (summaryState !== 'writing') {
-      setDisplayedSummary(summary);
+      setDisplayedSummary(summary ?? '');
       return;
     }
 
@@ -131,7 +131,9 @@ export default function SummarySection({
           ref={summaryRef}
           className={`font-body-md max-w-120 leading-[160%] ${isExpanded ? '' : 'line-clamp-5'}`}
         >
-          <MarkdownRenderer content={summaryState === 'writing' ? displayedSummary : summary} />
+          <MarkdownRenderer
+            content={summaryState === 'writing' ? displayedSummary : (summary ?? '')}
+          />
         </div>
 
         {isOverflowing && (

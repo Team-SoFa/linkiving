@@ -27,14 +27,21 @@ function buildQuery(params?: LinkListParams) {
   return qs ? `?${qs}` : '';
 }
 
-const normalizeLink = (data: Partial<Link>): Link => {
+const normalizeLink = (
+  data: Partial<Omit<Link, 'summary'>> & { summary?: { id: number; content: string } | string }
+): Link => {
   const now = new Date().toISOString();
+  const rawSummary = data.summary;
+  const summary =
+    rawSummary !== null && typeof rawSummary === 'object'
+      ? (rawSummary as { id: number; content: string }).content
+      : (rawSummary ?? '');
 
   return {
     id: data.id ?? 0,
     url: data.url ?? '',
     title: data.title ?? '',
-    summary: data.summary ?? '',
+    summary,
     memo: data.memo ?? undefined,
     imageUrl: data.imageUrl ?? '',
     createdAt: data.createdAt ?? now,

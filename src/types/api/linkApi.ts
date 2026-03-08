@@ -13,7 +13,7 @@ export interface LinkRes {
   id: number;
   url: string;
   title: string;
-  summary?: string;
+  summary?: { id: number; content: string } | string;
   memo?: string;
   imageUrl?: string;
 }

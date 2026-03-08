@@ -7,8 +7,9 @@ export function useUpdateLinkTitle() {
 
   return useMutation<Link, Error, { id: number; title: string }>({
     mutationFn: ({ id, title }) => updateLinkTitle(id, title),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: ['links'] });
+      qc.invalidateQueries({ queryKey: ['link', variables.id] });
     },
   });
 }
