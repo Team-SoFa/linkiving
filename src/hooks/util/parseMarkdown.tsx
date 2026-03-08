@@ -9,6 +9,7 @@ function escapeHtml(text: string): string {
 }
 
 function parseMarkdown(text: string): string {
+  if (!text || typeof text !== 'string') return '';
   // 1단계: 코드블록을 먼저 플레이스홀더로 추출 (내부 내용이 다른 regex에 오염되지 않도록)
   const codeBlocks: string[] = [];
   let processed = text.replace(/```[\w]*\n([\s\S]*?)```/g, (_, code) => {
@@ -26,6 +27,9 @@ function parseMarkdown(text: string): string {
     inlineCodes.push(`<code class="bg-gray200 rounded px-1 text-sm">${escapeHtml(code)}</code>`);
     return `%%INLINECODE_${index}%%`;
   });
+
+  // 일반 텍스트 구간의 raw HTML 차단
+  processed = escapeHtml(processed);
 
   // 3단계: 나머지 마크다운 변환 (코드블록 밖에서만 적용됨)
   processed = processed
@@ -87,7 +91,7 @@ export default function MarkdownRenderer({ content }: { content: string }) {
   return (
     <div
       className="text-sm leading-relaxed"
-      dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
+      dangerouslySetInnerHTML={{ __html: parseMarkdown(content ?? '') }}
     />
   );
 }

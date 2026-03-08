@@ -9,7 +9,7 @@ export function useUpdateLinkMemo() {
     mutationFn: ({ id, memo }) => updateLinkMemo(id, memo),
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ['links'] });
-      qc.invalidateQueries({ queryKey: ['links', variables.id] });
+      qc.invalidateQueries({ queryKey: ['link', variables.id] });
     },
   });
 }

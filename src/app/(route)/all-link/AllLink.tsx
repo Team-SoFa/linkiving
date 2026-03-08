@@ -8,6 +8,7 @@ import DeleteLinkModal from '@/components/basics/LinkCard/components/DeleteLinkM
 import Spinner from '@/components/basics/Spinner/Spinner';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
 import { useGetInfiniteLinks } from '@/hooks/useGetInfiniteLinks';
+import { useGetLink } from '@/hooks/useGetLink';
 import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
 import { useEffect, useRef, useState } from 'react';
@@ -40,8 +41,14 @@ export default function AllLink() {
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
     useGetInfiniteLinks();
 
+  const {
+    data: selectedLinkDetail,
+    isLoading: isSelectedLinkLoading,
+    isError: isSelectedLinkError,
+    refetch: refetchSelectedLink,
+  } = useGetLink(isPanelOpen ? selectedLinkId : null);
+
   const links = data?.pages.flatMap(page => page.content) ?? [];
-  const selectedLink = links.find(link => link.id === selectedLinkId) ?? null;
 
   const handleSelectLink = (id: number) => {
     selectLink(id);
@@ -125,14 +132,23 @@ export default function AllLink() {
         </div>
         {isPanelOpen && (
           <aside className="hidden h-screen shrink-0 xl:block xl:w-130">
-            {selectedLink ? (
+            {isSelectedLinkLoading ? (
+              <div className="border-gray200 flex h-full items-center justify-center rounded-2xl border bg-white p-6">
+                <Spinner />
+              </div>
+            ) : isSelectedLinkError ? (
+              <div className="border-gray200 text-gray600 flex h-full flex-col items-center justify-center gap-2 rounded-2xl border bg-white p-6">
+                <p>상세 정보를 불러오지 못했습니다.</p>
+                <Button onClick={() => refetchSelectedLink()} label="다시 시도" />
+              </div>
+            ) : selectedLinkDetail ? (
               <LinkCardDetailPanel
-                id={selectedLink.id}
-                url={selectedLink.url}
-                title={selectedLink.title}
-                summary={selectedLink.summary ?? ''}
-                memo={selectedLink.memo ?? ''}
-                imageUrl={selectedLink.imageUrl}
+                id={selectedLinkDetail.id}
+                url={selectedLinkDetail.url}
+                title={selectedLinkDetail.title}
+                summary={selectedLinkDetail.summary ?? ''}
+                memo={selectedLinkDetail.memo ?? ''}
+                imageUrl={selectedLinkDetail.imageUrl}
                 onClose={() => setIsPanelOpen(false)}
               />
             ) : (

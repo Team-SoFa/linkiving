@@ -9,7 +9,7 @@ export function useUpdateLink() {
     mutationFn: ({ id, payload }) => updateLink(id, payload),
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ['links'] });
-      qc.invalidateQueries({ queryKey: ['links', variables.id] });
+      qc.invalidateQueries({ queryKey: ['link', variables.id] });
     },
   });
 }
