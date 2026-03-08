@@ -6,8 +6,6 @@ import type {
   LinkListApiResponse,
   LinkListViewData,
   LinkMetaScrapeApiResponse,
-  LinkSummaryFormat,
-  LinkSummaryRegenerateApiResponse,
 } from '@/types/api/linkApi';
 import type { CreateLinkPayload, Link, UpdateLinkPayload } from '@/types/link';
 
@@ -158,18 +156,4 @@ export const scrapeLinkMeta = async (url: string) => {
   }
 
   return response.data;
-};
-
-export const regenerateLinkSummary = async (id: number, format: LinkSummaryFormat) => {
-  const usp = new URLSearchParams({ format });
-  const body = await clientApiClient<LinkSummaryRegenerateApiResponse>(
-    `${LINKS_BFF}/${id}/summary?${usp.toString()}`,
-    { cache: 'no-store' }
-  );
-
-  if (!body?.data || !body.success) {
-    throw new Error(body?.message ?? 'Invalid response');
-  }
-
-  return body.data;
 };
