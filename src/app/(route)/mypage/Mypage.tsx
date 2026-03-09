@@ -1,5 +1,6 @@
 'use client';
 
+import { logout } from '@/apis/authApi';
 import Button from '@/components/basics/Button/Button';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -11,17 +12,8 @@ export default function Mypage() {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-
-      if (res.ok) {
-        router.push('/');
-      } else {
-        console.error('Logout failed');
-        alert('로그아웃에 실패했습니다.');
-      }
+      await logout();
+      router.push('/');
     } catch (err) {
       console.error('Logout error: ', err);
       alert('로그아웃 중 에러가 발생했습니다.');
