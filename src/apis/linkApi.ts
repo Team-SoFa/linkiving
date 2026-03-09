@@ -1,6 +1,4 @@
-import { type SafeFetchOptions, safeFetch } from '@/hooks/util/api/fetch/safeFetch';
 import { clientApiClient } from '@/lib/client/apiClient';
-import { COOKIES_KEYS } from '@/lib/constants/cookies';
 import type {
   DeleteLinkApiResponse,
   DuplicateLinkApiResponse,
@@ -14,13 +12,6 @@ import type {
 import type { CreateLinkPayload, Link, UpdateLinkPayload } from '@/types/link';
 
 const LINKS_BFF = '/api/links';
-const getLinksEndpoint = () => {
-  const apiUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
-  if (!apiUrl) {
-    throw new Error('Missing environment variable: NEXT_PUBLIC_BASE_API_URL');
-  }
-  return `${apiUrl}/v1/links`;
-};
 
 export type LinkListParams = {
   lastId?: number | null;
@@ -53,35 +44,9 @@ const normalizeLink = (data: Partial<Link>): Link => {
   };
 };
 
-const authHeaderValue = () => {
-  if (typeof document === 'undefined') return '';
-  const tokenEntry = document.cookie
-    .split('; ')
-    .find(row => row.startsWith(`${COOKIES_KEYS.ACCESS_TOKEN}=`));
-  const token = tokenEntry
-    ? decodeURIComponent(tokenEntry.substring(`${COOKIES_KEYS.ACCESS_TOKEN}=`.length))
-    : '';
-  return token ? `Bearer ${token}` : '';
-};
-
-const withAuth = (init?: SafeFetchOptions): SafeFetchOptions => {
-  const authorization = authHeaderValue();
-  const headers: HeadersInit = {
-    ...(authorization ? { Authorization: authorization } : {}),
-    ...(init?.headers ?? {}),
-  };
-
-  return {
-    timeout: 15_000,
-    jsonContentTypeCheck: true,
-    ...init,
-    headers,
-  };
-};
-
 // 전체 링크 fetch
 export const fetchLinks = async (params?: LinkListParams): Promise<LinkListViewData> => {
-  const body = await clientApiClient<LinkListApiResponse>(`/api/links${buildQuery(params)}`);
+  const body = await clientApiClient<LinkListApiResponse>(`${LINKS_BFF}${buildQuery(params)}`);
 
   if (!body?.data || !body.success) {
     throw new Error(body?.message ?? 'Invalid response');
@@ -95,7 +60,7 @@ export const fetchLinks = async (params?: LinkListParams): Promise<LinkListViewD
 
 // 링크 추가
 export const createLink = async (payload: CreateLinkPayload): Promise<Link> => {
-  const body = await clientApiClient<LinkApiResponse>('/api/links', {
+  const body = await clientApiClient<LinkApiResponse>(LINKS_BFF, {
     method: 'POST',
     body: JSON.stringify(payload),
   });
@@ -108,7 +73,7 @@ export const createLink = async (payload: CreateLinkPayload): Promise<Link> => {
 };
 
 export const fetchLink = async (id: number): Promise<Link> => {
-  const body = await clientApiClient<LinkApiResponse>(`/api/links/${id}`);
+  const body = await clientApiClient<LinkApiResponse>(`${LINKS_BFF}/${id}`);
 
   if (!body?.data || !body.success) {
     throw new Error(body?.message ?? 'Invalid response');
@@ -118,7 +83,7 @@ export const fetchLink = async (id: number): Promise<Link> => {
 };
 
 export const updateLink = async (id: number, payload: UpdateLinkPayload): Promise<Link> => {
-  const body = await clientApiClient<LinkApiResponse>(`/api/links/${id}`, {
+  const body = await clientApiClient<LinkApiResponse>(`${LINKS_BFF}/${id}`, {
     method: 'PUT',
     body: JSON.stringify(payload),
   });
@@ -131,15 +96,10 @@ export const updateLink = async (id: number, payload: UpdateLinkPayload): Promis
 };
 
 export const updateLinkTitle = async (id: number, title: string): Promise<Link> => {
-  const linksEndpoint = getLinksEndpoint();
-  const body = await safeFetch<LinkApiResponse>(
-    `${linksEndpoint}/${id}/title`,
-    withAuth({
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title }),
-    })
-  );
+  const body = await clientApiClient<LinkApiResponse>(`${LINKS_BFF}/${id}/title`, {
+    method: 'PATCH',
+    body: JSON.stringify({ title }),
+  });
 
   if (!body?.data || !body.success) {
     throw new Error(body?.message ?? 'Invalid response');
@@ -149,15 +109,10 @@ export const updateLinkTitle = async (id: number, title: string): Promise<Link> 
 };
 
 export const updateLinkMemo = async (id: number, memo: string): Promise<Link> => {
-  const linksEndpoint = getLinksEndpoint();
-  const body = await safeFetch<LinkApiResponse>(
-    `${linksEndpoint}/${id}/memo`,
-    withAuth({
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ memo }),
-    })
-  );
+  const body = await clientApiClient<LinkApiResponse>(`${LINKS_BFF}/${id}/memo`, {
+    method: 'PATCH',
+    body: JSON.stringify({ memo }),
+  });
 
   if (!body?.data || !body.success) {
     throw new Error(body?.message ?? 'Invalid response');
@@ -167,11 +122,9 @@ export const updateLinkMemo = async (id: number, memo: string): Promise<Link> =>
 };
 
 export const deleteLink = async (id: number): Promise<DeleteLinkApiResponse> => {
-  const linksEndpoint = getLinksEndpoint();
-  const body = await safeFetch<DeleteLinkApiResponse>(
-    `${linksEndpoint}/${id}`,
-    withAuth({ method: 'DELETE' })
-  );
+  const body = await clientApiClient<DeleteLinkApiResponse>(`${LINKS_BFF}/${id}`, {
+    method: 'DELETE',
+  });
 
   if (!body || typeof body.success !== 'boolean' || !body.status || !body.message) {
     throw new Error(body?.message ?? 'Invalid response');
@@ -208,11 +161,10 @@ export const scrapeLinkMeta = async (url: string) => {
 };
 
 export const regenerateLinkSummary = async (id: number, format: LinkSummaryFormat) => {
-  const linksEndpoint = getLinksEndpoint();
   const usp = new URLSearchParams({ format });
-  const body = await safeFetch<LinkSummaryRegenerateApiResponse>(
-    `${linksEndpoint}/${id}/summary?${usp.toString()}`,
-    withAuth({ cache: 'no-store' })
+  const body = await clientApiClient<LinkSummaryRegenerateApiResponse>(
+    `${LINKS_BFF}/${id}/summary?${usp.toString()}`,
+    { cache: 'no-store' }
   );
 
   if (!body?.data || !body.success) {
