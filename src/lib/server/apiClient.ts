@@ -15,8 +15,11 @@ if (!API_BASE_URL) {
  * Next.js API Routes에서만 사용
  */
 export async function serverApiClient<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const cookieStore = await cookies(); // await 추가
+  const cookieStore = await cookies();
   const token = cookieStore.get(COOKIES_KEYS.ACCESS_TOKEN)?.value;
+
+  console.log('[serverApiClient] token:', token ? '있음' : '없음');
+  console.log('[serverApiClient] endpoint:', endpoint);
 
   if (!token) {
     throw new ApiError(401, 'No authentication token');
