@@ -25,14 +25,32 @@ export async function serverApiClient<T>(endpoint: string, options: RequestInit 
     throw new ApiError(401, 'No authentication token');
   }
 
+  const headers = new Headers(options.headers ?? {});
+  headers.set('Content-Type', 'application/json');
+  headers.set('Authorization', `Bearer ${token}`);
+
+  const existingCookie = headers.get('Cookie');
+  if (existingCookie) {
+    const parts = existingCookie
+      .split(';')
+      .map(part => part.trim())
+      .filter(Boolean);
+    const filtered = parts.filter(part => {
+      const eq = part.indexOf('=');
+      if (eq < 0) return true;
+      const name = part.slice(0, eq).trim();
+      return name !== COOKIES_KEYS.ACCESS_TOKEN;
+    });
+    filtered.push(`${COOKIES_KEYS.ACCESS_TOKEN}=${token}`);
+    headers.set('Cookie', filtered.join('; '));
+  } else {
+    headers.set('Cookie', `${COOKIES_KEYS.ACCESS_TOKEN}=${token}`);
+  }
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     cache: options.cache ?? 'no-store',
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-      Authorization: `Bearer ${token}`,
-    },
+    headers,
   });
 
   if (!response.ok) {
