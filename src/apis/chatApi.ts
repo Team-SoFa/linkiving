@@ -1,6 +1,8 @@
 // 백엔드 직접 호출
 import { clientApiClient } from '@/lib/client/apiClient';
 import type {
+  AddMessageFeedbackApiResponse,
+  AddMessageFeedbackPayload,
   ChatHistoryApiResponse,
   ChatHistoryData,
   ChatListApiResponse,
@@ -79,4 +81,23 @@ export const fetchChatMessages = async ({
   }
 
   return data;
+};
+
+export const addMessageFeedback = async (
+  messageId: number,
+  payload: AddMessageFeedbackPayload
+): Promise<AddMessageFeedbackApiResponse> => {
+  const response = await clientApiClient<AddMessageFeedbackApiResponse>(
+    `/api/messages/${messageId}/feedback`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!response.success) {
+    throw new Error(response.message ?? 'Failed to add message feedback');
+  }
+
+  return response;
 };

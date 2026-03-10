@@ -1,23 +1,30 @@
 ﻿'use client';
 
-import { fetchChatMessages } from '@/apis/chatApi';
+import { addMessageFeedback, fetchChatMessages } from '@/apis/chatApi';
 import type { ChatSocketLink, ChatSocketMessage } from '@/apis/chatSocket';
 import CardList from '@/components/basics/CardList/CardList';
 import LinkCard from '@/components/basics/LinkCard/LinkCard';
 import Tab from '@/components/basics/Tab/Tab';
+import CopyButton from '@/components/wrappers/CopyButton';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
+import ReportModal from '@/components/wrappers/ReportModal/ReportModal';
 import { useChatStream } from '@/hooks/server/Chats/useChatStream';
+import { useModalStore } from '@/stores/modalStore';
+import { showToast } from '@/stores/toastStore';
 import type { ChatHistoryMessage } from '@/types/api/chatApi';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import AnswerActions, { type AnswerReaction } from '../_components/AnswerActions';
 import ChatQueryBox from '../_components/ChatQueryBox';
 
 type ChatMessage = {
   id: string;
+  messageId?: number | null;
   role: 'user' | 'ai' | 'system';
   text: string;
   links?: ChatSocketLink[] | null;
+  reaction?: AnswerReaction;
 };
 
 const PAGE_SIZE = 5;
@@ -33,14 +40,30 @@ const toLinks = (links: ChatHistoryMessage['links']): ChatSocketLink[] | null =>
   }));
 };
 
+const toReaction = (feedback?: string | null): AnswerReaction => {
+  if (feedback === 'LIKE') return 'up';
+  if (feedback === 'DISLIKE') return 'down';
+  return null;
+};
+
 const mapHistoryMessage = (message: ChatHistoryMessage): ChatMessage => ({
   id: `history-${message.id}`,
+  messageId: message.id,
   role: message.type === 'USER' ? 'user' : 'ai',
   text: message.content,
   links: toLinks(message.links),
+  reaction: toReaction(message.feedback),
 });
 
 const normalizeMessageText = (text: string) => text.trim();
+
+const mergeAiText = (prevText: string, nextText: string) => {
+  if (!prevText) return nextText;
+  if (!nextText) return prevText;
+  if (nextText.startsWith(prevText)) return nextText;
+  if (prevText.endsWith(nextText)) return prevText;
+  return `${prevText}${nextText}`;
+};
 
 export default function Chat() {
   const params = useParams();
@@ -50,6 +73,8 @@ export default function Chat() {
   const chatIdNum = useMemo(() => Number(chatId), [chatId]);
   const initialQuestion = useMemo(() => searchParams.get('q')?.trim() ?? '', [searchParams]);
   const initialSentRef = useRef(false);
+  const modal = useModalStore(state => state.modal);
+  const openModal = useModalStore(state => state.open);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [streamError, setStreamError] = useState<string | null>(null);
@@ -63,17 +88,78 @@ export default function Chat() {
   const pendingScrollAdjustRef = useRef<{ oldHeight: number; oldTop: number } | null>(null);
   const olderHistoryInFlightRef = useRef(false);
   const historyRequestSeqRef = useRef(0);
+  const reactionRequestSeqRef = useRef<Record<string, number>>({});
 
   const appendAiMessage = useCallback((payload: ChatSocketMessage) => {
-    setMessages(prev => [
-      ...prev,
-      {
-        id: `${Date.now()}-${crypto.randomUUID()}`,
-        role: 'ai',
-        text: payload.content,
-        links: payload.links,
-      },
-    ]);
+    setMessages(prev => {
+      const nextContent = payload.content ?? '';
+      const nextLinks = payload.links ?? null;
+
+      if (payload.messageId !== null) {
+        const sameMessageIndex = prev.findIndex(
+          message => message.role === 'ai' && message.messageId === payload.messageId
+        );
+
+        if (sameMessageIndex >= 0) {
+          return prev.map((message, index) =>
+            index === sameMessageIndex
+              ? {
+                  ...message,
+                  text: mergeAiText(message.text, nextContent),
+                  links: nextLinks ?? message.links ?? null,
+                }
+              : message
+          );
+        }
+
+        const unresolvedIndex = [...prev]
+          .reverse()
+          .findIndex(message => message.role === 'ai' && (message.messageId ?? null) === null);
+
+        if (unresolvedIndex >= 0) {
+          const targetIndex = prev.length - 1 - unresolvedIndex;
+          return prev.map((message, index) =>
+            index === targetIndex
+              ? {
+                  ...message,
+                  messageId: payload.messageId,
+                  text: mergeAiText(message.text, nextContent),
+                  links: nextLinks ?? message.links ?? null,
+                }
+              : message
+          );
+        }
+      } else {
+        const lastAiIndex = [...prev]
+          .reverse()
+          .findIndex(message => message.role === 'ai' && (message.messageId ?? null) === null);
+
+        if (lastAiIndex >= 0) {
+          const targetIndex = prev.length - 1 - lastAiIndex;
+          return prev.map((message, index) =>
+            index === targetIndex
+              ? {
+                  ...message,
+                  text: mergeAiText(message.text, nextContent),
+                  links: nextLinks ?? message.links ?? null,
+                }
+              : message
+          );
+        }
+      }
+
+      return [
+        ...prev,
+        {
+          id: `${Date.now()}-${crypto.randomUUID()}`,
+          messageId: payload.messageId,
+          role: 'ai',
+          text: nextContent,
+          links: nextLinks,
+          reaction: null,
+        },
+      ];
+    });
   }, []);
 
   const { connected, send } = useChatStream({
@@ -257,6 +343,85 @@ export default function Chat() {
     }
   }, [loadOlderHistory]);
 
+  const handleReactionChange = useCallback(
+    async (message: ChatMessage, reaction: AnswerReaction) => {
+      const previousReaction = message.reaction ?? null;
+      const requestSeq = (reactionRequestSeqRef.current[message.id] ?? 0) + 1;
+      reactionRequestSeqRef.current[message.id] = requestSeq;
+
+      setMessages(prev =>
+        prev.map(item => (item.id === message.id ? { ...item, reaction } : item))
+      );
+
+      if (message.messageId == null) {
+        showToast({
+          message: '피드백을 전송할 메시지 ID를 찾을 수 없습니다.',
+          variant: 'error',
+          showIcon: true,
+        });
+        setMessages(prev =>
+          prev.map(item =>
+            item.id === message.id ? { ...item, reaction: previousReaction } : item
+          )
+        );
+        return;
+      }
+
+      const sentiment = reaction === 'up' ? 'LIKE' : reaction === 'down' ? 'DISLIKE' : 'NONE';
+
+      try {
+        await addMessageFeedback(message.messageId, {
+          sentiment,
+          text: '',
+        });
+
+        if (reactionRequestSeqRef.current[message.id] !== requestSeq) return;
+
+        if (reaction === 'up') {
+          showToast({
+            message: '감사합니다. 제공해 주신 피드백은 Linkiving을 개선하는 데 도움이 됩니다.',
+            variant: 'info',
+            showIcon: true,
+          });
+        }
+
+        if (reaction === 'down') {
+          showToast({
+            message: '아쉬운 점을 알려주셔서 감사합니다. 더 나은 답변을 위해 개선하겠습니다.',
+            variant: 'info',
+            showIcon: true,
+          });
+        }
+      } catch (err) {
+        if (reactionRequestSeqRef.current[message.id] !== requestSeq) return;
+
+        setMessages(prev =>
+          prev.map(item =>
+            item.id === message.id ? { ...item, reaction: previousReaction } : item
+          )
+        );
+        showToast({
+          message: (err as Error).message ?? '피드백 전송에 실패했습니다.',
+          variant: 'error',
+          showIcon: true,
+        });
+      }
+    },
+    []
+  );
+
+  const handleRegenerate = useCallback(() => {
+    showToast({
+      message: '재생성 기능은 준비 중입니다.',
+      variant: 'info',
+      showIcon: true,
+    });
+  }, []);
+
+  const handleReport = useCallback(() => {
+    openModal('REPORT');
+  }, [openModal]);
+
   return (
     <div className="h-screen w-full xl:flex">
       <div className="min-w-0 flex-1">
@@ -288,8 +453,19 @@ export default function Chat() {
                 } ${index > 0 ? 'mt-[2rem]' : ''}`}
               >
                 {message.role === 'user' ? (
-                  <div className="bg-blue50 text-gray900 max-w-[70%] rounded-2xl px-4 py-3 whitespace-pre-wrap">
-                    {message.text}
+                  <div className="max-w-[70%]">
+                    <div className="bg-blue50 text-gray900 rounded-2xl px-4 py-3 whitespace-pre-wrap">
+                      {message.text}
+                    </div>
+                    <div className="mt-2 flex justify-end">
+                      <CopyButton
+                        value={message.text}
+                        successMsg="질문을 복사했습니다."
+                        failMsg="질문 복사에 실패했습니다."
+                        tooltipMsg="질문 복사하기"
+                        size="sm"
+                      />
+                    </div>
                   </div>
                 ) : (
                   <div className="w-full rounded-xl border border-gray-200 bg-white p-3">
@@ -313,6 +489,20 @@ export default function Chat() {
                                     />
                                   ))}
                                 </CardList>
+                              </div>
+                            )}
+                            {message.role === 'ai' && (
+                              <div className="mt-3">
+                                <AnswerActions
+                                  copyValue={message.text}
+                                  menuKey={`answer-more-${message.id}`}
+                                  reaction={message.reaction ?? null}
+                                  onReactionChange={reaction =>
+                                    void handleReactionChange(message, reaction)
+                                  }
+                                  onRegenerate={handleRegenerate}
+                                  onReport={handleReport}
+                                />
                               </div>
                             )}
                           </div>
@@ -365,6 +555,7 @@ export default function Chat() {
           />
         </aside>
       )}
+      {modal.type === 'REPORT' && <ReportModal />}
     </div>
   );
 }

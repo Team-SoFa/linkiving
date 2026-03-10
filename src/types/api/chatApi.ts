@@ -50,3 +50,16 @@ export interface ChatHistoryData {
 }
 
 export type ChatHistoryApiResponse = ApiResponseBase<ChatHistoryData>;
+
+export type FeedbackSentiment = 'LIKE' | 'DISLIKE' | 'NONE';
+
+export interface AddMessageFeedbackPayload {
+  sentiment: FeedbackSentiment;
+  text?: string;
+}
+
+export interface AddMessageFeedbackData {
+  id: number;
+}
+
+export type AddMessageFeedbackApiResponse = ApiResponseBase<AddMessageFeedbackData>;

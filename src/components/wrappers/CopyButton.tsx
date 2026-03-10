@@ -1,4 +1,7 @@
+'use client';
+
 import { showToast } from '@/stores/toastStore';
+import { useEffect, useState } from 'react';
 
 import IconButton, { IconButtonProps } from '../basics/IconButton/IconButton';
 import Tooltip from '../basics/Tooltip/Tooltip';
@@ -25,8 +28,12 @@ export default function CopyButton({
   onClick,
   ...iconButtonProps
 }: CopyButtonProps) {
-  const isClipboardSupported =
-    typeof navigator !== 'undefined' && Boolean(navigator.clipboard?.writeText);
+  const [isClipboardSupported, setIsClipboardSupported] = useState(false);
+
+  useEffect(() => {
+    setIsClipboardSupported(Boolean(navigator.clipboard?.writeText));
+  }, []);
+
   const isDisabled = Boolean(disabled) || !value || !isClipboardSupported;
 
   const handleCopyClick: NonNullable<IconButtonProps['onClick']> = async event => {
