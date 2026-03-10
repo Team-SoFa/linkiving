@@ -1,11 +1,17 @@
-'use client';
+﻿'use client';
 
+import { addMessageFeedback } from '@/apis/chatApi';
 import CardList from '@/components/basics/CardList/CardList';
 import LinkCard from '@/components/basics/LinkCard/LinkCard';
 import Tab from '@/components/basics/Tab/Tab';
+import CopyButton from '@/components/wrappers/CopyButton';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
+import ReportModal from '@/components/wrappers/ReportModal/ReportModal';
+import { useModalStore } from '@/stores/modalStore';
+import { showToast } from '@/stores/toastStore';
 import { useState } from 'react';
 
+import AnswerActions, { type AnswerReaction } from '../../(route)/chat/_components/AnswerActions';
 import ChatQueryBox from '../../(route)/chat/_components/ChatQueryBox';
 
 type ChatLink = {
@@ -18,41 +24,48 @@ type ChatLink = {
 
 type ChatMessage = {
   id: string;
+  messageId?: number | null;
   role: 'user' | 'ai';
   text: string;
   links?: ChatLink[] | null;
+  reaction?: AnswerReaction;
 };
 
 const MOCK_RESPONSE = {
   content:
-    "네이버 쇼핑과 스토어(Plus Store)를 이용하시려면, '네이버+ 스토어' 링크(46)를 확인해 보세요. 현재 접속 시 '잠시 후 다시 확인해주세요' 오류가 표시되지만, 서비스가 정상화될 때까지 잠시 후 재접속하거나 '네이버 쇼핑 본문 바로가기' 및 '네이버홈 쇼핑&페이 고객센터'를 통해 문제 해결을 시도할 수 있습니다. 계정·포인트는 보유 중이므로 영향이 최소화됩니다. 2024년 기준 네이버 쇼핑은 현재 점검 중이니, 쇼핑 전 점검 진행 여부를 꼭 확인하세요.",
+    '네이버 쇼핑(플러스 스토어) 접속 오류가 반복될 때는 서비스 공지 확인, 앱/브라우저 재시도, 고객센터 문의 순서로 점검하는 것이 좋습니다. 계정 자체 문제보다는 일시적인 장애일 가능성이 높습니다.',
   links: [
     {
       linkId: 46,
-      title: '네이버+ 스토어',
+      title: '네이버 쇼핑',
       url: 'https://shopping.naver.com/',
       imageUrl:
         'https://linkiving-s3.s3.ap-northeast-2.amazonaws.com/links/5a4d2bc9-9159-35ac-b162-f882605fcbfb.png',
-      summary:
-        '네이버 쇼핑/스토어 안내 및 점검 상황 대응을 위한 임시 목데이터입니다. 서비스 오류 시 잠시 후 재접속하거나 고객센터를 이용하세요.',
+      summary: '네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.',
     },
   ] as ChatLink[],
 };
 
 const createAiMockMessage = (): ChatMessage => ({
   id: `${Date.now()}-${crypto.randomUUID()}`,
+  messageId: Date.now(),
   role: 'ai',
   text: MOCK_RESPONSE.content,
   links: MOCK_RESPONSE.links,
+  reaction: null,
 });
 
 export default function MockChatPage() {
+  const modal = useModalStore(state => state.modal);
+  const openModal = useModalStore(state => state.open);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'mock-initial',
+      messageId: 1,
       role: 'ai',
-      text: '임시 채팅 페이지입니다. 질문을 보내면 API 없이 목응답이 즉시 표시됩니다.',
+      text: '목업 채팅 페이지입니다. 질문을 보내면 API 없이 고정 응답이 바로 표시됩니다.',
       links: MOCK_RESPONSE.links,
+      reaction: null,
     },
   ]);
   const [selectedLink, setSelectedLink] = useState<ChatLink | null>(null);
@@ -68,6 +81,65 @@ export default function MockChatPage() {
     ]);
   };
 
+  const handleReactionChange = async (message: ChatMessage, reaction: AnswerReaction) => {
+    const previousReaction = message.reaction ?? null;
+    setMessages(prev => prev.map(item => (item.id === message.id ? { ...item, reaction } : item)));
+
+    if (message.messageId == null) {
+      showToast({
+        message: '피드백을 전송할 메시지 ID를 찾을 수 없습니다.',
+        variant: 'error',
+        showIcon: true,
+      });
+      setMessages(prev =>
+        prev.map(item => (item.id === message.id ? { ...item, reaction: previousReaction } : item))
+      );
+      return;
+    }
+
+    const sentiment = reaction === 'up' ? 'LIKE' : reaction === 'down' ? 'DISLIKE' : 'NONE';
+
+    try {
+      await addMessageFeedback(message.messageId, { sentiment, text: '' });
+      if (reaction === 'up') {
+        showToast({
+          message: '감사합니다. 제공해 주신 피드백은 Linkiving을 개선하는 데 도움이 됩니다.',
+          variant: 'info',
+          showIcon: true,
+        });
+      }
+
+      if (reaction === 'down') {
+        showToast({
+          message: '아쉬운 점을 알려주셔서 감사합니다. 더 나은 답변을 위해 개선하겠습니다.',
+          variant: 'info',
+          showIcon: true,
+        });
+      }
+    } catch (err) {
+      setMessages(prev =>
+        prev.map(item => (item.id === message.id ? { ...item, reaction: previousReaction } : item))
+      );
+      showToast({
+        message: (err as Error).message ?? '피드백 전송에 실패했습니다.',
+        variant: 'error',
+        showIcon: true,
+      });
+    }
+  };
+
+  const handleRegenerate = () => {
+    showToast({
+      message: '재생성 기능은 목업에서 준비 중입니다.',
+      variant: 'info',
+      showIcon: true,
+    });
+  };
+
+  const handleMore = () => {
+    openModal('REPORT');
+  };
+
   return (
     <div className="h-screen w-full xl:flex">
       <div className="min-w-0 flex-1">
@@ -81,8 +153,19 @@ export default function MockChatPage() {
                 } ${index > 0 ? 'mt-[2rem]' : ''}`}
               >
                 {message.role === 'user' ? (
-                  <div className="bg-blue50 text-gray900 max-w-[70%] rounded-2xl px-4 py-3 whitespace-pre-wrap">
-                    {message.text}
+                  <div className="max-w-[70%]">
+                    <div className="bg-blue50 text-gray900 rounded-2xl px-4 py-3 whitespace-pre-wrap">
+                      {message.text}
+                    </div>
+                    <div className="mt-2 flex justify-end">
+                      <CopyButton
+                        value={message.text}
+                        successMsg="질문을 복사했습니다."
+                        failMsg="질문 복사에 실패했습니다."
+                        tooltipMsg="질문 복사하기"
+                        size="sm"
+                      />
+                    </div>
                   </div>
                 ) : (
                   <div className="w-full rounded-xl bg-white p-3">
@@ -108,6 +191,18 @@ export default function MockChatPage() {
                                 </CardList>
                               </div>
                             )}
+                            <div className="mt-3">
+                              <AnswerActions
+                                copyValue={message.text}
+                                menuKey={`answer-more-${message.id}`}
+                                reaction={message.reaction ?? null}
+                                onReactionChange={reaction =>
+                                  void handleReactionChange(message, reaction)
+                                }
+                                onRegenerate={handleRegenerate}
+                                onReport={handleMore}
+                              />
+                            </div>
                           </div>
                         ),
                         링크: (
@@ -158,6 +253,7 @@ export default function MockChatPage() {
           />
         </aside>
       )}
+      {modal.type === 'REPORT' && <ReportModal />}
     </div>
   );
 }
