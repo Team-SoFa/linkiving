@@ -18,7 +18,7 @@ export async function serverApiClient<T>(endpoint: string, options: RequestInit 
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIES_KEYS.ACCESS_TOKEN)?.value;
 
-  console.log('[serverApiClient] token:', token ? '있음' : '없음');
+  console.log('[serverApiClient] token:', token);
   console.log('[serverApiClient] endpoint:', endpoint);
 
   if (!token) {
