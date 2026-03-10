@@ -1,14 +1,16 @@
 import { zodErrorToResponse } from '@/hooks/util/zodError';
 import { ApiError } from '@/lib/errors/ApiError';
+import * as Sentry from '@sentry/nextjs';
 
 import { RequestValidationError } from '../request/requestError';
 import { FetchError, ParseError, TimeoutError } from './errors';
 
-/**
- * 내부 에러를 HTTP Response로 변환하는 공통 핸들러
- * @serverOnly
- */
 export function handleApiError(err: unknown): Response {
+  if (err instanceof Error && !('sentryReported' in err)) {
+    // 이미 보고된 에러인지 확인
+    Sentry.captureException(err);
+  }
+
   if (err instanceof RequestValidationError) {
     return zodErrorToResponse(err.zodError);
   }
@@ -19,10 +21,7 @@ export function handleApiError(err: unknown): Response {
 
   if (err instanceof FetchError) {
     return Response.json(
-      {
-        success: false,
-        message: 'Upstream request failed',
-      },
+      { success: false, message: err.message || 'Upstream request failed' },
       { status: err.status ?? 502 }
     );
   }
@@ -32,13 +31,7 @@ export function handleApiError(err: unknown): Response {
   }
 
   if (err instanceof ApiError) {
-    return Response.json(
-      {
-        success: false,
-        message: err.message,
-      },
-      { status: err.status }
-    );
+    return Response.json({ success: false, message: err.message }, { status: err.status });
   }
 
   return Response.json({ success: false, message: 'Internal server error' }, { status: 500 });

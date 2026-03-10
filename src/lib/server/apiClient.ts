@@ -4,20 +4,15 @@ import { cookies } from 'next/headers';
 
 import { ApiError } from '../errors/ApiError';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL; // TODO: 환경변수 논의 후 BASE_API_URL로 변경
+const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 
 if (!API_BASE_URL) {
   throw new Error('Missing environment variable: NEXT_PUBLIC_BASE_API_URL');
 }
 
-/**
- * 서버 사이드 API 클라이언트
- * Next.js API Routes에서만 사용
- */
 export async function serverApiClient<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIES_KEYS.ACCESS_TOKEN)?.value;
-
   console.log('[serverApiClient] token:', token);
   console.log('[serverApiClient] endpoint:', endpoint);
 
@@ -46,6 +41,9 @@ export async function serverApiClient<T>(endpoint: string, options: RequestInit 
   } else {
     headers.set('Cookie', `${COOKIES_KEYS.ACCESS_TOKEN}=${token}`);
   }
+
+  console.log('[serverApiClient] Authorization:', headers.get('Authorization')); // TODO: 추후 삭제
+  console.log('[serverApiClient] Cookie:', headers.get('Cookie')); // TODO: 추후 삭제
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
