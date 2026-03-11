@@ -1,54 +1,18 @@
 import { handleApiError } from '@/hooks/util/api';
-import { COOKIES_KEYS } from '@/lib/constants/cookies';
 import { serverApiClient } from '@/lib/server/apiClient';
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(COOKIES_KEYS.ACCESS_TOKEN)?.value;
-
-    if (!token) {
-      return NextResponse.json({ success: false, message: 'No token' }, { status: 401 });
-    }
-
     const { searchParams } = new URL(req.url);
     const query = searchParams.toString();
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API_URL}/v1/links${query ? `?${query}` : ''}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        cache: 'no-store',
-      }
-    );
-
-    const data = await res.json();
+    const data = await serverApiClient(`/v1/links${query ? `?${query}` : ''}`);
     return NextResponse.json(data);
   } catch (err) {
     return handleApiError(err);
   }
 }
-
-// import { handleApiError } from '@/hooks/util/api';
-// import { serverApiClient } from '@/lib/server/apiClient';
-// import { NextResponse } from 'next/server';
-
-// export async function GET(req: Request) {
-//   try {
-//     const { searchParams } = new URL(req.url);
-//     const query = searchParams.toString();
-
-//     const data = await serverApiClient(`/v1/links${query ? `?${query}` : ''}`);
-//     return NextResponse.json(data);
-//   } catch (err) {
-//     return handleApiError(err);
-//   }
-// }
 
 export async function POST(req: Request) {
   try {

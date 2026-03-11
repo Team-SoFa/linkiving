@@ -48,8 +48,21 @@ export async function serverApiClient<T>(endpoint: string, options: RequestInit 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     cache: options.cache ?? 'no-store',
+    redirect: 'manual',
     headers,
   });
+
+  // 리디렉션 발생 시 Authorization 헤더가 제거되므로 명시적으로 에러 처리
+  if ([301, 302, 303, 307, 308].includes(response.status)) {
+    const rawLocation = response.headers.get('location');
+    const safeLocation = rawLocation ? new URL(rawLocation, API_BASE_URL) : null;
+
+    console.error('[serverApiClient] Redirect detected', {
+      status: response.status,
+      location: safeLocation ? `${safeLocation.origin}${safeLocation.pathname}` : null,
+    });
+    throw createFetchError('Unexpected redirect from upstream API', { status: 502 });
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
