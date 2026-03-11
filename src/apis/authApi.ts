@@ -9,7 +9,7 @@ interface UserInfoResponse {
 }
 
 export const fetchUserInfo = async (): Promise<User> => {
-  const response = await clientApiClient<UserInfoResponse>('/api/auth/me');
+  const response = await clientApiClient<UserInfoResponse>('/api/member/me');
 
   if (!response.success || !response.data) {
     throw new ApiError(200, response.message || 'Failed to fetch user info', response);
@@ -19,7 +19,7 @@ export const fetchUserInfo = async (): Promise<User> => {
 };
 
 export const logout = async (): Promise<void> => {
-  await clientApiClient('/api/auth/logout', {
+  await clientApiClient('/api/member/logout', {
     method: 'POST',
   });
 };
