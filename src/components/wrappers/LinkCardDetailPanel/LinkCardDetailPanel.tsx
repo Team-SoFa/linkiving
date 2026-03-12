@@ -20,12 +20,9 @@ interface LinkCardDetailPanelProps {
   summary: string;
   memo?: string;
   imageUrl?: string;
-  memoEditable?: boolean;
   summaryState?: SummaryState;
   summaryErrorMessage?: string;
   onClose?: () => void;
-  onTitleChange?: (value: string) => void;
-  onMemoChange?: (value: string) => void;
   onRetrySummary?: () => void;
 }
 
@@ -36,12 +33,9 @@ const LinkCardDetailPanel = ({
   summary,
   memo = '',
   imageUrl,
-  memoEditable = true,
   summaryState: summaryStateProp = 'idle',
   summaryErrorMessage,
   onClose,
-  onTitleChange,
-  onMemoChange,
   onRetrySummary,
 }: LinkCardDetailPanelProps) => {
   const safeUrl = getSafeUrl(url);
@@ -55,7 +49,7 @@ const LinkCardDetailPanel = ({
           {/* Header */}
           <HeaderSection safeUrl={safeUrl} onClose={onClose} />
           {/* Title */}
-          <TitleSection title={title} onTitleChange={onTitleChange} />
+          <TitleSection linkId={id} title={title} />
 
           {/* Image */}
           <ImageSection imageUrl={imageUrl} title={title} />
@@ -70,7 +64,7 @@ const LinkCardDetailPanel = ({
           />
 
           {/* Memo */}
-          <MemoSection memo={memo} memoEditable={memoEditable} onMemoChange={onMemoChange} />
+          <MemoSection linkId={id} memo={memo} />
         </div>
       </aside>
       {modal.type === 'RE_SUMMARY' && <ReSummaryModal linkId={modal.props.linkId} />}

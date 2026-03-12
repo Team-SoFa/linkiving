@@ -1,6 +1,5 @@
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import React, { useState } from 'react';
 
 const meta = {
   title: 'Components/Wrappers/LinkCardDetailPanel',
@@ -24,9 +23,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const ControlledPanel = (props: Story['args']) => {
-  const [id, setId] = useState(props?.id ?? 1);
-  const [title, setTitle] = useState(props?.title ?? '');
-  const [memo, setMemo] = useState(props?.memo ?? '');
+  const id = props?.id ?? 1;
+  const title = props?.title ?? '';
+  const memo = props?.memo ?? '';
 
   return (
     <LinkCardDetailPanel
@@ -34,8 +33,6 @@ const ControlledPanel = (props: Story['args']) => {
       id={id}
       title={title}
       memo={memo}
-      onTitleChange={setTitle}
-      onMemoChange={setMemo}
       onClose={() => console.log('close panel')}
       onRetrySummary={props?.onRetrySummary ?? (() => console.log('retry summary'))}
     />
