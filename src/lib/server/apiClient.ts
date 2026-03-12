@@ -13,8 +13,6 @@ if (!API_BASE_URL) {
 export async function serverApiClient<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIES_KEYS.ACCESS_TOKEN)?.value;
-  console.log('[serverApiClient] token:', token);
-  console.log('[serverApiClient] endpoint:', endpoint);
 
   if (!token) {
     throw new ApiError(401, 'No authentication token');
@@ -23,27 +21,6 @@ export async function serverApiClient<T>(endpoint: string, options: RequestInit 
   const headers = new Headers(options.headers ?? {});
   headers.set('Content-Type', 'application/json');
   headers.set('Authorization', `Bearer ${token}`);
-
-  const existingCookie = headers.get('Cookie');
-  if (existingCookie) {
-    const parts = existingCookie
-      .split(';')
-      .map(part => part.trim())
-      .filter(Boolean);
-    const filtered = parts.filter(part => {
-      const eq = part.indexOf('=');
-      if (eq < 0) return true;
-      const name = part.slice(0, eq).trim();
-      return name !== COOKIES_KEYS.ACCESS_TOKEN;
-    });
-    filtered.push(`${COOKIES_KEYS.ACCESS_TOKEN}=${token}`);
-    headers.set('Cookie', filtered.join('; '));
-  } else {
-    headers.set('Cookie', `${COOKIES_KEYS.ACCESS_TOKEN}=${token}`);
-  }
-
-  console.log('[serverApiClient] Authorization:', headers.get('Authorization')); // TODO: 추후 삭제
-  console.log('[serverApiClient] Cookie:', headers.get('Cookie')); // TODO: 추후 삭제
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
@@ -65,9 +42,23 @@ export async function serverApiClient<T>(endpoint: string, options: RequestInit 
   }
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw createFetchError(errorData.message || `Request failed`, {
+    const contentType = response.headers.get('content-type');
+    const rawBody = await response.text();
+
+    let message = 'Request failed';
+    if (contentType?.includes('application/json')) {
+      try {
+        const errorData = JSON.parse(rawBody || '{}');
+        message = errorData.message || message;
+      } catch {
+        // JSON 파싱 실패 시 기본 메시지 유지
+      }
+    }
+
+    throw createFetchError(message, {
       status: response.status,
+      body: rawBody,
+      contentType,
     });
   }
 

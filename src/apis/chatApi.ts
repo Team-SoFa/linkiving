@@ -14,7 +14,7 @@ export const fetchChats = async (): Promise<ChatRoom[]> => {
   const response = await clientApiClient<ChatListApiResponse>('/api/chats');
 
   if (!response.success || !response.data) {
-    throw new Error(response.message ?? 'Failed to fetch chats');
+    throw new Error(response.message || 'Failed to fetch chats');
   }
 
   const chats = response.data.chats;
@@ -33,7 +33,7 @@ export const createChat = async (payload: CreateChatPayload): Promise<ChatRoom> 
   });
 
   if (!response.success || !response.data) {
-    throw new Error(response.message ?? 'Failed to create chat');
+    throw new Error(response.message || 'Failed to create chat');
   }
 
   return response.data;
@@ -45,7 +45,7 @@ export const deleteChat = async (id: number): Promise<DeleteChatApiResponse> => 
   });
 
   if (!response.success) {
-    throw new Error(response.message ?? 'Failed to delete chat');
+    throw new Error(response.message || 'Failed to delete chat');
   }
 
   return response;
@@ -70,7 +70,7 @@ export const fetchChatMessages = async ({
 
   const response = await clientApiClient<ChatHistoryApiResponse>(`/api/chats/${chatId}?${qs}`);
   if (!response.success || !response.data) {
-    throw new Error(response.message ?? 'Failed to fetch chat messages');
+    throw new Error(response.message || 'Failed to fetch chat messages');
   }
 
   const data = response.data;
