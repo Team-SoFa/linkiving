@@ -1,5 +1,6 @@
 import { LINE_HEIGHTS } from '@/components/basics/TextArea/TextArea';
 import Tooltip from '@/components/basics/Tooltip/Tooltip';
+import { useUpdateLinkTitle } from '@/hooks/useUpdateLinkTitle';
 import { MAX_TITLE_LENGTH } from '@/lib/constants/link';
 import { useEffect, useRef, useState } from 'react';
 
@@ -8,17 +9,19 @@ import { styles } from '../LinkCardDetailPanel.style';
 import TitleTextArea from '../TitleTextArea';
 
 interface TitleSectionProps {
+  linkId: number;
   title: string;
   onTitleChange?: (value: string) => void;
 }
 
-export default function TitleSection({ title, onTitleChange }: TitleSectionProps) {
+export default function TitleSection({ linkId, title, onTitleChange }: TitleSectionProps) {
   const { section, titleCard, linkActions } = styles();
 
   const [internalTitle, setInternalTitle] = useState(title);
   const [isTitleEditing, setIsTitleEditing] = useState(false);
 
   const titleAreaRef = useRef<HTMLTextAreaElement>(null);
+  const { mutate: updateLinkTitle } = useUpdateLinkTitle();
 
   useEffect(() => {
     setInternalTitle(title);
@@ -30,13 +33,34 @@ export default function TitleSection({ title, onTitleChange }: TitleSectionProps
     }
   }, [isTitleEditing]);
 
+  const isSubmittingRef = useRef(false);
+  const handleSave = () => {
+    if (isSubmittingRef.current) return; // 재진입 방지
+    if (!internalTitle.trim()) {
+      setInternalTitle(title);
+      setIsTitleEditing(false);
+      return;
+    }
+    if (internalTitle !== title) {
+      updateLinkTitle(
+        { id: linkId, title: internalTitle },
+        {
+          onSettled: () => {
+            isSubmittingRef.current = false;
+          },
+        }
+      );
+    }
+    setIsTitleEditing(false);
+  };
+
   return (
     <section className={section()}>
       {isTitleEditing ? (
         <div
           onBlur={e => {
             if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-              setIsTitleEditing(false);
+              handleSave();
             }
           }}
         >
@@ -47,7 +71,7 @@ export default function TitleSection({ title, onTitleChange }: TitleSectionProps
                 value={internalTitle}
                 placeholder="텍스트 에디터에서 제목을 수정해 주세요"
                 maxLength={MAX_TITLE_LENGTH}
-                onSubmit={() => setIsTitleEditing(false)}
+                onSubmit={() => handleSave()}
                 onChange={e => {
                   const value = e.target.value;
                   setInternalTitle(value);
