@@ -6,12 +6,11 @@ import Modal from '@/components/basics/Modal/Modal';
 import ProgressNotification from '@/components/basics/ProgressNotification/ProgressNotification';
 import useReSummary from '@/hooks/useReSummary';
 import useSelectSummary from '@/hooks/useSelectSummary';
+import MarkdownRenderer from '@/hooks/util/parseMarkdown';
 import clsx from 'clsx';
 import { useEffect } from 'react';
 
-import NewSummary from './NewSummary';
 import PostReSummaryButton from './PostReSummaryButton';
-import PrevSummary from './PrevSummary';
 
 interface ReSummaryProps {
   linkId: number;
@@ -72,8 +71,22 @@ export default function ReSummaryModal({ linkId }: ReSummaryProps) {
               </span>
             </div>
             <div className="flex gap-2">
-              <PrevSummary content={prevContent} />
-              <NewSummary content={newContent} />
+              <div className="flex flex-1 flex-col gap-2">
+                <span className="font-label-sm">기존 요약</span>
+                <div className="rounded-lg bg-white p-2">
+                  <div className="custom-scrollbar font-body-md h-45 overflow-y-auto pr-1 wrap-break-word">
+                    <MarkdownRenderer content={prevContent} />
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-1 flex-col gap-2">
+                <span className="font-label-sm">재생성 요약</span>
+                <div className="rounded-lg bg-white p-2">
+                  <div className="custom-scrollbar font-body-md h-45 overflow-auto pr-1">
+                    <MarkdownRenderer content={newContent} />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
