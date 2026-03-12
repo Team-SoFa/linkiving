@@ -2,7 +2,8 @@
 
 import SVGIcon from '@/components/Icons/SVGIcon';
 import clsx from 'clsx';
-import { HTMLAttributes, ReactNode, forwardRef } from 'react';
+import Image from 'next/image';
+import { HTMLAttributes, ReactNode, forwardRef, useEffect, useState } from 'react';
 
 import { style } from './Anchor.style';
 
@@ -20,6 +21,15 @@ interface AnchorProps extends Omit<
   size?: 'sm' | 'md';
 }
 
+const getFaviconUrl = (href: string) => {
+  try {
+    const { hostname } = new URL(href);
+    return `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
+  } catch {
+    return null;
+  }
+};
+
 const Anchor = forwardRef<HTMLAnchorElement, AnchorProps>(function Anchor(
   {
     className,
@@ -34,6 +44,12 @@ const Anchor = forwardRef<HTMLAnchorElement, AnchorProps>(function Anchor(
   },
   ref
 ) {
+  const [faviconError, setFaviconError] = useState(false);
+
+  // href 바뀌면 에러 초기화
+  useEffect(() => {
+    setFaviconError(false);
+  }, [href]);
   // === STYLES ===
   const classes = style({ size });
 
@@ -48,6 +64,10 @@ const Anchor = forwardRef<HTMLAnchorElement, AnchorProps>(function Anchor(
     return tokens.size ? Array.from(tokens).join(' ') : undefined;
   })();
 
+  const faviconUrl = getFaviconUrl(href);
+
+  const iconSizeMap = { sm: 12, md: 16 } as const;
+
   return (
     <a
       ref={ref}
@@ -58,9 +78,20 @@ const Anchor = forwardRef<HTMLAnchorElement, AnchorProps>(function Anchor(
       className={clsx(classes, className)}
       {...rest}
     >
-      {iconVisible && (
-        <SVGIcon icon="IC_LinkOpen" size={sizeMap[size]} aria-hidden="true" className="mb-px" />
-      )}
+      {}
+      {iconVisible &&
+        (faviconUrl && !faviconError ? (
+          <Image
+            src={faviconUrl}
+            width={iconSizeMap[size]}
+            height={iconSizeMap[size]}
+            alt=""
+            aria-hidden="true"
+            onError={() => setFaviconError(true)} // 파비콘 없으면 기존 아이콘으로 폴백
+          />
+        ) : (
+          <SVGIcon icon="IC_LinkOpen" size={sizeMap[size]} aria-hidden="true" className="mb-px" />
+        ))}
       <span className="truncate">{children}</span>
     </a>
   );
