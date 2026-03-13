@@ -75,15 +75,15 @@ export default function ReSummaryModal({ linkId }: ReSummaryProps) {
                 <span className="font-label-sm">기존 요약</span>
                 <div className="rounded-lg bg-white p-2">
                   <div className="custom-scrollbar font-body-md h-45 overflow-y-auto pr-1 wrap-break-word">
-                    <MarkdownRenderer content={prevContent} />
+                    <MarkdownRenderer className="text-body-md" content={prevContent} />
                   </div>
                 </div>
               </div>
               <div className="flex flex-1 flex-col gap-2">
                 <span className="font-label-sm">재생성 요약</span>
                 <div className="rounded-lg bg-white p-2">
-                  <div className="custom-scrollbar font-body-md h-45 overflow-auto pr-1 wrap-break-word">
-                    <MarkdownRenderer content={newContent} />
+                  <div className="custom-scrollbar font-body-md h-45 overflow-auto pr-1">
+                    <MarkdownRenderer className="text-body-md" content={newContent} />
                   </div>
                 </div>
               </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { getSafeUrl } from '@/hooks/util/getSafeUrl';
+import MarkdownRenderer from '@/hooks/util/parseMarkdown';
 import { useInteractiveKeyBlock } from '@/hooks/util/useInteractiveKeyBlock';
 import Image from 'next/image';
 import React from 'react';
@@ -42,7 +43,7 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
   return (
     <div
       ref={ref}
-      className="border-gray200 hover:bg-gray50 active:bg-blue50 focus:border-blue500 group relative flex aspect-47/58 w-full cursor-pointer flex-col overflow-hidden rounded-2xl border transition-colors"
+      className="border-gray200 hover:bg-gray50 active:bg-blue50 focus:border-blue500 group relative flex aspect-47/58 w-full min-w-35 cursor-pointer flex-col overflow-hidden rounded-2xl border transition-colors"
       tabIndex={0}
       onClick={onClick}
       onKeyDown={handleKeyDown}
@@ -94,6 +95,7 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
           src={imageUrl ? imageUrl : '/images/default_linkcard_image.png'}
           alt={title}
           fill
+          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
           className="border-gray200 border-b object-cover"
         />
       </div>
@@ -104,14 +106,17 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
             <Anchor
               href={safeHref}
               aria-label={`${title} 페이지 링크 열기`}
-              className="[&>span]:max-w-35"
+              className="min-w-0 [&>span]:max-w-full [&>span]:truncate"
             >
               {link}
             </Anchor>
           </div>
         </div>
         {!!summary ? (
-          <span className="text-etc-linkcard-summary font-body-sm line-clamp-2">{summary}</span>
+          <MarkdownRenderer
+            className="text-etc-linkcard-summary font-body-sm line-clamp-2"
+            content={summary}
+          />
         ) : (
           <div className="font-body-sm text-etc-linkcard-summary flex justify-end">
             <span>{SUMMARY_FAIL_TEXT}</span>
