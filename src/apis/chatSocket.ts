@@ -1,4 +1,5 @@
 import { COOKIES_KEYS } from '@/lib/constants/cookies';
+import { getAccessToken } from '@/stores/tokenStore';
 import {
   Client,
   type IFrame,
@@ -18,9 +19,11 @@ const authHeaderValue = (): string | null => {
   const tokenEntry = document.cookie
     .split('; ')
     .find(row => row.startsWith(`${COOKIES_KEYS.ACCESS_TOKEN}=`));
-  const token = tokenEntry
+  const cookieToken = tokenEntry
     ? decodeURIComponent(tokenEntry.substring(`${COOKIES_KEYS.ACCESS_TOKEN}=`.length))
     : '';
+  const token = cookieToken || getAccessToken() || '';
+
   return token ? `Bearer ${token}` : null;
 };
 
