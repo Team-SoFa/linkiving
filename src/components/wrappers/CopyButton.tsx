@@ -71,7 +71,6 @@ export default function CopyButton({
         contextStyle={contextStyle}
         ariaLabel={tooltipMsg}
         disabled={isDisabled}
-        className={`pointer-events-auto ${className ?? ''}`}
         onClick={handleCopyClick}
         {...iconButtonProps}
       />
