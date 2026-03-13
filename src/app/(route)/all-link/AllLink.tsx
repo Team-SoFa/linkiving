@@ -55,6 +55,13 @@ export default function AllLink() {
     setIsPanelOpen(true);
   };
 
+  // AddLink/index.tsx에서 링크 추가 후 토스트 버튼 클릭 시 store에 저장된 id에 해당하는 패널 열기
+  useEffect(() => {
+    if (selectedLinkId !== null) {
+      setIsPanelOpen(true);
+    }
+  }, [selectedLinkId]);
+
   const handleToggleSelect = (id: number) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
@@ -67,7 +74,6 @@ export default function AllLink() {
     });
   };
 
-  const selectedLinks = links.filter(link => selectedIds.has(link.id));
   const hasSelection = selectedIds.size > 0;
 
   if (isLoading)
@@ -149,7 +155,10 @@ export default function AllLink() {
                 summary={selectedLinkDetail.summary ?? ''}
                 memo={selectedLinkDetail.memo ?? ''}
                 imageUrl={selectedLinkDetail.imageUrl}
-                onClose={() => setIsPanelOpen(false)}
+                onClose={() => {
+                  setIsPanelOpen(false);
+                  selectLink(null);
+                }}
               />
             ) : (
               <div className="border-gray200 text-gray600 h-full rounded-2xl border bg-white p-6">
