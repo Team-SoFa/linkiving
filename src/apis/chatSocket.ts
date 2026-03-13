@@ -1,3 +1,4 @@
+import { clientApiClient } from '@/lib/client/apiClient';
 import { COOKIES_KEYS } from '@/lib/constants/cookies';
 import { getAccessToken } from '@/stores/tokenStore';
 import {
@@ -15,7 +16,7 @@ if (!WS_BASE_URL) {
   throw new Error('Missing environment variable: NEXT_PUBLIC_WS_BASE_URL');
 }
 
-const authHeaderValue = (): string | null => {
+const authHeaderFromClientState = (): string | null => {
   const tokenEntry = document.cookie
     .split('; ')
     .find(row => row.startsWith(`${COOKIES_KEYS.ACCESS_TOKEN}=`));
@@ -25,6 +26,30 @@ const authHeaderValue = (): string | null => {
   const token = cookieToken || getAccessToken() || '';
 
   return token ? `Bearer ${token}` : null;
+};
+
+type SocketAuthResponse = {
+  success: boolean;
+  data?: {
+    authorization?: string;
+  };
+};
+
+const fetchSocketAuthorization = async (): Promise<string | null> => {
+  const clientAuthorization = authHeaderFromClientState();
+  if (clientAuthorization) return clientAuthorization;
+
+  try {
+    const response = await clientApiClient<SocketAuthResponse>('/api/socket-auth', {
+      cache: 'no-store',
+    });
+
+    if (!response.success) return null;
+    return response.data?.authorization ?? null;
+  } catch (error) {
+    logWsDebug('auth-fetch-error', error);
+    return null;
+  }
 };
 
 const withAuthorizationHeader = (authorization: string | null): StompHeaders =>
@@ -68,7 +93,7 @@ const DEFAULT_USE_SOCKJS = envUseSockJs === undefined ? true : envUseSockJs === 
 const WS_DEBUG = process.env.NEXT_PUBLIC_WS_DEBUG === 'true';
 
 export type ChatSocket = {
-  connect: () => void;
+  connect: () => Promise<void>;
   disconnect: () => void;
   send: (message: string) => void;
   cancel: () => void;
@@ -169,6 +194,9 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
     onDisconnect,
   } = options;
   let subscription: StompSubscription | null = null;
+  let currentAuthorization: string | null = null;
+  let connectAttempt = 0;
+  let disconnected = false;
 
   const socketEndpoint = useSockJS
     ? toSockJsUrl(WS_CHAT_ENDPOINT)
@@ -179,8 +207,7 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
       useSockJS ? new SockJS(socketEndpoint) : new WebSocket(socketEndpoint),
     connectHeaders: {},
     beforeConnect: stompClient => {
-      // 소켓 연결 시도마다 최신 토큰 사용하도록 함
-      stompClient.connectHeaders = withAuthorizationHeader(authHeaderValue());
+      stompClient.connectHeaders = withAuthorizationHeader(currentAuthorization);
     },
     reconnectDelay: 5000,
     onStompError: (frame: IFrame) => onError?.(frame),
@@ -211,9 +238,30 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
     });
   };
 
-  const connect = () => client.activate();
+  const connect = async () => {
+    const attempt = ++connectAttempt;
+    disconnected = false;
+    currentAuthorization = await fetchSocketAuthorization();
+
+    if (disconnected || attempt !== connectAttempt) {
+      logWsDebug('connect-aborted', { attempt, connectAttempt, disconnected });
+      return;
+    }
+
+    if (!currentAuthorization) {
+      const error = new Error('Cannot connect: authentication token is unavailable.');
+      logWsDebug('connect-auth-missing');
+      onError?.(error);
+      return;
+    }
+
+    client.activate();
+  };
 
   const disconnect = () => {
+    connectAttempt += 1;
+    disconnected = true;
+    currentAuthorization = null;
     logWsDebug('disconnect');
     subscription?.unsubscribe();
     subscription = null;
@@ -231,7 +279,7 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
     client.publish({
       destination: SEND_DEST,
       body,
-      headers: withAuthorizationHeader(authHeaderValue()),
+      headers: withAuthorizationHeader(currentAuthorization),
     });
   };
 
@@ -246,7 +294,7 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
     client.publish({
       destination: CANCEL_DEST,
       body,
-      headers: withAuthorizationHeader(authHeaderValue()),
+      headers: withAuthorizationHeader(currentAuthorization),
     });
   };
 
