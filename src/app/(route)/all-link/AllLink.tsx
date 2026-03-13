@@ -96,7 +96,10 @@ export default function AllLink() {
         <div className="min-w-0 flex-1 px-6 py-8 lg:px-10">
           <div className="mx-auto flex h-full w-full max-w-200 flex-col gap-5">
             <header className="flex items-center justify-between">
-              <h1 className="font-title-md">전체 링크</h1>
+              <div className="flex items-center gap-1">
+                <h1 className="font-title-md">전체 링크</h1>
+                <p className="font-body-md text-gray600">({links.length})</p>
+              </div>
               {hasSelection && (
                 <Button
                   ref={deleteButtonRef}

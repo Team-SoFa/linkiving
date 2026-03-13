@@ -87,11 +87,14 @@ function parseMarkdown(text: string): string {
   return processed;
 }
 
-export default function MarkdownRenderer({ content }: { content: string }) {
+export default function MarkdownRenderer({
+  content,
+  className,
+}: {
+  content: string;
+  className: string;
+}) {
   return (
-    <div
-      className="text-sm leading-relaxed"
-      dangerouslySetInnerHTML={{ __html: parseMarkdown(content ?? '') }}
-    />
+    <div className={className} dangerouslySetInnerHTML={{ __html: parseMarkdown(content ?? '') }} />
   );
 }
