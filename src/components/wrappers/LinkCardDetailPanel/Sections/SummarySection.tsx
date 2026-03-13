@@ -132,6 +132,7 @@ export default function SummarySection({
           className={`font-body-md max-w-120 leading-[160%] ${isExpanded ? '' : 'line-clamp-5'}`}
         >
           <MarkdownRenderer
+            className="text-body-md"
             content={summaryState === 'writing' ? displayedSummary : (summary ?? '')}
           />
         </div>
