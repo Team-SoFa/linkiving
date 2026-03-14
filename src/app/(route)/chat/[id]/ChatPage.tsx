@@ -468,7 +468,7 @@ export default function Chat() {
                     </div>
                   </div>
                 ) : (
-                  <div className="w-full rounded-xl border border-gray-200 bg-white p-3">
+                  <div className="w-full rounded-xl bg-white p-3">
                     <Tab
                       tabs={['답변', '링크']}
                       contents={{
