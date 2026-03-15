@@ -16,8 +16,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ success: false, message: 'Invalid format.' }, { status: 400 });
     }
 
-    const data = await serverApiClient(`/v1/links/${id}/summary?format=${format}`, {
+    const data = await serverApiClient(`/v1/links/${id}/summary`, {
       method: 'POST',
+      body: JSON.stringify({ format }),
     });
 
     return NextResponse.json(data, { status: 200 });
