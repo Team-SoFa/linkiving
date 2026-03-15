@@ -2,7 +2,7 @@ import { handleApiError } from '@/hooks/util/api';
 import { serverApiClient } from '@/lib/server/apiClient';
 import { NextResponse } from 'next/server';
 
-export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: rawId } = await params;
     const id = Number(rawId);
@@ -16,7 +16,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ success: false, message: 'Invalid format.' }, { status: 400 });
     }
 
-    const data = await serverApiClient(`/v1/links/${id}/summary?format=${format}`);
+    const data = await serverApiClient(`/v1/links/${id}/summary?format=${format}`, {
+      method: 'POST',
+    });
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
