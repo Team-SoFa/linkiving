@@ -6,6 +6,18 @@ import type {
   SummaryResponse,
 } from '@/types/api/summaryApi';
 
+export const retrySummary = async (id: number) => {
+  const body = await clientApiClient<SummaryResponse>(`/api/links/${id}/retry-summary`, {
+    method: 'POST',
+  });
+
+  if (!body?.data || !body.success) {
+    throw new Error(body?.message ?? 'Invalid response structure');
+  }
+
+  return body.data;
+};
+
 export const fetchNewSummary = async (params: RegenerateSummaryParams) => {
   const format = params.format ?? 'CONCISE';
   const body = await clientApiClient<SummaryResponse>(

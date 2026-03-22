@@ -3,6 +3,7 @@ import Button from '@/components/basics/Button/Button';
 import Divider from '@/components/basics/Divider/Divider';
 import Label from '@/components/basics/Label/Label';
 import ProgressNotification from '@/components/basics/ProgressNotification/ProgressNotification';
+import useRetrySummary from '@/hooks/useRetrySummary';
 import MarkdownRenderer from '@/hooks/util/parseMarkdown';
 import { useModalStore } from '@/stores/modalStore';
 import { useEffect, useRef, useState } from 'react';
@@ -16,7 +17,6 @@ interface SummarySectionProps {
   summary: string;
   summaryState: SummaryState;
   summaryErrorMessage?: string;
-  onRetrySummary?: () => void;
 }
 
 export default function SummarySection({
@@ -24,7 +24,6 @@ export default function SummarySection({
   summary,
   summaryState,
   summaryErrorMessage,
-  onRetrySummary,
 }: SummarySectionProps) {
   const { section, summaryWrapper } = styles();
 
@@ -34,6 +33,11 @@ export default function SummarySection({
   const [displayedSummary, setDisplayedSummary] = useState(summary ?? '');
 
   const { open } = useModalStore();
+  const { mutate: retrySummaryMutate, isLoading } = useRetrySummary(linkId);
+
+  const onRetrySummary = () => {
+    retrySummaryMutate();
+  };
 
   // 타자 애니메이션
   useEffect(() => {
@@ -112,6 +116,7 @@ export default function SummarySection({
             contextStyle="onPanel"
             icon="IC_Regenerate"
             label="다시 시도"
+            loading={isLoading}
             onClick={onRetrySummary}
           />
         </div>

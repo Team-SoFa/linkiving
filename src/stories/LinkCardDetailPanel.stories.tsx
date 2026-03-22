@@ -34,7 +34,6 @@ const ControlledPanel = (props: Story['args']) => {
       title={title}
       memo={memo}
       onClose={() => console.log('close panel')}
-      onRetrySummary={props?.onRetrySummary ?? (() => console.log('retry summary'))}
     />
   );
 };
