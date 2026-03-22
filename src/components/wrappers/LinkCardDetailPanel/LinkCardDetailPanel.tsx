@@ -23,7 +23,6 @@ interface LinkCardDetailPanelProps {
   summaryState?: SummaryState;
   summaryErrorMessage?: string;
   onClose?: () => void;
-  onRetrySummary?: () => void;
 }
 
 const LinkCardDetailPanel = ({
@@ -36,7 +35,6 @@ const LinkCardDetailPanel = ({
   summaryState: summaryStateProp = 'idle',
   summaryErrorMessage,
   onClose,
-  onRetrySummary,
 }: LinkCardDetailPanelProps) => {
   const safeUrl = getSafeUrl(url);
   const { root, content } = styles();
@@ -60,7 +58,6 @@ const LinkCardDetailPanel = ({
             summary={summary}
             summaryState={summaryStateProp}
             summaryErrorMessage={summaryErrorMessage}
-            onRetrySummary={onRetrySummary}
           />
 
           {/* Memo */}

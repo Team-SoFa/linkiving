@@ -16,7 +16,6 @@ interface SummarySectionProps {
   summary: string;
   summaryState: SummaryState;
   summaryErrorMessage?: string;
-  onRetrySummary?: () => void;
 }
 
 export default function SummarySection({
@@ -24,7 +23,6 @@ export default function SummarySection({
   summary,
   summaryState,
   summaryErrorMessage,
-  onRetrySummary,
 }: SummarySectionProps) {
   const { section, summaryWrapper } = styles();
 
@@ -34,6 +32,10 @@ export default function SummarySection({
   const [displayedSummary, setDisplayedSummary] = useState(summary ?? '');
 
   const { open } = useModalStore();
+
+  const onRetrySummary = () => {
+    console.log('retry'); // TODO: 백엔드 확인 후 api 연결
+  };
 
   // 타자 애니메이션
   useEffect(() => {
