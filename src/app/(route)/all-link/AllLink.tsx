@@ -76,19 +76,22 @@ export default function AllLink() {
 
   const hasSelection = selectedIds.size > 0;
 
-  if (isLoading)
+  if (isLoading) {
     return (
-      <div className="flex w-full items-center justify-center">
-        <Spinner />
+      <div className="flex min-h-screen w-full items-center justify-center">
+        <Spinner size={36} />
       </div>
     );
-  if (isError && !data)
+  }
+
+  if (isError && !data) {
     return (
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex min-h-screen w-full flex-col items-center justify-center gap-2">
         <p className="text-gray600">링크를 불러오지 못했습니다.</p>
         <Button onClick={() => refetch()} label="다시 시도" />
       </div>
     );
+  }
 
   return (
     <div className="h-screen min-w-0">
