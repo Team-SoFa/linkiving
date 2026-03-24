@@ -64,7 +64,7 @@ export default function TitleSection({ linkId, title, onTitleChange }: TitleSect
             }
           }}
         >
-          <Tooltip content="제목을 수정해 보세요">
+          <Tooltip content="제목 수정하기" disabled={isTitleEditing}>
             <div className="w-full">
               <TitleTextArea
                 ref={titleAreaRef}
@@ -82,7 +82,7 @@ export default function TitleSection({ linkId, title, onTitleChange }: TitleSect
           </Tooltip>
         </div>
       ) : (
-        <Tooltip content="제목을 수정해 보세요">
+        <Tooltip content="제목을 수정해 보세요" disabled={isTitleEditing}>
           <div
             className={titleCard()}
             style={{
