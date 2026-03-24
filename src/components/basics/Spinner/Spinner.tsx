@@ -1,5 +1,5 @@
 interface SpinnerProps extends React.SVGProps<SVGSVGElement> {
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'; // 스피너 가로/세로 크기 (px)
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | number; // 스피너 가로/세로 크기 (px)
   speed?: number; // 회전 속도 (초)
   ariaLabel?: string;
 }
@@ -16,15 +16,16 @@ const Spinner = ({ size = 'md', speed = 1, ariaLabel = '로딩중' }: SpinnerPro
     lg: 20,
     xl: 24,
   };
-  const radius = (sizeMap[size] - strokeWidth) / 2;
+  const spinnerSize = typeof size === 'number' ? size : sizeMap[size];
+  const radius = (spinnerSize - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius; // 원의 둘레 길이
 
   return (
     <svg
       className="animate-spin"
-      width={sizeMap[size]}
-      height={sizeMap[size]}
-      viewBox={`0 0 ${sizeMap[size]} ${sizeMap[size]}`}
+      width={spinnerSize}
+      height={spinnerSize}
+      viewBox={`0 0 ${spinnerSize} ${spinnerSize}`}
       style={{
         animation: `spin ${speed}s linear infinite`,
       }}
@@ -36,8 +37,8 @@ const Spinner = ({ size = 'md', speed = 1, ariaLabel = '로딩중' }: SpinnerPro
     >
       {/* 배경 원 */}
       <circle
-        cx={sizeMap[size] / 2}
-        cy={sizeMap[size] / 2}
+        cx={spinnerSize / 2}
+        cy={spinnerSize / 2}
         r={radius}
         stroke={bg_stroke_color}
         strokeWidth={strokeWidth}
@@ -45,8 +46,8 @@ const Spinner = ({ size = 'md', speed = 1, ariaLabel = '로딩중' }: SpinnerPro
       />
       {/* 바 */}
       <circle
-        cx={sizeMap[size] / 2}
-        cy={sizeMap[size] / 2}
+        cx={spinnerSize / 2}
+        cy={spinnerSize / 2}
         r={radius}
         fill="transparent"
         stroke={child_stroke_color}
