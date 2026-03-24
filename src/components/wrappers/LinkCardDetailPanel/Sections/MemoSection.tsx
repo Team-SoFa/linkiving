@@ -58,7 +58,7 @@ export default function MemoSection({ linkId, memo }: MemoSectionProps) {
         메모
       </Label>
 
-      <Tooltip content="메모를 적어 두세요">
+      <Tooltip content="메모 수정하기" disabled={isEditing}>
         <TextArea
           ref={memoAreaRef}
           value={internalMemo}

@@ -20,6 +20,7 @@ export interface TooltipProps extends Omit<
   side?: Side;
   offset?: number;
   delay?: number;
+  disabled?: boolean;
   children: React.ReactNode;
 
   // 스타일링 관련 props
@@ -35,6 +36,7 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip
     side = 'bottom',
     offset = 12,
     delay = 80,
+    disabled = false,
     className,
     children,
     onOpenChange,
@@ -56,7 +58,15 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip
     onOpenChange?.(open);
   }, [onOpenChange, open]);
 
+  useUpdateEffect(() => {
+    if (disabled) {
+      closeTooltip();
+      stopDelayTimer();
+    }
+  }, [closeTooltip, disabled, stopDelayTimer]);
+
   const show = () => {
+    if (disabled) return;
     stopDelayTimer();
     startDelayTimer();
   };
@@ -93,15 +103,15 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip
     <span
       ref={ref}
       className="relative flex"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
+      onMouseEnter={disabled ? onMouseEnter : handleMouseEnter}
+      onMouseLeave={disabled ? onMouseLeave : handleMouseLeave}
+      onFocus={disabled ? onFocus : handleFocus}
+      onBlur={disabled ? onBlur : handleBlur}
       {...rest}
     >
       {children}
 
-      {open && (
+      {open && !disabled && (
         <span
           id={id}
           role="tooltip"
