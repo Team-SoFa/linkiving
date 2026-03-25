@@ -448,7 +448,7 @@ export default function Chat() {
             {messages.map((message, index) => (
               <div
                 key={message.id}
-                className={`flex text-sm ${
+                className={`flex ${
                   message.role === 'user' ? 'justify-end' : 'justify-start'
                 } ${index > 0 ? 'mt-[2rem]' : ''}`}
               >
@@ -473,7 +473,7 @@ export default function Chat() {
                       tabs={['답변', '링크']}
                       contents={{
                         답변: (
-                          <div className="text-gray700 text-sm whitespace-pre-wrap">
+                          <div className="font-body-md text-gray700 whitespace-pre-wrap">
                             <div>{message.text}</div>
                             {message.links && message.links.length > 0 && (
                               <div className="mt-4">
