@@ -41,7 +41,8 @@ const MOCK_RESPONSE = {
       url: 'https://shopping.naver.com/',
       imageUrl:
         'https://linkiving-s3.s3.ap-northeast-2.amazonaws.com/links/5a4d2bc9-9159-35ac-b162-f882605fcbfb.png',
-      summary: '네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.',
+      summary:
+        '네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.네이버 쇼핑 서비스 현황 및 공지 확인용 예시 링크입니다.',
     },
   ] as ChatLink[],
 };
@@ -142,9 +143,9 @@ export default function MockChatPage() {
 
   return (
     <div className="h-screen w-full xl:flex">
-      <div className="min-w-0 flex-1">
+      <div className="custom-scrollbar min-w-0 flex-1 overflow-x-hidden overflow-y-auto pr-1">
         <div className="mx-auto flex h-screen w-full max-w-[816px] flex-col px-4 pt-6">
-          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pb-42">
+          <div className="flex min-h-0 flex-1 flex-col gap-3 pb-42">
             {messages.map((message, index) => (
               <div
                 key={message.id}
