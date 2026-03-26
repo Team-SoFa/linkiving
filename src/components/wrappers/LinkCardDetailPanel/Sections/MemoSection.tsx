@@ -1,6 +1,6 @@
 'use client';
 
-import Label from '@/components/basics/Label/Label';
+import { LINE_HEIGHTS } from '@/components/basics/TextArea/TextArea';
 import TextArea from '@/components/basics/TextArea/TextArea';
 import Tooltip from '@/components/basics/Tooltip/Tooltip';
 import { useUpdateLinkMemo } from '@/hooks/useUpdateLinkMemo';
@@ -16,7 +16,7 @@ interface MemoSectionProps {
 }
 
 export default function MemoSection({ linkId, memo }: MemoSectionProps) {
-  const { section, linkActions } = styles();
+  const { section, linkActions, memoCard } = styles();
 
   const [internalMemo, setInternalMemo] = useState(memo);
   const [isEditing, setIsEditing] = useState(false);
@@ -37,7 +37,7 @@ export default function MemoSection({ linkId, memo }: MemoSectionProps) {
   const isSubmittingRef = useRef(false);
 
   const handleSave = () => {
-    if (isSubmittingRef.current) return; // 재진입 방지
+    if (isSubmittingRef.current) return;
 
     if (internalMemo !== memo) {
       isSubmittingRef.current = true;
@@ -52,28 +52,55 @@ export default function MemoSection({ linkId, memo }: MemoSectionProps) {
     }
     setIsEditing(false);
   };
+
   return (
     <section className={section()}>
-      <Label textSize="sm" className="text-gray900">
-        메모
-      </Label>
-
-      <Tooltip content="메모 수정하기" disabled={isEditing}>
-        <TextArea
-          ref={memoAreaRef}
-          value={internalMemo}
-          heightLines={2}
-          maxHeightLines={5}
-          maxLength={isEditing ? MAX_MEMO_LENGTH : undefined}
-          readOnly={!isEditing}
-          placeholder="메모를 입력해 주세요"
-          onClick={() => setIsEditing(true)}
-          onFocus={() => setIsEditing(true)}
-          onSubmit={handleSave}
-          onBlur={handleSave}
-          onChange={e => setInternalMemo(e.target.value)}
-        />
-      </Tooltip>
+      {isEditing ? (
+        <div
+          onBlur={e => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+              handleSave();
+            }
+          }}
+        >
+          <TextArea
+            ref={memoAreaRef}
+            value={internalMemo}
+            heightLines={2}
+            maxHeightLines={5}
+            maxLength={MAX_MEMO_LENGTH}
+            showMax
+            placeholder="메모를 입력해 주세요"
+            onSubmit={handleSave}
+            onChange={e => setInternalMemo(e.target.value)}
+          />
+        </div>
+      ) : (
+        <Tooltip content="메모 수정하기">
+          <div
+            className={memoCard()}
+            style={{
+              minHeight: `${LINE_HEIGHTS.md * 2}px`,
+              maxHeight: `${LINE_HEIGHTS.md * 5}px`,
+            }}
+            role="button"
+            tabIndex={0}
+            onClick={() => setIsEditing(true)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setIsEditing(true);
+              }
+            }}
+          >
+            <p
+              className={`font-body-md leading-[160%] whitespace-pre-wrap ${internalMemo ? '' : 'text-gray-500'}`}
+            >
+              {internalMemo || '메모를 입력해주세요.'}
+            </p>
+          </div>
+        </Tooltip>
+      )}
 
       <div className={linkActions()}>
         <CopyButton
