@@ -1,8 +1,8 @@
 'use client';
 
-import ICLandingBackground from '@/components/Icons/svgs/ic_landing_background.svg';
 import ICLandingIcLogo from '@/components/Icons/svgs/ic_landing_ic_logo.svg';
 import ICLandingTextLogo from '@/components/Icons/svgs/ic_landing_text_logo.svg';
+import SofaLoginBackgroundFull from '@/components/Icons/svgs/sofa_login_bg_full.svg';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 
@@ -27,7 +27,10 @@ export default function Landing() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-gray-50">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gray-50">
+      <div className="pointer-events-none absolute inset-y-0 -right-[3vw] left-0 z-0 overflow-hidden [&>svg]:h-full [&>svg]:w-[103vw]">
+        <SofaLoginBackgroundFull aria-hidden="true" />
+      </div>
       <div className="relative z-10 flex w-full max-w-md flex-col items-center px-6 text-center">
         <div className="flex items-center gap-5">
           <div className="h-[53px] w-[60px] [&>svg]:h-full [&>svg]:w-full" aria-hidden="true">
@@ -58,9 +61,6 @@ export default function Landing() {
           <Image src="/images/google-icon.png" alt="구글 로고" width={20} height={20} />
           Google 계정으로 계속하기
         </button>
-      </div>
-      <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-0 h-[320px] overflow-hidden [&>svg]:h-full [&>svg]:w-full">
-        <ICLandingBackground aria-hidden="true" />
       </div>
     </div>
   );
