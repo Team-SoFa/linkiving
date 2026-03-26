@@ -7,7 +7,9 @@ export const styles = tv({
     header: 'flex items-center justify-between px-5 py-3',
     section: 'flex flex-col gap-2 px-5 pt-5 pb-4',
     titleCard:
-      'custom-scrollbar border-gray100 line-clamp-2 w-full overflow-y-auto rounded-md border bg-white p-3',
+      'custom-scrollbar border-gray100 w-full overflow-y-auto rounded-md border bg-white p-3',
+    memoCard:
+      'custom-scrollbar border-gray100 w-full overflow-y-auto rounded-md border bg-white p-3',
     actionRow: 'flex items-center gap-2',
     linkActions: 'flex justify-end',
     imageWrapper: 'border-gray100 relative h-[220px] w-full overflow-hidden border bg-white',
