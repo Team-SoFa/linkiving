@@ -424,7 +424,11 @@ export default function Chat() {
 
   return (
     <div className="h-screen w-full xl:flex">
-      <div className="min-w-0 flex-1">
+      <div
+        ref={scrollRootRef}
+        onScroll={handleScroll}
+        className="custom-scrollbar min-w-0 flex-1 overflow-x-hidden overflow-y-auto pr-1"
+      >
         <div className="mx-auto flex h-screen w-full max-w-[816px] flex-col px-4 pt-6">
           {streamError && (
             <div className="mb-4 flex items-center justify-between">
@@ -432,11 +436,7 @@ export default function Chat() {
             </div>
           )}
 
-          <div
-            ref={scrollRootRef}
-            onScroll={handleScroll}
-            className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pb-42"
-          >
+          <div className="flex min-h-0 flex-1 flex-col gap-3 pb-42">
             {historyLoading && historyBootstrapped && (
               <div className="text-gray500 text-center text-xs">이전 대화를 불러오는 중...</div>
             )}
