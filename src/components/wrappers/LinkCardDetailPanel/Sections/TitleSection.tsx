@@ -1,4 +1,5 @@
 import { LINE_HEIGHTS } from '@/components/basics/TextArea/TextArea';
+import TextArea from '@/components/basics/TextArea/TextArea';
 import Tooltip from '@/components/basics/Tooltip/Tooltip';
 import { useUpdateLinkTitle } from '@/hooks/useUpdateLinkTitle';
 import { MAX_TITLE_LENGTH } from '@/lib/constants/link';
@@ -6,7 +7,6 @@ import { useEffect, useRef, useState } from 'react';
 
 import CopyButton from '../../CopyButton';
 import { styles } from '../LinkCardDetailPanel.style';
-import TitleTextArea from '../TitleTextArea';
 
 interface TitleSectionProps {
   linkId: number;
@@ -64,25 +64,26 @@ export default function TitleSection({ linkId, title, onTitleChange }: TitleSect
             }
           }}
         >
-          <Tooltip content="제목 수정하기" disabled={isTitleEditing}>
-            <div className="w-full">
-              <TitleTextArea
-                ref={titleAreaRef}
-                value={internalTitle}
-                placeholder="텍스트 에디터에서 제목을 수정해 주세요"
-                maxLength={MAX_TITLE_LENGTH}
-                onSubmit={() => handleSave()}
-                onChange={e => {
-                  const value = e.target.value;
-                  setInternalTitle(value);
-                  onTitleChange?.(value);
-                }}
-              />
-            </div>
-          </Tooltip>
+          <div className="w-full">
+            <TextArea
+              value={internalTitle}
+              placeholder="제목을 입력해 주세요."
+              ref={titleAreaRef}
+              heightLines={2}
+              maxHeightLines={3}
+              maxLength={MAX_TITLE_LENGTH}
+              showMax
+              onSubmit={() => handleSave()}
+              onChange={e => {
+                const value = e.target.value;
+                setInternalTitle(value);
+                onTitleChange?.(value);
+              }}
+            />
+          </div>
         </div>
       ) : (
-        <Tooltip content="제목을 수정해 보세요" disabled={isTitleEditing}>
+        <Tooltip content="제목 수정하기">
           <div
             className={titleCard()}
             style={{

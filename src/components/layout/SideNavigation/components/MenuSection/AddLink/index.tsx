@@ -6,6 +6,7 @@ import Label from '@/components/basics/Label/Label';
 import Modal from '@/components/basics/Modal/Modal';
 import TextArea from '@/components/basics/TextArea/TextArea';
 import { usePostLinks } from '@/hooks/usePostLinks';
+import { MAX_MEMO_LENGTH } from '@/lib/constants/link';
 import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
 import { hideToast, showToast } from '@/stores/toastStore';
@@ -207,7 +208,8 @@ const AddLinkModal = () => {
                     radius="lg"
                     heightLines={3}
                     maxHeightLines={3}
-                    maxLength={600}
+                    maxLength={MAX_MEMO_LENGTH}
+                    showMax
                     isLoading={metaLoading && isValidUrl}
                     disabled={shouldDisableDetails}
                     value={field.value ?? ''}

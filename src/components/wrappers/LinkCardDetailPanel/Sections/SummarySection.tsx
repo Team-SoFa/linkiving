@@ -70,12 +70,7 @@ export default function SummarySection({
       const lineHeight = parseFloat(window.getComputedStyle(element).lineHeight || '0');
       if (!lineHeight) return;
 
-      const wasClamped = element.classList.contains('line-clamp-5');
-      if (wasClamped) element.classList.remove('line-clamp-5');
-
       const fullHeight = element.scrollHeight;
-
-      if (wasClamped) element.classList.add('line-clamp-5');
 
       const maxHeight = lineHeight * 5;
       setIsOverflowing(fullHeight > maxHeight + 1);
@@ -127,14 +122,24 @@ export default function SummarySection({
 
     return (
       <div className={summaryWrapper()}>
-        <div
-          ref={summaryRef}
-          className={`font-body-md max-w-120 leading-[160%] ${isExpanded ? '' : 'line-clamp-5'}`}
-        >
-          <MarkdownRenderer
-            className="text-body-md"
-            content={summaryState === 'writing' ? displayedSummary : (summary ?? '')}
-          />
+        <div className="block">
+          <div
+            ref={summaryRef}
+            className="font-body-md max-w-120 leading-[160%]"
+            style={
+              isExpanded
+                ? undefined
+                : {
+                    maxHeight: `calc(1.6em * 5)`,
+                    overflow: 'hidden',
+                  }
+            }
+          >
+            <MarkdownRenderer
+              className="text-body-md"
+              content={summaryState === 'writing' ? displayedSummary : (summary ?? '')}
+            />
+          </div>
         </div>
 
         {isOverflowing && (
