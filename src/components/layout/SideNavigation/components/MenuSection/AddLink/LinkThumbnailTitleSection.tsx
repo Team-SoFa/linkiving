@@ -2,6 +2,7 @@ import Label from '@/components/basics/Label/Label';
 import Skeleton from '@/components/basics/Skeleton/Skeleton';
 import Spinner from '@/components/basics/Spinner/Spinner';
 import TextArea from '@/components/basics/TextArea/TextArea';
+import { MAX_TITLE_LENGTH } from '@/lib/constants/link';
 import Image from 'next/image';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 
@@ -59,7 +60,8 @@ export default function LinkThumbnailTitleSection({
               radius="lg"
               heightLines={2}
               maxHeightLines={2}
-              maxLength={100}
+              maxLength={MAX_TITLE_LENGTH}
+              showMax
               isLoading={metaLoading && isValidUrl}
               disabled={shouldDisableDetails}
               value={field.value ?? ''}
