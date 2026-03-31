@@ -483,7 +483,7 @@ export default function Chat() {
                                       key={link.linkId}
                                       title={link.title}
                                       link={link.url}
-                                      summary=""
+                                      summary={link.summary ?? ''}
                                       imageUrl={link.imageUrl ?? ''}
                                       onClick={() => setSelectedLink(link)}
                                     />
@@ -516,7 +516,7 @@ export default function Chat() {
                                     key={link.linkId}
                                     title={link.title}
                                     link={link.url}
-                                    summary=""
+                                    summary={link.summary ?? ''}
                                     imageUrl={link.imageUrl ?? ''}
                                     onClick={() => setSelectedLink(link)}
                                   />
