@@ -9,6 +9,7 @@ import Spinner from '@/components/basics/Spinner/Spinner';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
 import { useGetInfiniteLinks } from '@/hooks/useGetInfiniteLinks';
 import { useGetLink } from '@/hooks/useGetLink';
+import useLinkCount from '@/hooks/useGetLinksCount';
 import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
 import { useEffect, useRef, useState } from 'react';
@@ -21,6 +22,8 @@ export default function AllLink() {
 
   const listRef = useRef<HTMLDivElement>(null);
   const deleteButtonRef = useRef<HTMLButtonElement>(null);
+
+  const { count } = useLinkCount();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -101,7 +104,7 @@ export default function AllLink() {
             <header className="flex items-center justify-between">
               <div className="flex items-center gap-1">
                 <h1 className="font-title-md">전체 링크</h1>
-                <p className="font-body-md text-gray600">({links.length})</p>
+                <p className="font-body-md text-gray600">({count ?? links.length})</p>
               </div>
               {hasSelection && (
                 <Button

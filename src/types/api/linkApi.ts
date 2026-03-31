@@ -9,6 +9,11 @@ export interface ApiResponseBase<T> {
   timestamp?: string;
 }
 
+export interface LinkCountResponse {
+  totalCount: number;
+}
+export type LinkCountApiResponse = ApiResponseBase<LinkCountResponse>;
+
 export interface LinkRes {
   id: number;
   url: string;
