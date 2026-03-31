@@ -3,6 +3,7 @@ import type {
   DeleteLinkApiResponse,
   DuplicateLinkApiResponse,
   LinkApiResponse,
+  LinkCountApiResponse,
   LinkListApiResponse,
   LinkListViewData,
   LinkMetaScrapeApiResponse,
@@ -61,6 +62,16 @@ export const fetchLinks = async (params?: LinkListParams): Promise<LinkListViewD
     ...body.data,
     content: body.data.links.map(normalizeLink),
   };
+};
+
+export const fetchLinksCount = async (): Promise<number> => {
+  const body = await clientApiClient<LinkCountApiResponse>('/api/links/count');
+
+  if (!body?.data || typeof body.data.totalCount !== 'number') {
+    throw new Error(body?.message ?? 'Invalid response');
+  }
+
+  return body.data.totalCount;
 };
 
 // 링크 추가
