@@ -4,7 +4,7 @@ import { getSafeUrl } from '@/hooks/util/getSafeUrl';
 import MarkdownRenderer from '@/hooks/util/parseMarkdown';
 import { useInteractiveKeyBlock } from '@/hooks/util/useInteractiveKeyBlock';
 import Image from 'next/image';
-import React from 'react';
+import React, { memo } from 'react';
 
 import Anchor from '../Anchor/Anchor';
 import Badge from '../Badge/Badge';
@@ -127,4 +127,4 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
   );
 });
 
-export default LinkCard;
+export default memo(LinkCard);

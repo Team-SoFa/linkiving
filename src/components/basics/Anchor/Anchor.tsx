@@ -3,7 +3,7 @@
 import SVGIcon from '@/components/Icons/SVGIcon';
 import clsx from 'clsx';
 import Image from 'next/image';
-import { HTMLAttributes, ReactNode, forwardRef, useEffect, useState } from 'react';
+import { HTMLAttributes, ReactNode, forwardRef, memo, useEffect, useMemo, useState } from 'react';
 
 import { style } from './Anchor.style';
 
@@ -58,13 +58,13 @@ const Anchor = forwardRef<HTMLAnchorElement, AnchorProps>(function Anchor(
     md: 'sm',
   } as const;
 
-  const finalRel = (() => {
+  const finalRel = useMemo(() => {
     const tokens = new Set((rel ?? '').split(/\s+/).filter(Boolean));
     if (target === '_blank') tokens.add('noopener'); // window.opener 방지
     return tokens.size ? Array.from(tokens).join(' ') : undefined;
-  })();
+  }, [rel, target]);
 
-  const faviconUrl = getFaviconUrl(href);
+  const faviconUrl = useMemo(() => getFaviconUrl(href), [href]);
 
   const iconSizeMap = { sm: 12, md: 16 } as const;
 
@@ -97,4 +97,4 @@ const Anchor = forwardRef<HTMLAnchorElement, AnchorProps>(function Anchor(
   );
 });
 
-export default Anchor;
+export default memo(Anchor);
