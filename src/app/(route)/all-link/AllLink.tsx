@@ -1,7 +1,6 @@
 'use client';
 
 import Button from '@/components/basics/Button/Button';
-import CardList from '@/components/basics/CardList/CardList';
 import InfiniteScroll from '@/components/basics/InfiniteScroll/InfiniteScroll';
 import LinkCard from '@/components/basics/LinkCard/LinkCard';
 import DeleteLinkModal from '@/components/basics/LinkCard/components/DeleteLinkModal';
@@ -14,7 +13,54 @@ import { useSummaryStatusSocket } from '@/hooks/useSummaryStatusSocket';
 import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
 import type { LinkSummaryStatus } from '@/types/link';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type Link } from '@/types/link';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+const LinkCardItem = memo(
+  function LinkCardItem({
+    item,
+    isSelected,
+    summaryStatus,
+    summaryText,
+    summaryErrorMessage,
+    onSelect,
+    onOpen,
+  }: {
+    item: Link;
+    isSelected: boolean;
+    summaryStatus: LinkSummaryStatus;
+    summaryText: string;
+    summaryErrorMessage?: string;
+    onSelect: (id: number) => void;
+    onOpen: (id: number) => void;
+  }) {
+    const handleClick = useCallback(() => onOpen(item.id), [item.id, onOpen]);
+    const handleSelect = useCallback(() => onSelect(item.id), [item.id, onSelect]);
+
+    return (
+      <LinkCard
+        title={item.title}
+        link={item.url}
+        summary={summaryText}
+        summaryStatus={summaryStatus}
+        summaryErrorMessage={summaryErrorMessage}
+        imageUrl={item.imageUrl ?? ''}
+        onClick={handleClick}
+        selectable
+        isSelected={isSelected}
+        onSelect={handleSelect}
+      />
+    );
+  },
+  (prev, next) =>
+    prev.item === next.item &&
+    prev.isSelected === next.isSelected &&
+    prev.summaryStatus === next.summaryStatus &&
+    prev.summaryText === next.summaryText &&
+    prev.summaryErrorMessage === next.summaryErrorMessage &&
+    prev.onSelect === next.onSelect &&
+    prev.onOpen === next.onOpen
+);
 
 export default function AllLink() {
   const { selectedLinkId, selectLink } = useLinkStore();
@@ -38,10 +84,28 @@ export default function AllLink() {
 
   const { count } = useLinkCount();
   const processingLinkIdsRef = useRef<Set<number>>(new Set());
+  const linksRef = useRef<Link[]>([]); // ✅ 정상 위치
+
+  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+    useGetInfiniteLinks();
+
+  const links = useMemo(() => data?.pages.flatMap(page => page.content) ?? [], [data]);
+
+  // ✅ 최신 links 유지
+  useEffect(() => {
+    linksRef.current = links;
+  }, [links]);
+
+  // ✅ generating 상태 추적
+  useEffect(() => {
+    processingLinkIdsRef.current = new Set(
+      links.filter(link => link.summaryStatus === 'generating').map(link => link.id)
+    );
+  }, [links]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (modal.type === 'DELETE_LINK') return; // 모달 열려있으면 스킵
+      if (modal.type === 'DELETE_LINK') return;
 
       if (
         listRef.current &&
@@ -51,23 +115,14 @@ export default function AllLink() {
         setSelectedIds(new Set());
       }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [modal.type]); // type을 의존성 배열에 추가하여 모달이 열렸을 때 외부 클릭 핸들러 실행 막음
-
-  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
-    useGetInfiniteLinks();
+  }, [modal.type]);
 
   useSummaryStatusSocket({
     enabled: true,
-    onConnect: () => {
-      console.log('[summary-socket] connected to backend');
-    },
-    onDisconnect: () => {
-      console.warn('[summary-socket] disconnected from backend');
-    },
     onEvent: event => {
-      console.log('[summary-socket] event received', event);
       setSummaryStatusByLinkId(prev => ({
         ...prev,
         [event.linkId]: {
@@ -78,35 +133,20 @@ export default function AllLink() {
         },
       }));
 
-      // 요약 생성 시작 감지
       if (event.status === 'generating') {
         processingLinkIdsRef.current.add(event.linkId);
-        console.log('[summary-socket] tracking linkId', event.linkId);
       }
 
-      // 요약 생성 완료/실패 감지 → 최종 상태 도달 시 refetch
       if (event.status === 'ready' || event.status === 'failed') {
         const wasProcessing = processingLinkIdsRef.current.has(event.linkId);
-        const isVisibleLink = links.some(link => link.id === event.linkId);
+        const isVisibleLink = linksRef.current.some(link => link.id === event.linkId);
 
         processingLinkIdsRef.current.delete(event.linkId);
 
         if (wasProcessing || isVisibleLink) {
-          console.log('[summary-socket] linkId summary complete', {
-            linkId: event.linkId,
-            status: event.status,
-          });
-          console.log('[summary-socket] refetching after summary', event.linkId);
           refetch();
         }
       }
-    },
-    onError: error => {
-      console.error('[summary-socket] error', {
-        message: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-        error,
-      });
     },
   });
 
@@ -117,37 +157,60 @@ export default function AllLink() {
     refetch: refetchSelectedLink,
   } = useGetLink(isPanelOpen ? selectedLinkId : null);
 
-  const links = useMemo(() => data?.pages.flatMap(page => page.content) ?? [], [data]);
+  const handleLoadMore = useCallback(
+    (_signal?: AbortSignal) => fetchNextPage().then(() => undefined),
+    [fetchNextPage]
+  );
 
-  useEffect(() => {
-    processingLinkIdsRef.current = new Set(
-      links.filter(link => link.summaryStatus === 'generating').map(link => link.id)
-    );
-  }, [links]);
+  const handleSelectLink = useCallback(
+    (id: number) => {
+      selectLink(id);
+      setIsPanelOpen(true);
+    },
+    [selectLink]
+  );
 
-  const handleSelectLink = (id: number) => {
-    selectLink(id);
-    setIsPanelOpen(true);
-  };
-
-  // AddLink/index.tsx에서 링크 추가 후 토스트 버튼 클릭 시 store에 저장된 id에 해당하는 패널 열기
   useEffect(() => {
     if (selectedLinkId !== null) {
       setIsPanelOpen(true);
     }
   }, [selectedLinkId]);
 
-  const handleToggleSelect = (id: number) => {
+  const handleToggleSelect = useCallback((id: number) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
+
       if (next.has(id)) {
         next.delete(id);
       } else {
         next.add(id);
       }
+
       return next;
     });
-  };
+  }, []);
+
+  const renderItem = useCallback(
+    (link: Link) => {
+      const statusInfo = summaryStatusByLinkId[link.id];
+
+      const summaryStatus = statusInfo?.status ?? link.summaryStatus ?? 'idle';
+      const summaryText = statusInfo?.summary ?? link.summary ?? '';
+
+      return (
+        <LinkCardItem
+          item={link}
+          isSelected={selectedIds.has(link.id)}
+          summaryStatus={summaryStatus}
+          summaryText={summaryText}
+          summaryErrorMessage={statusInfo?.errorMessage}
+          onSelect={handleToggleSelect}
+          onOpen={handleSelectLink}
+        />
+      );
+    },
+    [selectedIds, summaryStatusByLinkId, handleToggleSelect, handleSelectLink]
+  );
 
   const hasSelection = selectedIds.size > 0;
 
@@ -170,7 +233,7 @@ export default function AllLink() {
 
   return (
     <div className="h-screen min-w-0">
-      <div className="h-screen min-w-0 xl:flex">
+      <div className="flex h-screen min-w-0 flex-col xl:flex-row">
         <div className="min-w-0 flex-1 px-6 py-8 lg:px-10">
           <div className="mx-auto flex h-full w-full max-w-200 flex-col gap-5">
             <header className="flex items-center justify-between">
@@ -186,44 +249,25 @@ export default function AllLink() {
                 />
               )}
             </header>
-            <div ref={listRef} className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-1">
+
+            <div ref={listRef} className="min-h-0 flex-1">
               {links.length === 0 ? (
                 <p className="text-gray600">표시할 링크가 없습니다.</p>
               ) : (
                 <InfiniteScroll
-                  onLoadMore={() => {
-                    fetchNextPage();
-                  }}
+                  className="custom-scrollbar h-full overflow-y-auto p-1"
+                  items={links}
+                  getKey={item => item.id}
+                  renderItem={renderItem}
+                  onLoadMore={handleLoadMore}
                   hasMore={hasNextPage ?? false}
                   isLoading={isFetchingNextPage}
-                >
-                  <CardList>
-                    {links.map(link => {
-                      const statusInfo = summaryStatusByLinkId[link.id];
-                      const summaryStatus = statusInfo?.status ?? link.summaryStatus ?? 'idle';
-                      const summaryText = statusInfo?.summary ?? link.summary ?? '';
-                      return (
-                        <LinkCard
-                          key={link.id}
-                          title={link.title}
-                          link={link.url}
-                          summary={summaryText}
-                          summaryStatus={summaryStatus}
-                          summaryErrorMessage={statusInfo?.errorMessage}
-                          imageUrl={link.imageUrl ?? ''}
-                          onClick={() => handleSelectLink(link.id)}
-                          selectable
-                          isSelected={selectedIds.has(link.id)}
-                          onSelect={() => handleToggleSelect(link.id)}
-                        />
-                      );
-                    })}
-                  </CardList>
-                </InfiniteScroll>
+                />
               )}
             </div>
           </div>
         </div>
+
         {isPanelOpen && (
           <aside className="hidden h-screen shrink-0 xl:block xl:w-130">
             {isSelectedLinkLoading ? (
@@ -263,12 +307,9 @@ export default function AllLink() {
             .filter(l => modal.props.linkIds.includes(l.id))
             .map(l => ({ id: l.id, title: l.title, url: l.url }))}
           onSuccess={succeededIds => {
-            // 삭제 성공한 id만 선택 해제
             setSelectedIds(prev => {
               const next = new Set(prev);
-              succeededIds.forEach(id => {
-                next.delete(id);
-              });
+              succeededIds.forEach(id => next.delete(id));
               return next;
             });
           }}
