@@ -10,20 +10,34 @@ import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkC
 import { useGetInfiniteLinks } from '@/hooks/useGetInfiniteLinks';
 import { useGetLink } from '@/hooks/useGetLink';
 import useLinkCount from '@/hooks/useGetLinksCount';
+import { useSummaryStatusSocket } from '@/hooks/useSummaryStatusSocket';
 import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
+import type { LinkSummaryStatus } from '@/types/link';
 import { useEffect, useRef, useState } from 'react';
 
 export default function AllLink() {
   const { selectedLinkId, selectLink } = useLinkStore();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [summaryStatusByLinkId, setSummaryStatusByLinkId] = useState<
+    Record<
+      number,
+      {
+        status: LinkSummaryStatus;
+        progress?: number;
+        summary?: string;
+        errorMessage?: string;
+      }
+    >
+  >({});
   const { modal, open } = useModalStore();
 
   const listRef = useRef<HTMLDivElement>(null);
   const deleteButtonRef = useRef<HTMLButtonElement>(null);
 
   const { count } = useLinkCount();
+  const processingLinkIdsRef = useRef<Set<number>>(new Set());
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -43,6 +57,54 @@ export default function AllLink() {
 
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
     useGetInfiniteLinks();
+
+  useSummaryStatusSocket({
+    enabled: true,
+    onConnect: () => {
+      console.log('[summary-socket] connected to backend');
+    },
+    onDisconnect: () => {
+      console.warn('[summary-socket] disconnected from backend');
+    },
+    onEvent: event => {
+      console.log('[summary-socket] event received', event);
+      setSummaryStatusByLinkId(prev => ({
+        ...prev,
+        [event.linkId]: {
+          status: event.status,
+          progress: event.progress,
+          summary: event.summary,
+          errorMessage: event.errorMessage,
+        },
+      }));
+
+      // 요약 생성 시작 감지
+      if (event.status === 'generating') {
+        processingLinkIdsRef.current.add(event.linkId);
+        console.log('[summary-socket] tracking linkId', event.linkId);
+      }
+
+      // 요약 생성 완료/실패 감지 → 최종 상태 도달 시 refetch
+      if (event.status === 'ready' || event.status === 'failed') {
+        if (processingLinkIdsRef.current.has(event.linkId)) {
+          processingLinkIdsRef.current.delete(event.linkId);
+          console.log('[summary-socket] linkId summary complete', {
+            linkId: event.linkId,
+            status: event.status,
+          });
+          console.log('[summary-socket] refetching after summary', event.linkId);
+          refetch();
+        }
+      }
+    },
+    onError: error => {
+      console.error('[summary-socket] error', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        error,
+      });
+    },
+  });
 
   const {
     data: selectedLinkDetail,
@@ -126,19 +188,29 @@ export default function AllLink() {
                   isLoading={isFetchingNextPage}
                 >
                   <CardList>
-                    {links.map(link => (
-                      <LinkCard
-                        key={link.id}
-                        title={link.title}
-                        link={link.url}
-                        summary={link.summary ?? ''}
-                        imageUrl={link.imageUrl ?? ''}
-                        onClick={() => handleSelectLink(link.id)}
-                        selectable
-                        isSelected={selectedIds.has(link.id)}
-                        onSelect={() => handleToggleSelect(link.id)}
-                      />
-                    ))}
+                    {links.map(link => {
+                      const statusInfo = summaryStatusByLinkId[link.id];
+                      const summaryStatus =
+                        statusInfo?.status ??
+                        link.summaryStatus ??
+                        (link.summary ? 'ready' : 'failed');
+                      const summaryText = statusInfo?.summary ?? link.summary ?? '';
+                      return (
+                        <LinkCard
+                          key={link.id}
+                          title={link.title}
+                          link={link.url}
+                          summary={summaryText}
+                          summaryStatus={summaryStatus}
+                          summaryErrorMessage={statusInfo?.errorMessage}
+                          imageUrl={link.imageUrl ?? ''}
+                          onClick={() => handleSelectLink(link.id)}
+                          selectable
+                          isSelected={selectedIds.has(link.id)}
+                          onSelect={() => handleToggleSelect(link.id)}
+                        />
+                      );
+                    })}
                   </CardList>
                 </InfiniteScroll>
               )}
