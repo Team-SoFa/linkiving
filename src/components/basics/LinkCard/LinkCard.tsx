@@ -3,6 +3,7 @@
 import { getSafeUrl } from '@/hooks/util/getSafeUrl';
 import MarkdownRenderer from '@/hooks/util/parseMarkdown';
 import { useInteractiveKeyBlock } from '@/hooks/util/useInteractiveKeyBlock';
+import type { LinkSummaryStatus } from '@/types/link';
 import Image from 'next/image';
 import React from 'react';
 
@@ -17,6 +18,8 @@ interface LinkCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onCl
   link: string;
   summary: string;
   title: string;
+  summaryStatus?: LinkSummaryStatus;
+  summaryErrorMessage?: string;
   isSelected?: boolean;
   selectable?: boolean;
   onClick?: () => void;
@@ -28,6 +31,8 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
     imageUrl,
     link,
     summary,
+    summaryStatus = 'idle',
+    summaryErrorMessage,
     title,
     onClick,
     isSelected = false,
@@ -39,6 +44,21 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
 ) {
   const handleKeyDown = useInteractiveKeyBlock({ onClick });
   const safeHref = getSafeUrl(link);
+
+  const normalizedSummary = summary?.trim();
+  const isSummaryEmpty =
+    !normalizedSummary ||
+    normalizedSummary.toLowerCase() === 'null' ||
+    normalizedSummary.toLowerCase() === 'undefined';
+
+  const normalizedImageUrl =
+    imageUrl &&
+    imageUrl.trim() &&
+    imageUrl.trim().toLowerCase() !== 'null' &&
+    imageUrl.trim().toLowerCase() !== 'undefined'
+      ? imageUrl
+      : '';
+  const safeImageUrl = getSafeUrl(normalizedImageUrl) || '/images/default_linkcard_image.png';
 
   return (
     <div
@@ -81,18 +101,18 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
         </div>
       )}
 
-      {!summary && (
+      {(summaryStatus === 'generating' || summaryStatus === 'failed') && (
         <Badge
-          label="요약 실패"
-          icon="IC_Warning"
-          variant="warning"
+          label={summaryStatus === 'generating' ? '요약 생성 중' : '요약 실패'}
+          icon={summaryStatus === 'generating' ? 'IC_SumGenerate' : 'IC_Warning'}
+          variant={summaryStatus === 'generating' ? 'primary' : 'warning'}
           className="absolute top-2 left-2 z-10"
         />
       )}
 
       <div className="bg-gray900 relative aspect-94/47 w-full max-w-94 shrink-0">
         <Image
-          src={imageUrl ? imageUrl : '/images/default_linkcard_image.png'}
+          src={safeImageUrl}
           alt={title}
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -112,16 +132,52 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
             </Anchor>
           </div>
         </div>
-        {!!summary ? (
-          <MarkdownRenderer
-            className="text-etc-linkcard-summary font-body-sm line-clamp-2"
-            content={summary}
-          />
-        ) : (
-          <div className="font-body-sm text-etc-linkcard-summary flex justify-end">
-            <span>{SUMMARY_FAIL_TEXT}</span>
-          </div>
-        )}
+        {(() => {
+          if (summaryStatus === 'generating') {
+            return (
+              <div className="mt-[2.1875rem] flex flex-col gap-2">
+                <div className="bg-gray200 h-4 w-full rounded" />
+                <div className="bg-gray200 h-4 w-3/4 rounded" />
+              </div>
+            );
+          }
+
+          if (summaryStatus === 'failed') {
+            return (
+              <div className="font-body-sm text-etc-linkcard-summary flex justify-end">
+                <span>{summaryErrorMessage ?? SUMMARY_FAIL_TEXT}</span>
+              </div>
+            );
+          }
+
+          if (summaryStatus === 'ready') {
+            return !isSummaryEmpty ? (
+              <MarkdownRenderer
+                className="text-etc-linkcard-summary font-body-sm line-clamp-2"
+                content={summary}
+              />
+            ) : (
+              <div className="font-body-sm text-etc-linkcard-summary text-gray600">
+                <span>요약이 곧 도착합니다...</span>
+              </div>
+            );
+          }
+
+          if (!isSummaryEmpty) {
+            return (
+              <MarkdownRenderer
+                className="text-etc-linkcard-summary font-body-sm line-clamp-2"
+                content={summary}
+              />
+            );
+          }
+
+          return (
+            <div className="font-body-sm text-etc-linkcard-summary text-gray600 flex justify-end">
+              <span>요약이 아직 생성되지 않았습니다.</span>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

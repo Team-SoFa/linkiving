@@ -13,7 +13,8 @@ export function usePostLinks({ skipInvalidate = false }: UsePostLinksOptions = {
     mutationFn: createLink,
     onSuccess: () => {
       if (!skipInvalidate) {
-        qc.invalidateQueries({ queryKey: ['links'] });
+        console.log('[usePostLinks] link created, refetching links');
+        qc.refetchQueries({ queryKey: ['links'] });
       }
     },
   });

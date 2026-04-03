@@ -47,6 +47,9 @@ const normalizeLink = (
     imageUrl: data.imageUrl ?? '',
     createdAt: data.createdAt ?? now,
     updatedAt: data.updatedAt ?? now,
+    summaryStatus: data.summaryStatus,
+    summaryProgress: data.summaryProgress,
+    summaryUpdatedAt: data.summaryUpdatedAt,
   };
 };
 
