@@ -17,7 +17,7 @@ const makeItems = (offset: number, size: number): DemoItem[] =>
     return {
       id,
       title: `항목 #${id}`,
-      desc: `이것은 데모 항목 ${id}의 설명입니다. 무한 스크롤 동작을 확인해 보세요.`,
+      desc: `이것은 데모 항목 ${id}의 설명입니다.`,
     };
   });
 
@@ -30,33 +30,31 @@ const createMockFetch =
   ) =>
   async (page: number): Promise<{ items: DemoItem[]; hasMore: boolean }> => {
     await new Promise(r => setTimeout(r, delay));
+
     if (errorAtPage && page === errorAtPage) {
       throw new Error('가짜 오류: 네트워크 문제');
     }
+
     const start = (page - 1) * pageSize;
     const remain = Math.max(0, total - start);
     const size = Math.min(pageSize, remain);
+
     const items = size > 0 ? makeItems(start, size) : [];
     const hasMore = start + size < total;
+
     return { items, hasMore };
   };
 
-// ===== Demo wrapper components =====
+// ===== Demo =====
 
 type DemoStateProps = {
-  /** 전체 개수 */
   total?: number;
-  /** 페이지 크기 */
   pageSize?: number;
-  /** 지연(ms) */
   delay?: number;
-  /** 특정 페이지에서 에러 유발 (예: 3) */
   errorAtPage?: number;
-  /** container root 사용 여부 */
   useContainer?: boolean;
-  /** container 높이 (useContainer=true일 때만) */
   containerHeight?: number;
-} & Pick<InfiniteScrollProps, 'rootMargin' | 'threshold' | 'observe' | 'loader' | 'endMessage'>;
+} & Pick<InfiniteScrollProps<DemoItem>, 'loader' | 'endMessage'>;
 
 const DemoList: React.FC<DemoStateProps> = ({
   total = DEFAULT_TOTAL,
@@ -64,10 +62,7 @@ const DemoList: React.FC<DemoStateProps> = ({
   delay = DEFAULT_DELAY,
   errorAtPage,
   useContainer = false,
-  containerHeight = 384,
-  rootMargin = '0px 0px 400px 0px',
-  threshold = 0,
-  observe = true,
+  containerHeight = 400,
   loader,
   endMessage,
 }) => {
@@ -76,64 +71,75 @@ const DemoList: React.FC<DemoStateProps> = ({
   const [hasMore, setHasMore] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
 
   const fetcher = React.useMemo(
     () => createMockFetch(total, pageSize, delay, errorAtPage),
     [total, pageSize, delay, errorAtPage]
   );
 
+  // 초기 로드
   React.useEffect(() => {
     let mounted = true;
+
     (async () => {
       try {
         setIsLoading(true);
         const { items: first, hasMore } = await fetcher(1);
+
         if (!mounted) return;
+
         setItems(first);
         setHasMore(hasMore);
         setPage(2);
       } catch {
-        setErrorMessage('초기 데이터를 불러오지 못했어요.');
+        setErrorMessage('초기 데이터를 불러오지 못했습니다.');
       } finally {
         setIsLoading(false);
       }
     })();
+
     return () => {
       mounted = false;
     };
   }, [fetcher]);
 
+  // 다음 페이지 로드
   const onLoadMore = React.useCallback(async () => {
     try {
       setErrorMessage(null);
       setIsLoading(true);
+
       const { items: next, hasMore } = await fetcher(page);
+
       setItems(prev => [...prev, ...next]);
       setHasMore(hasMore);
       setPage(p => p + 1);
     } catch {
-      setErrorMessage('목록을 불러오지 못했어요. 다시 시도해 주세요.');
+      setErrorMessage('목록을 불러오지 못했습니다.');
     } finally {
       setIsLoading(false);
     }
   }, [fetcher, page]);
 
   const content = (
-    <InfiniteScroll
-      className="w-full"
+    <InfiniteScroll<DemoItem>
+      className="h-full w-full"
+      items={items}
+      getKey={item => item.id}
+      renderItem={item => (
+        <div className="w-full rounded-2xl border p-4">
+          <div className="text-base font-medium">{item.title}</div>
+          <div className="text-sm text-gray-500">{item.desc}</div>
+        </div>
+      )}
       onLoadMore={onLoadMore}
       hasMore={hasMore}
       isLoading={isLoading}
       errorMessage={errorMessage}
-      root={useContainer ? containerRef.current : null}
-      rootMargin={rootMargin}
-      threshold={threshold}
-      observe={observe}
       loader={
         loader ?? (
           <span>
-            다음 페이지 불러오는 중… <span aria-hidden>⏳</span>
+            로딩 중… <span aria-hidden>⏳</span>
           </span>
         )
       }
@@ -142,29 +148,21 @@ const DemoList: React.FC<DemoStateProps> = ({
         <div className="flex items-center gap-2 text-red-500">
           <span>⚠️</span>
           <span>{msg}</span>
-          <button type="button" onClick={() => onLoadMore()} className="underline">
+          <button onClick={onLoadMore} className="underline">
             다시 시도
           </button>
         </div>
       )}
-    >
-      <ul className="grid gap-3">
-        {items.map(it => (
-          <li key={it.id} className="rounded-2xl border p-4">
-            <div className="text-base font-medium">{it.title}</div>
-            <div className="text-sm text-gray-500">{it.desc}</div>
-          </li>
-        ))}
-      </ul>
-    </InfiniteScroll>
+    />
   );
 
-  if (!useContainer) return content;
+  if (!useContainer) {
+    return <div className="h-[500px] w-[360px]">{content}</div>;
+  }
 
   return (
     <div
-      ref={containerRef}
-      className={clsx('w-full overflow-y-auto rounded-2xl border p-3')}
+      className={clsx('w-[360px] overflow-y-auto rounded-2xl border p-3')}
       style={{ height: containerHeight }}
     >
       {content}
@@ -172,55 +170,32 @@ const DemoList: React.FC<DemoStateProps> = ({
   );
 };
 
+// ===== Storybook =====
+
 const meta = {
   title: 'Components/Basics/InfiniteScroll',
   component: InfiniteScroll,
-  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
-  },
-  argTypes: {
-    hasMore: { control: { disable: true } },
-    isLoading: { control: { disable: true } },
-    errorMessage: { control: { disable: true } },
-    onLoadMore: { control: { disable: true } },
-    root: { control: { disable: true } },
-    children: { control: { disable: true } },
-
-    rootMargin: {
-      control: 'text',
-      description: 'IntersectionObserver rootMargin',
-    },
-    threshold: {
-      control: 'number',
-      description: 'IntersectionObserver threshold',
-    },
-    observe: {
-      control: 'boolean',
-      description: '관찰 토글',
-    },
   },
 } satisfies Meta<typeof InfiniteScroll>;
 
 export default meta;
 
+type Story = StoryObj;
+
 const demoArgTypes = {
-  total: { control: 'number', description: '총 아이템 수(데모용)' },
-  pageSize: { control: 'number', description: '페이지 크기(데모용)' },
-  delay: { control: 'number', description: '지연(ms, 데모용)' },
-  errorAtPage: { control: 'number', description: '해당 페이지에서 에러 유발(데모용)' },
-  useContainer: { control: 'boolean', description: '스크롤 컨테이너 사용' },
-  containerHeight: { control: 'number', description: '컨테이너 높이(px)' },
+  total: { control: 'number' },
+  pageSize: { control: 'number' },
+  delay: { control: 'number' },
+  errorAtPage: { control: 'number' },
+  useContainer: { control: 'boolean' },
+  containerHeight: { control: 'number' },
 };
 
-type Story = StoryObj; // 간단 타이핑
-
 export const Basic: Story = {
-  name: '기본(뷰포트 관찰)',
+  name: '기본 (viewport scroll)',
   args: {
-    rootMargin: '0px 0px 400px 0px',
-    threshold: 0,
-    observe: true,
     total: DEFAULT_TOTAL,
     pageSize: DEFAULT_PAGE_SIZE,
     delay: DEFAULT_DELAY,
@@ -231,11 +206,8 @@ export const Basic: Story = {
 };
 
 export const WithError: Story = {
-  name: '에러 발생 및 재시도',
+  name: '에러 발생',
   args: {
-    rootMargin: '0px 0px 300px 0px',
-    threshold: 0,
-    observe: true,
     total: DEFAULT_TOTAL,
     pageSize: DEFAULT_PAGE_SIZE,
     delay: 400,
@@ -246,12 +218,9 @@ export const WithError: Story = {
   render: (args: DemoStateProps) => <DemoList {...args} />,
 };
 
-export const InScrollableContainer: Story = {
-  name: '컨테이너 관찰(스크롤 박스)',
+export const InContainer: Story = {
+  name: '스크롤 컨테이너 내부',
   args: {
-    rootMargin: '0px 0px 200px 0px',
-    threshold: 0,
-    observe: true,
     total: DEFAULT_TOTAL,
     pageSize: DEFAULT_PAGE_SIZE,
     delay: DEFAULT_DELAY,

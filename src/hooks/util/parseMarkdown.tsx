@@ -1,3 +1,5 @@
+import { memo, useMemo } from 'react';
+
 function escapeHtml(text: string): string {
   return text
     .replace(/&/g, '&amp;')
@@ -10,11 +12,13 @@ function escapeHtml(text: string): string {
 const formatInline = (raw: string) => {
   if (!raw) return '';
 
+  const escaped = escapeHtml(raw);
+
   // Bold 처리
   const boldTokens: string[] = [];
-  const tokenized = raw.replace(/\*\*(.+?)\*\*/g, (_, g1) => {
+  const tokenized = escaped.replace(/\*\*(.+?)\*\*/g, (_, g1) => {
     const index = boldTokens.length;
-    boldTokens.push(`<strong class="font-semibold">${escapeHtml(g1)}</strong>`);
+    boldTokens.push(`<strong class="font-semibold">${g1}</strong>`);
     return `%%BOLD_${index}%%`;
   });
 
@@ -22,7 +26,7 @@ const formatInline = (raw: string) => {
   const inlineTokens: string[] = [];
   const inlineProcessed = tokenized.replace(/`([^`]+)`/g, (_, code) => {
     const index = inlineTokens.length;
-    inlineTokens.push(`<code class="bg-gray200 rounded px-1 text-sm">${escapeHtml(code)}</code>`);
+    inlineTokens.push(`<code class="bg-gray200 rounded px-1 text-sm">${code}</code>`);
     return `%%INLINE_${index}%%`;
   });
 
@@ -108,14 +112,13 @@ function parseMarkdown(text: string): string {
   return processed;
 }
 
-export default function MarkdownRenderer({
+export default memo(function MarkdownRenderer({
   content,
   className,
 }: {
   content: string;
   className?: string;
 }) {
-  return (
-    <div className={className} dangerouslySetInnerHTML={{ __html: parseMarkdown(content ?? '') }} />
-  );
-}
+  const html = useMemo(() => parseMarkdown(content ?? ''), [content]);
+  return <div className={className} dangerouslySetInnerHTML={{ __html: html }} />;
+});

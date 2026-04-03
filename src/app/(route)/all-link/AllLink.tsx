@@ -1,7 +1,6 @@
 'use client';
 
 import Button from '@/components/basics/Button/Button';
-import CardList from '@/components/basics/CardList/CardList';
 import InfiniteScroll from '@/components/basics/InfiniteScroll/InfiniteScroll';
 import LinkCard from '@/components/basics/LinkCard/LinkCard';
 import DeleteLinkModal from '@/components/basics/LinkCard/components/DeleteLinkModal';
@@ -12,7 +11,44 @@ import { useGetLink } from '@/hooks/useGetLink';
 import useLinkCount from '@/hooks/useGetLinksCount';
 import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
-import { useEffect, useRef, useState } from 'react';
+import { type Link } from '@/types/link';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+const LinkCardItem = memo(
+  function LinkCardItem({
+    item,
+    selectedIds,
+    onSelect,
+    onOpen,
+  }: {
+    item: Link;
+    selectedIds: Set<number>;
+    onSelect: (id: number) => void;
+    onOpen: (id: number) => void;
+  }) {
+    const isSelected = selectedIds.has(item.id);
+    const handleClick = useCallback(() => onOpen(item.id), [item.id, onOpen]);
+    const handleSelect = useCallback(() => onSelect(item.id), [item.id, onSelect]);
+
+    return (
+      <LinkCard
+        title={item.title}
+        link={item.url}
+        summary={item.summary ?? ''}
+        imageUrl={item.imageUrl ?? ''}
+        onClick={handleClick}
+        selectable
+        isSelected={isSelected}
+        onSelect={handleSelect}
+      />
+    );
+  },
+  // 현재 아이템의 "선택 상태 변화"와 핸들러 참조가 바뀌었을 때만 리렌더링하도록 제어
+  (prev, next) =>
+    prev.selectedIds.has(prev.item.id) === next.selectedIds.has(next.item.id) &&
+    prev.onSelect === next.onSelect &&
+    prev.onOpen === next.onOpen
+);
 
 export default function AllLink() {
   const { selectedLinkId, selectLink } = useLinkStore();
@@ -51,12 +87,22 @@ export default function AllLink() {
     refetch: refetchSelectedLink,
   } = useGetLink(isPanelOpen ? selectedLinkId : null);
 
-  const links = data?.pages.flatMap(page => page.content) ?? [];
+  const links = useMemo(() => data?.pages.flatMap(page => page.content) ?? [], [data]);
 
-  const handleSelectLink = (id: number) => {
-    selectLink(id);
-    setIsPanelOpen(true);
-  };
+  const handleLoadMore = useCallback(
+    (_signal?: AbortSignal) => {
+      return fetchNextPage().then(() => undefined);
+    },
+    [fetchNextPage]
+  );
+
+  const handleSelectLink = useCallback(
+    (id: number) => {
+      selectLink(id);
+      setIsPanelOpen(true);
+    },
+    [selectLink]
+  );
 
   // AddLink/index.tsx에서 링크 추가 후 토스트 버튼 클릭 시 store에 저장된 id에 해당하는 패널 열기
   useEffect(() => {
@@ -65,7 +111,7 @@ export default function AllLink() {
     }
   }, [selectedLinkId]);
 
-  const handleToggleSelect = (id: number) => {
+  const handleToggleSelect = useCallback((id: number) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -75,7 +121,21 @@ export default function AllLink() {
       }
       return next;
     });
-  };
+  }, []);
+
+  // selectedIds를 의존성에 추가하면 selectedIds가 바뀔 때마다 renderItem, virtualizer 전체가 리렌더 되어 성능 최적화 깨짐
+  const renderItem = useCallback(
+    (link: Link) => (
+      <LinkCardItem
+        item={link}
+        selectedIds={selectedIds}
+        onSelect={handleToggleSelect}
+        onOpen={handleSelectLink}
+      />
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [handleToggleSelect, handleSelectLink]
+  );
 
   const hasSelection = selectedIds.size > 0;
 
@@ -98,7 +158,7 @@ export default function AllLink() {
 
   return (
     <div className="h-screen min-w-0">
-      <div className="h-screen min-w-0 xl:flex">
+      <div className="flex h-screen min-w-0 flex-col xl:flex-row">
         <div className="min-w-0 flex-1 px-6 py-8 lg:px-10">
           <div className="mx-auto flex h-full w-full max-w-200 flex-col gap-5">
             <header className="flex items-center justify-between">
@@ -114,33 +174,19 @@ export default function AllLink() {
                 />
               )}
             </header>
-            <div ref={listRef} className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-1">
+            <div ref={listRef} className="min-h-0 flex-1">
               {links.length === 0 ? (
                 <p className="text-gray600">표시할 링크가 없습니다.</p>
               ) : (
                 <InfiniteScroll
-                  onLoadMore={() => {
-                    fetchNextPage();
-                  }}
+                  className="custom-scrollbar h-full overflow-y-auto p-1"
+                  items={links}
+                  getKey={item => item.id}
+                  renderItem={renderItem}
+                  onLoadMore={handleLoadMore}
                   hasMore={hasNextPage ?? false}
                   isLoading={isFetchingNextPage}
-                >
-                  <CardList>
-                    {links.map(link => (
-                      <LinkCard
-                        key={link.id}
-                        title={link.title}
-                        link={link.url}
-                        summary={link.summary ?? ''}
-                        imageUrl={link.imageUrl ?? ''}
-                        onClick={() => handleSelectLink(link.id)}
-                        selectable
-                        isSelected={selectedIds.has(link.id)}
-                        onSelect={() => handleToggleSelect(link.id)}
-                      />
-                    ))}
-                  </CardList>
-                </InfiniteScroll>
+                />
               )}
             </div>
           </div>
