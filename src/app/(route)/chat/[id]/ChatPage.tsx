@@ -424,59 +424,93 @@ export default function Chat() {
 
   return (
     <div className="h-screen w-full xl:flex">
-      <div
-        ref={scrollRootRef}
-        onScroll={handleScroll}
-        className="custom-scrollbar min-w-0 flex-1 overflow-x-hidden overflow-y-auto pr-1"
-      >
-        <div className="mx-auto flex h-screen w-full max-w-[816px] flex-col px-4 pt-6">
-          {streamError && (
-            <div className="mb-4 flex items-center justify-between">
-              <div className="text-red500 text-sm">{streamError}</div>
-            </div>
-          )}
-
-          <div className="flex min-h-0 flex-1 flex-col gap-3 pb-42">
-            {historyLoading && historyBootstrapped && (
-              <div className="text-gray500 text-center text-xs">이전 대화를 불러오는 중...</div>
+      <div className="relative h-full min-w-0 flex-1">
+        <div
+          ref={scrollRootRef}
+          onScroll={handleScroll}
+          className="custom-scrollbar h-full overflow-x-hidden overflow-y-auto pr-1"
+        >
+          <div className="mx-auto flex min-h-full w-full max-w-[816px] flex-col px-4 pt-6">
+            {streamError && (
+              <div className="mb-4 flex items-center justify-between">
+                <div className="text-red500 text-sm">{streamError}</div>
+              </div>
             )}
 
-            {messages.length === 0 && !historyLoading && (
-              <div className="text-gray500 text-sm">질문을 입력하면 답변이 표시됩니다.</div>
-            )}
+            <div className="flex min-h-0 flex-1 flex-col gap-3 pb-42">
+              {historyLoading && historyBootstrapped && (
+                <div className="text-gray500 text-center text-xs">이전 대화를 불러오는 중...</div>
+              )}
 
-            {messages.map((message, index) => (
-              <div
-                key={message.id}
-                className={`flex ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                } ${index > 0 ? 'mt-[2rem]' : ''}`}
-              >
-                {message.role === 'user' ? (
-                  <div className="max-w-[70%]">
-                    <div className="bg-blue50 text-gray900 rounded-2xl px-4 py-3 whitespace-pre-wrap">
-                      {message.text}
+              {messages.length === 0 && !historyLoading && (
+                <div className="text-gray500 text-sm">질문을 입력하면 답변이 표시됩니다.</div>
+              )}
+
+              {messages.map((message, index) => (
+                <div
+                  key={message.id}
+                  className={`flex ${
+                    message.role === 'user' ? 'justify-end' : 'justify-start'
+                  } ${index > 0 ? 'mt-[2rem]' : ''}`}
+                >
+                  {message.role === 'user' ? (
+                    <div className="max-w-[70%]">
+                      <div className="bg-blue50 text-gray900 rounded-2xl px-4 py-3 whitespace-pre-wrap">
+                        {message.text}
+                      </div>
+                      <div className="mt-2 flex justify-end">
+                        <CopyButton
+                          value={message.text}
+                          successMsg="질문을 복사했습니다."
+                          failMsg="질문 복사에 실패했습니다."
+                          tooltipMsg="질문 복사하기"
+                          size="sm"
+                        />
+                      </div>
                     </div>
-                    <div className="mt-2 flex justify-end">
-                      <CopyButton
-                        value={message.text}
-                        successMsg="질문을 복사했습니다."
-                        failMsg="질문 복사에 실패했습니다."
-                        tooltipMsg="질문 복사하기"
-                        size="sm"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-full rounded-xl bg-white p-3">
-                    <Tab
-                      tabs={['답변', '링크']}
-                      contents={{
-                        답변: (
-                          <div className="font-body-md text-gray700 whitespace-pre-wrap">
-                            <div>{message.text}</div>
-                            {message.links && message.links.length > 0 && (
-                              <div className="mt-4">
+                  ) : (
+                    <div className="w-full rounded-xl bg-white p-3">
+                      <Tab
+                        tabs={['답변', '링크']}
+                        contents={{
+                          답변: (
+                            <div className="font-body-md text-gray700 whitespace-pre-wrap">
+                              <div>{message.text}</div>
+                              {message.links && message.links.length > 0 && (
+                                <div className="mt-4">
+                                  <CardList>
+                                    {message.links.map(link => (
+                                      <LinkCard
+                                        key={link.linkId}
+                                        title={link.title}
+                                        link={link.url}
+                                        summary={link.summary ?? ''}
+                                        imageUrl={link.imageUrl ?? ''}
+                                        onClick={() => setSelectedLink(link)}
+                                      />
+                                    ))}
+                                  </CardList>
+                                </div>
+                              )}
+                              {message.role === 'ai' && (
+                                <div className="mt-3">
+                                  <AnswerActions
+                                    copyValue={message.text}
+                                    menuKey={`answer-more-${message.id}`}
+                                    reaction={message.reaction ?? null}
+                                    onReactionChange={reaction =>
+                                      void handleReactionChange(message, reaction)
+                                    }
+                                    onRegenerate={handleRegenerate}
+                                    onReport={handleReport}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          ),
+                          링크: (
+                            <div className="pt-1">
+                              {message.links && message.links.length > 0 ? (
                                 <CardList>
                                   {message.links.map(link => (
                                     <LinkCard
@@ -489,56 +523,24 @@ export default function Chat() {
                                     />
                                   ))}
                                 </CardList>
-                              </div>
-                            )}
-                            {message.role === 'ai' && (
-                              <div className="mt-3">
-                                <AnswerActions
-                                  copyValue={message.text}
-                                  menuKey={`answer-more-${message.id}`}
-                                  reaction={message.reaction ?? null}
-                                  onReactionChange={reaction =>
-                                    void handleReactionChange(message, reaction)
-                                  }
-                                  onRegenerate={handleRegenerate}
-                                  onReport={handleReport}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        ),
-                        링크: (
-                          <div className="pt-1">
-                            {message.links && message.links.length > 0 ? (
-                              <CardList>
-                                {message.links.map(link => (
-                                  <LinkCard
-                                    key={link.linkId}
-                                    title={link.title}
-                                    link={link.url}
-                                    summary={link.summary ?? ''}
-                                    imageUrl={link.imageUrl ?? ''}
-                                    onClick={() => setSelectedLink(link)}
-                                  />
-                                ))}
-                              </CardList>
-                            ) : (
-                              <div className="text-gray500 text-sm">표시할 링크가 없습니다.</div>
-                            )}
-                          </div>
-                        ),
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className="relative z-10 mb-15 flex w-full justify-center px-4">
-            <div className="w-full max-w-[816px] shrink-0">
-              <ChatQueryBox onSubmit={handleSubmit} disabled={!connected} />
+                              ) : (
+                                <div className="text-gray500 text-sm">표시할 링크가 없습니다.</div>
+                              )}
+                            </div>
+                          ),
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
+          </div>
+        </div>
+
+        <div className="absolute bottom-0 left-0 z-10 mb-15 flex w-full justify-center px-4">
+          <div className="w-full max-w-[816px] shrink-0">
+            <ChatQueryBox onSubmit={handleSubmit} disabled={!connected} />
           </div>
         </div>
       </div>
