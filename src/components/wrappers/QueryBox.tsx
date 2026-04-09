@@ -7,9 +7,17 @@ interface Props {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
+  disabled?: boolean;
+  inputDisabled?: boolean;
 }
 
-export default function QueryBox({ value, onChange, onSubmit }: Props) {
+export default function QueryBox({
+  value,
+  onChange,
+  onSubmit,
+  disabled = false,
+  inputDisabled = false,
+}: Props) {
   return (
     <div className="relative w-full">
       <TextArea
@@ -21,9 +29,10 @@ export default function QueryBox({ value, onChange, onSubmit }: Props) {
         value={value}
         onChange={e => onChange(e.target.value)}
         onSubmit={onSubmit}
+        disabled={inputDisabled}
         className="shadow-[0_2px_4px_rgba(0,0,0,0.04),0_4px_8px_rgba(0,0,0,0.04)]"
       />
-      <SendButton disabled={!value.trim()} onClick={onSubmit} />
+      <SendButton disabled={disabled || !value.trim()} onClick={onSubmit} />
     </div>
   );
 }

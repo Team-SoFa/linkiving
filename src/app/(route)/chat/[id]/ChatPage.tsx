@@ -4,6 +4,7 @@ import { addMessageFeedback, fetchChatMessages } from '@/apis/chatApi';
 import type { ChatSocketLink, ChatSocketMessage } from '@/apis/chatSocket';
 import CardList from '@/components/basics/CardList/CardList';
 import LinkCard from '@/components/basics/LinkCard/LinkCard';
+import Spinner from '@/components/basics/Spinner/Spinner';
 import Tab from '@/components/basics/Tab/Tab';
 import CopyButton from '@/components/wrappers/CopyButton';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
@@ -12,7 +13,7 @@ import { useChatStream } from '@/hooks/server/Chats/useChatStream';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
 import type { ChatHistoryMessage } from '@/types/api/chatApi';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import AnswerActions, { type AnswerReaction } from '../_components/AnswerActions';
@@ -28,6 +29,7 @@ type ChatMessage = {
 };
 
 const PAGE_SIZE = 5;
+const RESPONSE_IDLE_UNLOCK_MS = 500;
 
 const toLinks = (links: ChatHistoryMessage['links']): ChatSocketLink[] | null => {
   if (!links || links.length === 0) return null;
@@ -67,7 +69,6 @@ const mergeAiText = (prevText: string, nextText: string) => {
 
 export default function Chat() {
   const params = useParams();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const chatId = useMemo(() => (typeof params?.id === 'string' ? params.id : ''), [params]);
   const chatIdNum = useMemo(() => Number(chatId), [chatId]);
@@ -77,6 +78,7 @@ export default function Chat() {
   const openModal = useModalStore(state => state.open);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isAwaitingResponse, setIsAwaitingResponse] = useState(false);
   const [streamError, setStreamError] = useState<string | null>(null);
   const [selectedLink, setSelectedLink] = useState<ChatSocketLink | null>(null);
   const [historyCursor, setHistoryCursor] = useState<number | null>(null);
@@ -89,6 +91,21 @@ export default function Chat() {
   const olderHistoryInFlightRef = useRef(false);
   const historyRequestSeqRef = useRef(0);
   const reactionRequestSeqRef = useRef<Record<string, number>>({});
+  const responseUnlockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearResponseUnlockTimer = useCallback(() => {
+    if (!responseUnlockTimerRef.current) return;
+    clearTimeout(responseUnlockTimerRef.current);
+    responseUnlockTimerRef.current = null;
+  }, []);
+
+  const scheduleResponseUnlock = useCallback(() => {
+    clearResponseUnlockTimer();
+    responseUnlockTimerRef.current = setTimeout(() => {
+      setIsAwaitingResponse(false);
+      responseUnlockTimerRef.current = null;
+    }, RESPONSE_IDLE_UNLOCK_MS);
+  }, [clearResponseUnlockTimer]);
 
   const appendAiMessage = useCallback((payload: ChatSocketMessage) => {
     setMessages(prev => {
@@ -169,11 +186,28 @@ export default function Chat() {
       if (String(payload.chatId) !== chatId) return;
 
       if (payload.success) {
-        appendAiMessage(payload);
         setStreamError(null);
+        const hasContent = Boolean(payload.content);
+        const hasLinks = Boolean(payload.links?.length);
+
+        if (payload.isEnd && !hasContent && !hasLinks) {
+          clearResponseUnlockTimer();
+          setIsAwaitingResponse(false);
+          return;
+        }
+
+        appendAiMessage(payload);
+        if (payload.isEnd) {
+          clearResponseUnlockTimer();
+          setIsAwaitingResponse(false);
+        } else {
+          scheduleResponseUnlock();
+        }
         return;
       }
 
+      clearResponseUnlockTimer();
+      setIsAwaitingResponse(false);
       setStreamError('답변 생성에 실패했습니다.');
       setMessages(prev => [
         ...prev,
@@ -189,17 +223,22 @@ export default function Chat() {
       setStreamError(null);
       if (!initialQuestion || initialSentRef.current) return;
       initialSentRef.current = true;
+      setIsAwaitingResponse(true);
       setMessages(prev => [
         ...prev,
         { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'user', text: initialQuestion },
       ]);
       send(initialQuestion);
-      router.replace(`/chat/${chatId}`);
+      window.history.replaceState(window.history.state, '', `/chat/${chatId}`);
     },
     onDisconnect: () => {
+      clearResponseUnlockTimer();
+      setIsAwaitingResponse(false);
       setStreamError('소켓 연결이 종료되었습니다.');
     },
     onError: (err: unknown) => {
+      clearResponseUnlockTimer();
+      setIsAwaitingResponse(false);
       setStreamError((err as Error).message ?? '소켓 연결 중 오류가 발생했습니다.');
     },
   });
@@ -293,13 +332,22 @@ export default function Chat() {
     historyRequestSeqRef.current += 1;
     olderHistoryInFlightRef.current = false;
     initialSentRef.current = false;
+    clearResponseUnlockTimer();
     setStreamError(null);
+    setIsAwaitingResponse(false);
     setSelectedLink(null);
     setMessages([]);
     setHistoryCursor(null);
     setHistoryHasNext(false);
     void loadInitialHistory();
-  }, [chatId, loadInitialHistory]);
+  }, [chatId, clearResponseUnlockTimer, loadInitialHistory]);
+
+  useEffect(
+    () => () => {
+      clearResponseUnlockTimer();
+    },
+    [clearResponseUnlockTimer]
+  );
 
   useEffect(() => {
     const adjust = pendingScrollAdjustRef.current;
@@ -319,10 +367,13 @@ export default function Chat() {
       setStreamError('소켓이 연결되지 않았습니다.');
       return;
     }
+    if (isAwaitingResponse) return;
 
     const trimmedValue = value.trim();
     if (!trimmedValue) return;
 
+    setIsAwaitingResponse(true);
+    clearResponseUnlockTimer();
     setMessages(prev => [
       ...prev,
       { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'user', text: trimmedValue },
@@ -331,6 +382,8 @@ export default function Chat() {
     try {
       send(trimmedValue);
     } catch (err) {
+      clearResponseUnlockTimer();
+      setIsAwaitingResponse(false);
       setStreamError((err as Error).message ?? '메시지 전송에 실패했습니다.');
     }
   };
@@ -534,13 +587,22 @@ export default function Chat() {
                   )}
                 </div>
               ))}
+
+              {isAwaitingResponse && (
+                <div className="flex justify-start">
+                  <div className="flex items-center gap-2 px-3 py-2">
+                    <Spinner width={18} height={18} />
+                    <span className="font-body-md text-gray500">답변을 생성하고 있어요.</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         <div className="absolute bottom-0 left-0 z-10 mb-15 flex w-full justify-center px-4">
           <div className="w-full max-w-[816px] shrink-0">
-            <ChatQueryBox onSubmit={handleSubmit} disabled={!connected} />
+            <ChatQueryBox onSubmit={handleSubmit} disabled={!connected || isAwaitingResponse} />
           </div>
         </div>
       </div>
