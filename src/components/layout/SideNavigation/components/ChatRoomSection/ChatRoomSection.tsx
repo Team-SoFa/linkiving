@@ -14,7 +14,7 @@ const ChatRoomSection = () => {
     <>
       <div className="mt-10 flex min-h-0 flex-1 flex-col">
         {(isLoading || chats.length !== 0) && <Label className="mb-2 shrink-0">채팅</Label>}
-        <div className="custom-scrollbar min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
+        <div className="custom-scrollbar flex min-h-0 flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto">
           {isLoading ? (
             <Spinner />
           ) : isError ? (

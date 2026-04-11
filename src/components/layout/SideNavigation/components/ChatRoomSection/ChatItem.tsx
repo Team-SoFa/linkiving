@@ -26,7 +26,7 @@ const ChatItem = ({ id, label }: Props) => {
   return (
     <>
       <div
-        className="group bg-btn-tertiary-subtle-onpanel flex h-9 w-48.5 cursor-pointer items-center justify-between rounded-full pr-3 pl-3 transition-colors hover:pr-1"
+        className="group bg-btn-tertiary-subtle-onpanel flex h-9 cursor-pointer items-center justify-between rounded-full pr-3 pl-3 transition-colors hover:pr-1"
         onClick={handleItemClick}
         onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -37,7 +37,7 @@ const ChatItem = ({ id, label }: Props) => {
         role="button"
         tabIndex={0}
       >
-        <span className="font-label-md text-gray500 group-hover:text-gray700 truncate group-hover:w-46">
+        <span className="font-label-md text-gray500 group-hover:text-gray700 min-w-0 truncate">
           {label}
         </span>
         <Popover>
@@ -48,7 +48,7 @@ const ChatItem = ({ id, label }: Props) => {
               size="sm"
               icon="IC_MoreVert"
               ariaLabel="채팅방 메뉴 더보기 버튼"
-              className="hidden pl-1 group-hover:block"
+              className="hidden shrink-0 group-hover:flex"
               onClick={handleButtonClick}
             />
           </PopoverTrigger>
