@@ -1,5 +1,6 @@
 import Button from '@/components/basics/Button/Button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/basics/Popover';
+import Spinner from '@/components/basics/Spinner/Spinner';
 import { useLogout } from '@/hooks/useLogout';
 import { useUserInfo } from '@/hooks/useUserInfo';
 
@@ -9,7 +10,11 @@ const SideNavigationBottom = () => {
   const { data: user, isLoading } = useUserInfo();
   const { mutate: handleLogout, isPending: isLoggingOut } = useLogout();
   if (isLoading) {
-    return <div className="bg-gray50 mt-auto shrink-0 p-5">로딩 중...</div>;
+    return (
+      <div className="flex shrink-0 items-center justify-center p-2">
+        <Spinner />
+      </div>
+    );
   }
 
   return (

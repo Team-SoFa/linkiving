@@ -1,5 +1,6 @@
+import SVGIcon from '@/components/Icons/SVGIcon';
 import { IconMapTypes } from '@/components/Icons/icons';
-import Button, { ButtonProps } from '@/components/basics/Button/Button';
+import { ButtonProps } from '@/components/basics/Button/Button';
 import IconButton from '@/components/basics/IconButton/IconButton';
 import { useBlurOnClick } from '@/hooks/util/useBlurOnClick';
 import { useSideNavStore } from '@/stores/sideNavStore';
@@ -26,15 +27,16 @@ const NavItem = forwardRef<HTMLButtonElement, NavItemProps>(
     };
 
     return isOpen ? (
-      <Button
-        {...commonProps}
-        icon={icon}
-        radius="full"
-        className="flex h-10! w-50 justify-start gap-2 pl-2"
+      <button
         ref={mergedRef}
-        label={label}
+        className="group text-gray500 hover:text-gray700 bg-btn-tertiary-subtle-onpanel flex h-10 w-50 cursor-pointer items-center gap-2 rounded-full pr-3 pl-2 transition-colors"
         onClick={blurOnClick}
-      />
+        type="button"
+        aria-label={ariaLabel}
+      >
+        <SVGIcon icon={icon} aria-label={ariaLabel} size="xl" aria-hidden="true" />
+        <span className="font-label-lg truncate">{label}</span>
+      </button>
     ) : (
       <IconButton
         {...commonProps}
