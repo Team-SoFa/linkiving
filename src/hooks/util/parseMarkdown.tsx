@@ -53,58 +53,81 @@ function parseMarkdown(text: string): string {
   });
 
   // 라인 단위로 처리
+  // 라인 단위로 처리
   const lines = processed.split('\n');
   const result: string[] = [];
 
-  let inList = false;
-  let listItems: string[] = [];
-  const flushList = () => {
-    if (!inList) return;
-    result.push(`<ul class="my-2">${listItems.join('')}</ul>`);
-    listItems = [];
-    inList = false;
+  const listStack: string[][] = []; // depth별 리스트 스택
+
+  const flushAllLists = () => {
+    while (listStack.length > 0) {
+      const items = listStack.pop();
+      if (items) {
+        result.push(`<ul class="my-1 pl-3">${items.join('')}</ul>`);
+      }
+    }
   };
 
   for (const line of lines) {
-    const trimmed = line.trim();
+    const trimmed = line.replace(/\t/g, '  '); // 탭 방지
 
-    // 리스트 처리
-    const listMatch = trimmed.match(/^- (.+)$/);
+    const listMatch = trimmed.match(/^(\s*)- (.+)$/);
     if (listMatch) {
-      inList = true;
-      listItems.push(`<li class="ml-4 list-disc">${formatInline(listMatch[1])}</li>`);
+      const indent = listMatch[1].length;
+      const depth = Math.floor(indent / 2); // 2칸 기준 (필요하면 4로 변경)
+
+      // depth 맞추기
+      while (listStack.length > depth) {
+        const items = listStack.pop();
+        if (items) {
+          result.push(`<ul class="my-2 pl-3">${items.join('')}</ul>`);
+        }
+      }
+
+      while (listStack.length < depth) {
+        listStack.push([]);
+      }
+
+      if (!listStack[depth]) {
+        listStack[depth] = [];
+      }
+
+      listStack[depth].push(
+        `<li class="ml-${depth * 4} list-disc my-0.5">${formatInline(listMatch[2])}</li>`
+      );
+
       continue;
     } else {
-      flushList();
+      flushAllLists();
     }
 
-    // 헤딩 처리
-    if (/^### (.+)/.test(trimmed)) {
+    // 기존 헤딩 / 텍스트 처리 유지
+    const clean = line.trim();
+
+    if (/^### (.+)/.test(clean)) {
       result.push(
-        `<h3 class="text-base font-semibold mt-3 mb-1">${escapeHtml(trimmed.replace(/^### /, ''))}</h3>`
+        `<h3 class="text-base font-semibold mt-3 mb-1">${escapeHtml(clean.replace(/^### /, ''))}</h3>`
       );
       continue;
     }
-    if (/^## (.+)/.test(trimmed)) {
+    if (/^## (.+)/.test(clean)) {
       result.push(
-        `<h2 class="text-lg font-semibold mt-4 mb-1">${escapeHtml(trimmed.replace(/^## /, ''))}</h2>`
+        `<h2 class="text-lg font-semibold mt-4 mb-1">${escapeHtml(clean.replace(/^## /, ''))}</h2>`
       );
       continue;
     }
-    if (/^# (.+)/.test(trimmed)) {
+    if (/^# (.+)/.test(clean)) {
       result.push(
-        `<h1 class="text-xl font-bold mt-4 mb-2">${escapeHtml(trimmed.replace(/^# /, ''))}</h1>`
+        `<h1 class="text-xl font-bold mt-4 mb-2">${escapeHtml(clean.replace(/^# /, ''))}</h1>`
       );
       continue;
     }
 
-    // 일반 텍스트
-    result.push(formatInline(trimmed));
+    result.push(formatInline(clean));
   }
 
-  flushList();
-
-  processed = result.join('<br/>');
+  flushAllLists();
+  processed = result.join('');
 
   // 코드블록 placeholder 복원
   processed = processed.replace(/%%CODEBLOCK_(\d+)%%/g, (_, i) => codeBlocks[Number(i)]);
@@ -120,5 +143,5 @@ export default memo(function MarkdownRenderer({
   className?: string;
 }) {
   const html = useMemo(() => parseMarkdown(content ?? ''), [content]);
-  return <div className={className} dangerouslySetInnerHTML={{ __html: html }} />;
+  return <div className={`px-4 ${className ?? ''}`} dangerouslySetInnerHTML={{ __html: html }} />;
 });
