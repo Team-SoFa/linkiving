@@ -22,7 +22,12 @@ const SideNavigationBottom = () => {
       <Popover placement="top-end">
         <PopoverTrigger popoverKey="user">
           {user ? (
-            <NavItem label={user.email ?? 'User'} icon="IC_Logo" ariaLabel="사용자 메뉴 버튼" />
+            <NavItem
+              label={user.name ?? 'User'}
+              icon="IC_Logo"
+              profile={user.profileImageUrl}
+              ariaLabel="사용자 메뉴 버튼"
+            />
           ) : (
             <NavItem label="User" icon="IC_Logo" ariaLabel="사용자 메뉴 버튼" />
           )}
