@@ -85,3 +85,42 @@
 .cursor-blink {
   animation: cursor-blink 0.9s step-end infinite;
 }
+
+/* ========== LOGO LOADING ANIMATION ========== */
+@keyframes ring-a {
+  0% {
+    transform: translate(-4px, 8px);
+  }
+  30% {
+    transform: translate(0, 0);
+  }
+  70% {
+    transform: translate(0, 0) rotate(360deg);
+  }
+  100% {
+    transform: translate(-4px, 8px) rotate(360deg);
+  }
+}
+
+@keyframes ring-b {
+  0% {
+    transform: translate(4px, -8px);
+  }
+  30% {
+    transform: translate(0, 0);
+  }
+  70% {
+    transform: translate(0, 0) rotate(360deg);
+  }
+  100% {
+    transform: translate(4px, -8px) rotate(360deg);
+  }
+}
+
+.ring-a {
+  animation: ring-a 2.6s ease-in-out infinite;
+}
+
+.ring-b {
+  animation: ring-b 2.6s ease-in-out infinite;
+}

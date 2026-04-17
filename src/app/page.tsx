@@ -1,11 +1,11 @@
-import { Suspense } from 'react';
-
 import Landing from './LandingPage';
 
-export default function page() {
-  return (
-    <Suspense fallback={<div>로딩 중...</div>}>
-      <Landing />
-    </Suspense>
-  );
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const params = await searchParams;
+
+  return <Landing error={params?.error} />;
 }
