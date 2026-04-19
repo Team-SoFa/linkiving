@@ -234,7 +234,7 @@ export default function AllLink() {
   return (
     <div className="h-screen min-w-0">
       <div className="flex h-screen min-w-0 flex-col xl:flex-row">
-        <div className="min-w-0 flex-1 px-6 py-8 lg:px-10">
+        <div className="min-w-0 flex-1 px-10 py-15">
           <div className="mx-auto flex h-full w-full max-w-200 flex-col gap-5">
             <header className="flex items-center justify-between">
               <div className="flex items-center gap-1">

@@ -483,7 +483,7 @@ export default function Chat() {
           onScroll={handleScroll}
           className="custom-scrollbar h-full overflow-x-hidden overflow-y-auto pr-1"
         >
-          <div className="mx-auto flex min-h-full w-full max-w-[816px] flex-col px-4 pt-6">
+          <div className="mx-auto flex min-h-full w-full max-w-[816px] flex-col px-4 pt-15">
             {streamError && (
               <div className="mb-4 flex items-center justify-between">
                 <div className="text-red500 text-sm">{streamError}</div>
