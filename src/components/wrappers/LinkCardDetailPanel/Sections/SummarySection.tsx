@@ -102,7 +102,7 @@ export default function SummarySection({
       );
     }
 
-    if (summaryState === 'error' || !summary) {
+    if (summaryState === 'error') {
       return (
         <div className="flex flex-col items-center gap-2 py-6 text-center">
           <ProgressNotification
@@ -118,6 +118,19 @@ export default function SummarySection({
             label="다시 시도"
             loading={isLoading}
             onClick={onRetrySummary}
+          />
+        </div>
+      );
+    }
+
+    if (!summary) {
+      return (
+        <div className="flex min-h-[172px] flex-col gap-2 px-3 py-3">
+          <ProgressNotification
+            label={summaryState === 'ready' ? '요약 내용을 불러오는 중...' : '요약 생성 중...'}
+            icon="IC_SumGenerate"
+            tone="default"
+            animated
           />
         </div>
       );
