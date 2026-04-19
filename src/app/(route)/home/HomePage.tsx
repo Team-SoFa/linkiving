@@ -19,7 +19,7 @@ export default function Home() {
     return (
       <div className="relative flex h-screen w-full justify-center">
         <div className="relative flex h-full w-full max-w-[816px] flex-1 flex-col px-4">
-          <div className="absolute top-6 right-0 max-w-[70%]">
+          <div className="absolute top-15 right-4 max-w-[70%]">
             <span className="bg-blue50 block rounded-2xl px-4 py-3 whitespace-pre-wrap">
               {form.firstChat}
             </span>
