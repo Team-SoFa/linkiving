@@ -26,11 +26,11 @@ export default function LinkThumbnailTitleSection({
   previewImageUrl,
 }: Props) {
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-col gap-2 md:flex-row">
       <div className="flex flex-1 flex-col">
         <Label>썸네일</Label>
         <div
-          className={`relative h-[4.2rem] w-full overflow-hidden rounded-lg bg-white ${
+          className={`relative h-30 w-full overflow-hidden rounded-lg bg-white md:h-[4.2rem] ${
             shouldDisableDetails ? 'opacity-60' : ''
           }`}
           aria-disabled={shouldDisableDetails}
@@ -61,7 +61,6 @@ export default function LinkThumbnailTitleSection({
               heightLines={2}
               maxHeightLines={2}
               maxLength={MAX_TITLE_LENGTH}
-              showMax
               isLoading={metaLoading && isValidUrl}
               disabled={shouldDisableDetails}
               value={field.value ?? ''}
