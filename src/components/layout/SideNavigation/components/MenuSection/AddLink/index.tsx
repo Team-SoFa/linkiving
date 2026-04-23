@@ -148,7 +148,7 @@ const AddLinkModal = () => {
     <Modal
       type="ADD_LINK"
       className={clsx(
-        'm-10 min-w-150 rounded-[0.625rem] border',
+        'custom-scrollbar m-10 max-h-130 min-w-50 overflow-y-scroll rounded-[0.625rem] border md:min-w-150',
         hasSubmitError ? 'border-red500' : 'border-transparent'
       )}
     >
