@@ -14,11 +14,17 @@ export interface LinkCountResponse {
 }
 export type LinkCountApiResponse = ApiResponseBase<LinkCountResponse>;
 
+export type SummaryStatusResponse = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+
 export interface LinkRes {
   id: number;
   url: string;
   title: string;
   summary?: { id: number; content: string } | string;
+  summaryStatus?: SummaryStatusResponse | Link['summaryStatus'];
+  summaryProgress?: number;
+  summaryUpdatedAt?: string;
+  summaryErrorMessage?: string;
   memo?: string;
   imageUrl?: string;
 }
@@ -73,3 +79,14 @@ export interface LinkSummaryRegenerateData {
 }
 
 export type LinkSummaryRegenerateApiResponse = ApiResponseBase<LinkSummaryRegenerateData>;
+
+export interface LinkSummaryStatusData {
+  linkId: number;
+  status: SummaryStatusResponse | Link['summaryStatus'];
+  summary?: { id: number; content: string } | string | null;
+  errorMessage?: string | null;
+  progress?: number | null;
+  updatedAt?: string | null;
+}
+
+export type LinkSummaryStatusApiResponse = ApiResponseBase<LinkSummaryStatusData>;

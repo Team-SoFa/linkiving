@@ -1,4 +1,5 @@
 import { clientApiClient } from '@/lib/client/apiClient';
+import { ApiError } from '@/lib/errors/ApiError';
 import type {
   DeleteLinkApiResponse,
   DuplicateLinkApiResponse,
@@ -7,14 +8,70 @@ import type {
   LinkListApiResponse,
   LinkListViewData,
   LinkMetaScrapeApiResponse,
+  LinkSummaryStatusApiResponse,
+  LinkSummaryStatusData,
+  SummaryStatusResponse,
 } from '@/types/api/linkApi';
-import type { CreateLinkPayload, Link, UpdateLinkPayload } from '@/types/link';
+import type { CreateLinkPayload, Link, LinkSummaryStatus, UpdateLinkPayload } from '@/types/link';
 
 const LINKS_BFF = '/api/links';
 
 export type LinkListParams = {
   lastId?: number | null;
   size?: number;
+};
+
+const RAW_TO_LINK_SUMMARY_STATUS: Record<SummaryStatusResponse, LinkSummaryStatus> = {
+  PENDING: 'generating',
+  PROCESSING: 'generating',
+  COMPLETED: 'ready',
+  FAILED: 'failed',
+};
+
+const isRawSummaryStatus = (value: unknown): value is SummaryStatusResponse =>
+  typeof value === 'string' &&
+  Object.prototype.hasOwnProperty.call(RAW_TO_LINK_SUMMARY_STATUS, value);
+
+const isLinkSummaryStatus = (value: unknown): value is LinkSummaryStatus =>
+  value === 'idle' || value === 'generating' || value === 'ready' || value === 'failed';
+
+const hasText = (value: string | null | undefined): value is string =>
+  typeof value === 'string' && value.trim().length > 0;
+
+export const resolveSummaryContent = (
+  rawSummary: { id?: number; content?: string } | string | null | undefined
+): string => {
+  if (rawSummary !== null && typeof rawSummary === 'object') {
+    return typeof rawSummary.content === 'string' ? rawSummary.content : '';
+  }
+
+  return typeof rawSummary === 'string' ? rawSummary : '';
+};
+
+export const normalizeLinkSummaryStatus = (
+  rawStatus: unknown,
+  summary: string | null | undefined,
+  errorMessage?: string | null
+): LinkSummaryStatus => {
+  if (isLinkSummaryStatus(rawStatus)) return rawStatus;
+  if (isRawSummaryStatus(rawStatus)) return RAW_TO_LINK_SUMMARY_STATUS[rawStatus];
+  if (hasText(errorMessage)) return 'failed';
+  if (hasText(summary)) return 'ready';
+  return 'idle';
+};
+
+const resolveInitialLinkSummaryStatus = (
+  rawStatus: unknown,
+  summary: string,
+  errorMessage?: string | null
+): LinkSummaryStatus | undefined => {
+  if (isLinkSummaryStatus(rawStatus) || isRawSummaryStatus(rawStatus)) {
+    return normalizeLinkSummaryStatus(rawStatus, summary, errorMessage);
+  }
+
+  if (hasText(errorMessage)) return 'failed';
+  if (hasText(summary)) return 'ready';
+  return undefined;
 };
 
 function buildQuery(params?: LinkListParams) {
@@ -28,15 +85,29 @@ function buildQuery(params?: LinkListParams) {
   return qs ? `?${qs}` : '';
 }
 
-const normalizeLink = (
-  data: Partial<Omit<Link, 'summary'>> & { summary?: { id: number; content: string } | string }
-): Link => {
+type LinkSource = {
+  id?: number;
+  url?: string;
+  title?: string;
+  summary?: { id: number; content: string } | string | null;
+  summaryStatus?: unknown;
+  summaryErrorMessage?: string | null;
+  summaryProgress?: number | null;
+  summaryUpdatedAt?: string | null;
+  memo?: string | null;
+  imageUrl?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+const normalizeLink = (data: LinkSource): Link => {
   const now = new Date().toISOString();
-  const rawSummary = data.summary;
-  const summary =
-    rawSummary !== null && typeof rawSummary === 'object'
-      ? (rawSummary as { id: number; content: string }).content
-      : (rawSummary ?? '');
+  const summary = resolveSummaryContent(data.summary);
+  const summaryStatus = resolveInitialLinkSummaryStatus(
+    data.summaryStatus,
+    summary,
+    data.summaryErrorMessage
+  );
 
   return {
     id: data.id ?? 0,
@@ -47,9 +118,9 @@ const normalizeLink = (
     imageUrl: data.imageUrl ?? '',
     createdAt: data.createdAt ?? now,
     updatedAt: data.updatedAt ?? now,
-    summaryStatus: data.summaryStatus,
-    summaryProgress: data.summaryProgress,
-    summaryUpdatedAt: data.summaryUpdatedAt,
+    summaryStatus,
+    summaryProgress: typeof data.summaryProgress === 'number' ? data.summaryProgress : undefined,
+    summaryUpdatedAt: data.summaryUpdatedAt ?? undefined,
   };
 };
 
@@ -177,4 +248,26 @@ export const scrapeLinkMeta = async (url: string) => {
   }
 
   return response.data;
+};
+
+export const fetchLinkSummaryStatus = async (id: number): Promise<LinkSummaryStatusData> => {
+  const body = await clientApiClient<LinkSummaryStatusApiResponse>(
+    `/api/links/${id}/summary-status`,
+    {
+      method: 'GET',
+    }
+  );
+
+  if (!body?.data || !body.success) {
+    const status =
+      typeof body?.status === 'number'
+        ? body.status
+        : typeof body?.status === 'string' && Number.isFinite(Number(body.status))
+          ? Number(body.status)
+          : 500;
+
+    throw new ApiError(status, body?.message ?? 'Invalid response', body);
+  }
+
+  return body.data;
 };
