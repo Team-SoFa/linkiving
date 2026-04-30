@@ -128,6 +128,7 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
               href={safeHref}
               aria-label={`${title} 페이지 링크 열기`}
               className="min-w-0 [&>span]:max-w-full [&>span]:truncate"
+              target="_blank"
             >
               {link}
             </Anchor>
@@ -136,7 +137,7 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
         {(() => {
           if (summaryStatus === 'generating') {
             return (
-              <div className="mt-[2.1875rem] flex flex-col gap-2">
+              <div className="mt-8.75 flex flex-col gap-2">
                 <div className="bg-gray200 h-4 w-full rounded" />
                 <div className="bg-gray200 h-4 w-3/4 rounded" />
               </div>
