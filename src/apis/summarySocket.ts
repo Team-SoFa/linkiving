@@ -163,11 +163,18 @@ export const createSummarySocket = ({
   let currentAuthorization: string | null = null;
   let connectAttempt = 0;
   let disconnected = false;
+  let hasNotifiedDisconnect = false;
   let subscription: StompSubscription | null = null;
 
   const socketEndpoint = useSockJS
     ? toSockJsUrl(WS_SUMMARY_ENDPOINT)
     : toWebSocketUrl(WS_SUMMARY_ENDPOINT);
+
+  const notifyDisconnect = () => {
+    if (hasNotifiedDisconnect) return;
+    hasNotifiedDisconnect = true;
+    onDisconnect?.();
+  };
 
   const client = new Client({
     webSocketFactory: () => {
@@ -175,7 +182,17 @@ export const createSummarySocket = ({
       return useSockJS ? new SockJS(socketEndpoint) : new WebSocket(socketEndpoint);
     },
     connectHeaders: {},
-    beforeConnect: stompClient => {
+    beforeConnect: async stompClient => {
+      currentAuthorization = await fetchSocketAuthorization();
+
+      if (!currentAuthorization) {
+        const error = new Error('Cannot connect: authentication token is unavailable.');
+        logWsDebug('connect-auth-missing');
+        console.error('[summary-socket] auth missing');
+        onError?.(error);
+        throw error;
+      }
+
       stompClient.connectHeaders = withAuthorizationHeader(currentAuthorization);
     },
     reconnectDelay: 5000,
@@ -197,11 +214,12 @@ export const createSummarySocket = ({
     },
     onWebSocketClose: () => {
       console.warn('[summary-socket] websocket closed');
-      onDisconnect?.();
+      notifyDisconnect();
     },
   });
 
   client.onConnect = () => {
+    hasNotifiedDisconnect = false;
     console.log('[summary-socket] connected to', SUBSCRIBE_DEST);
     logWsDebug('connected', { subscribe: SUBSCRIBE_DEST });
     onConnect?.();
@@ -224,24 +242,15 @@ export const createSummarySocket = ({
   const connect = async () => {
     const attempt = ++connectAttempt;
     disconnected = false;
-
-    currentAuthorization = await fetchSocketAuthorization();
+    hasNotifiedDisconnect = false;
 
     console.log('[summary-socket] connect attempt', attempt, {
-      currentAuthorization: !!currentAuthorization,
+      useSockJS,
     });
 
     if (disconnected || attempt !== connectAttempt) {
       logWsDebug('connect-aborted', { attempt, connectAttempt, disconnected });
       console.warn('[summary-socket] connect aborted', { attempt, connectAttempt, disconnected });
-      return;
-    }
-
-    if (!currentAuthorization) {
-      const error = new Error('Cannot connect: authentication token is unavailable.');
-      logWsDebug('connect-auth-missing');
-      console.error('[summary-socket] auth missing');
-      onError?.(error);
       return;
     }
 
@@ -256,7 +265,7 @@ export const createSummarySocket = ({
     subscription?.unsubscribe();
     subscription = null;
     client.deactivate();
-    onDisconnect?.();
+    notifyDisconnect();
   };
 
   return { connect, disconnect };
