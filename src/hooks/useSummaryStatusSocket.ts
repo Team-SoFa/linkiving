@@ -18,7 +18,7 @@ export const useSummaryStatusSocket = ({
   onError,
   onConnect,
   onDisconnect,
-  useSockJS = true,
+  useSockJS,
 }: UseSummaryStatusSocketOptions) => {
   const socketRef = useRef<ReturnType<typeof createSummarySocket> | null>(null);
   const onEventRef = useRef(onEvent);
