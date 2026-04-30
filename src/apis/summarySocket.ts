@@ -1,5 +1,6 @@
 'use client';
 
+import { clientApiClient } from '@/lib/client/apiClient';
 import { COOKIES_KEYS } from '@/lib/constants/cookies';
 import { getAccessToken } from '@/stores/tokenStore';
 import {
@@ -19,6 +20,8 @@ if (!WS_BASE_URL) {
 
 const WS_SUMMARY_ENDPOINT = `${WS_BASE_URL}/ws/link`;
 const SUBSCRIBE_DEST = process.env.NEXT_PUBLIC_WS_SUMMARY_SUBSCRIBE_DEST ?? '/user/queue/summary';
+const envUseSockJs = process.env.NEXT_PUBLIC_WS_USE_SOCKJS;
+const DEFAULT_USE_SOCKJS = envUseSockJs === undefined ? true : envUseSockJs === 'true';
 const WS_DEBUG = process.env.NEXT_PUBLIC_WS_DEBUG === 'true';
 
 const authHeaderFromClientState = (): string | null => {
@@ -35,6 +38,30 @@ const authHeaderFromClientState = (): string | null => {
 
 const withAuthorizationHeader = (authorization: string | null): StompHeaders =>
   authorization ? { Authorization: authorization } : {};
+
+type SocketAuthResponse = {
+  success: boolean;
+  data?: {
+    authorization?: string;
+  };
+};
+
+const fetchSocketAuthorization = async (): Promise<string | null> => {
+  const clientAuthorization = authHeaderFromClientState();
+  if (clientAuthorization) return clientAuthorization;
+
+  try {
+    const response = await clientApiClient<SocketAuthResponse>('/api/socket-auth', {
+      cache: 'no-store',
+    });
+
+    if (!response.success) return null;
+    return response.data?.authorization ?? null;
+  } catch (error) {
+    logWsDebug('auth-fetch-error', error);
+    return null;
+  }
+};
 
 export type SummaryStatusPayload = {
   linkId: number;
@@ -127,7 +154,7 @@ export type SummarySocket = {
 };
 
 export const createSummarySocket = ({
-  useSockJS = true,
+  useSockJS = DEFAULT_USE_SOCKJS,
   onEvent,
   onError,
   onConnect,
@@ -198,7 +225,7 @@ export const createSummarySocket = ({
     const attempt = ++connectAttempt;
     disconnected = false;
 
-    currentAuthorization = authHeaderFromClientState();
+    currentAuthorization = await fetchSocketAuthorization();
 
     console.log('[summary-socket] connect attempt', attempt, {
       currentAuthorization: !!currentAuthorization,
@@ -222,9 +249,12 @@ export const createSummarySocket = ({
   };
 
   const disconnect = () => {
+    connectAttempt += 1;
     disconnected = true;
+    currentAuthorization = null;
     console.log('[summary-socket] disconnected');
     subscription?.unsubscribe();
+    subscription = null;
     client.deactivate();
     onDisconnect?.();
   };
