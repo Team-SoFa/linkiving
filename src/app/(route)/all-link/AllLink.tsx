@@ -628,7 +628,7 @@ export default function AllLink() {
         </div>
 
         {isPanelOpen && (
-          <aside className="hidden h-screen shrink-0 xl:block xl:w-130">
+          <aside className="xl:h-screen xl:w-130 xl:shrink-0">
             {isSelectedLinkLoading ? (
               <div className="border-gray200 flex h-full items-center justify-center rounded-2xl border bg-white p-6">
                 <Spinner />
