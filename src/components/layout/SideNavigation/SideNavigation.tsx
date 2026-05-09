@@ -3,7 +3,7 @@
 import { useSideNavStore } from '@/stores/sideNavStore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import SideNavigationBottom from './components/Bottom/SideNavigationBottom';
 import ChatRoomSection from './components/ChatRoomSection/ChatRoomSection';
@@ -11,9 +11,9 @@ import SideNavigationHeader from './components/Header/SideNavigationHeader';
 import MenuSection from './components/MenuSection/MenuSection';
 
 function useIsMobile() {
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)');
     setIsMobile(mq.matches);
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
@@ -48,15 +48,13 @@ export default function SideNavigation() {
   useEffect(() => {
     if (isMobile) setOpen(false);
   }, [pathname, isMobile, setOpen]);
-  if (isMobile === null) return null;
   if (isMobile) {
     return (
       <>
-        {!isOpen && (
-          <div className="fixed top-5 left-5 z-50">
-            <SideNavigationHeader isOpen={false} onClick={toggle} />
-          </div>
-        )}
+        {/* 토글 버튼은 항상 고정 위치에 렌더 — 마운트/언마운트 없이 깜박임 제거 */}
+        <div className="fixed top-5 left-5 z-51">
+          <SideNavigationHeader isOpen={isOpen} onClick={toggle} />
+        </div>
 
         <AnimatePresence>
           {isOpen && (
@@ -92,8 +90,8 @@ export default function SideNavigation() {
             >
               <div className="flex h-full flex-col justify-between">
                 <div className="flex min-h-0 flex-1 flex-col">
-                  <SideNavigationHeader isOpen={true} onClick={toggle} />
-                  <MenuSection isOpen={true} />
+                  <div className="mb-10 h-10 shrink-0" />
+                  <MenuSection />
                   <ChatRoomSection />
                 </div>
                 <SideNavigationBottom />
@@ -114,7 +112,7 @@ export default function SideNavigation() {
       <div className="flex h-full flex-col justify-between">
         <div className="flex min-h-0 flex-1 flex-col">
           <SideNavigationHeader isOpen={isOpen} onClick={toggle} />
-          <MenuSection isOpen={isOpen} />
+          <MenuSection />
           {isOpen && <ChatRoomSection />}
         </div>
         <SideNavigationBottom />
