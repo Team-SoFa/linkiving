@@ -1,49 +1,46 @@
+import SVGIcon from '@/components/Icons/SVGIcon';
 import { IconMapTypes } from '@/components/Icons/icons';
-import { ButtonProps } from '@/components/basics/Button/Button';
-import LinkButton from '@/components/wrappers/LinkButton/LinkButton';
-import LinkIconButton from '@/components/wrappers/LinkIconButton/LinkIconButton';
-import { useBlurOnClick } from '@/hooks/util/useBlurOnClick';
+import { getSafeUrl } from '@/hooks/util/getSafeUrl';
 import { useSideNavStore } from '@/stores/sideNavStore';
+import { AnimatePresence, motion } from 'framer-motion';
+import Link from 'next/link';
 
-interface LinkNavItemProps extends Omit<
-  ButtonProps,
-  'variant' | 'contextStyle' | 'radius' | 'size'
-> {
+interface LinkNavItemProps {
   href: string;
-  icon: IconMapTypes; // LinkIconButton
-  ariaLabel: string; // LinkIconButton
+  icon: IconMapTypes;
+  label?: string;
+  ariaLabel: string;
 }
 
-const LinkNavItem = ({ label, href, icon, ariaLabel, ...props }: LinkNavItemProps) => {
+const LinkNavItem = ({ label, href, icon, ariaLabel }: LinkNavItemProps) => {
   const { isOpen } = useSideNavStore();
-  const { ref, onClick } = useBlurOnClick(props.onClick);
+  const safeUrl = getSafeUrl(href);
+  const isExternal = /^https?:\/\//i.test(safeUrl);
+  const linkProps = isExternal ? { target: '_blank' as const, rel: 'noopener noreferrer' } : {};
 
-  const commonProps = {
-    href,
-    variant: 'tertiary_subtle' as const,
-    contextStyle: 'onPanel' as const,
-    size: 'lg' as const,
-    ...props,
-  };
-
-  return isOpen ? (
-    <LinkButton
-      {...commonProps}
-      icon={icon}
-      radius="full"
-      className="flex h-10! w-50 justify-start gap-2 pl-2"
-      ref={ref}
-      label={label}
-      onClick={onClick}
-    />
-  ) : (
-    <LinkIconButton
-      {...commonProps}
-      icon={icon}
-      ariaLabel={ariaLabel}
-      ref={ref}
-      onClick={onClick}
-    />
+  return (
+    <Link
+      href={safeUrl}
+      className="bg-btn-tertiary-subtle-onpanel group text-gray500 hover:text-gray700 flex h-10 w-full cursor-pointer items-center gap-2 overflow-hidden rounded-full px-2 transition-colors"
+      aria-label={ariaLabel}
+      {...linkProps}
+    >
+      <SVGIcon icon={icon} aria-hidden="true" size="xl" className="shrink-0" />
+      <AnimatePresence>
+        {isOpen && label && (
+          <motion.span
+            key="label"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="font-label-lg truncate"
+          >
+            {label}
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </Link>
   );
 };
 
