@@ -636,7 +636,7 @@ export default function Chat() {
       </div>
 
       {selectedLink && (
-        <aside className="border-gray200 hidden h-screen shrink-0 border-l xl:block xl:w-130">
+        <aside className="xl:border-gray200 xl:h-screen xl:w-130 xl:shrink-0 xl:border-l">
           <LinkCardDetailPanel
             id={selectedLink.linkId}
             url={selectedLink.url}
