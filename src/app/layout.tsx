@@ -1,6 +1,7 @@
 // app/layout.tsx
 import ToastContainer from '@/components/basics/Toast/ToastContainer';
 import '@/styles/globals.css';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import type { Metadata } from 'next';
 
 import LayoutClient from './layout-client';
@@ -60,6 +61,7 @@ export default function RootLayout({
         <LayoutClient>{children}</LayoutClient>
         <ToastContainer />
       </body>
+      <GoogleAnalytics gaId="G-XRQZMERGZ5" />
     </html>
   );
 }

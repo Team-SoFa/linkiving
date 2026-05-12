@@ -27,6 +27,7 @@
   "dependencies": {
     "@floating-ui/react-dom": "^2.1.6",
     "@hookform/resolvers": "^5.2.2",
+    "@next/third-parties": "^16.2.6",
     "@radix-ui/react-slot": "^1.2.4",
     "@reactuses/core": "^6.1.5",
     "@sentry/nextjs": "^10",
