@@ -57,13 +57,12 @@ export const metadata: Metadata = {
     canonical: 'https://linkiving.com',
   },
 
-  // 배포 후 구글, 네이버 서치 등록
-  // verification: {
-  //   google: "todo",
-  //   other: {
-  //     "naver-site-verification": "todo",
-  //   },
-  // },
+  verification: {
+    google: '6E424KKiERDssOB61adcXm9BmyBt3PRHLe4JuimzdXw',
+    other: {
+      'naver-site-verification': '3f4f09dc04077bde858433f31cb285915e9efa07',
+    },
+  },
 };
 
 export default async function Page({
