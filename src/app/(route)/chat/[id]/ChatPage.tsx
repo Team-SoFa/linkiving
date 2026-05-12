@@ -88,6 +88,7 @@ export default function Chat() {
 
   const scrollRootRef = useRef<HTMLDivElement | null>(null);
   const pendingScrollAdjustRef = useRef<{ oldHeight: number; oldTop: number } | null>(null);
+  const shouldScrollToBottomRef = useRef(false);
   const olderHistoryInFlightRef = useRef(false);
   const historyRequestSeqRef = useRef(0);
   const reactionRequestSeqRef = useRef<Record<string, number>>({});
@@ -107,77 +108,93 @@ export default function Chat() {
     }, RESPONSE_IDLE_UNLOCK_MS);
   }, [clearResponseUnlockTimer]);
 
-  const appendAiMessage = useCallback((payload: ChatSocketMessage) => {
-    setMessages(prev => {
-      const nextContent = payload.content ?? '';
-      const nextLinks = payload.links ?? null;
-
-      if (payload.messageId !== null) {
-        const sameMessageIndex = prev.findIndex(
-          message => message.role === 'ai' && message.messageId === payload.messageId
-        );
-
-        if (sameMessageIndex >= 0) {
-          return prev.map((message, index) =>
-            index === sameMessageIndex
-              ? {
-                  ...message,
-                  text: mergeAiText(message.text, nextContent),
-                  links: nextLinks ?? message.links ?? null,
-                }
-              : message
-          );
-        }
-
-        const unresolvedIndex = [...prev]
-          .reverse()
-          .findIndex(message => message.role === 'ai' && (message.messageId ?? null) === null);
-
-        if (unresolvedIndex >= 0) {
-          const targetIndex = prev.length - 1 - unresolvedIndex;
-          return prev.map((message, index) =>
-            index === targetIndex
-              ? {
-                  ...message,
-                  messageId: payload.messageId,
-                  text: mergeAiText(message.text, nextContent),
-                  links: nextLinks ?? message.links ?? null,
-                }
-              : message
-          );
-        }
-      } else {
-        const lastAiIndex = [...prev]
-          .reverse()
-          .findIndex(message => message.role === 'ai' && (message.messageId ?? null) === null);
-
-        if (lastAiIndex >= 0) {
-          const targetIndex = prev.length - 1 - lastAiIndex;
-          return prev.map((message, index) =>
-            index === targetIndex
-              ? {
-                  ...message,
-                  text: mergeAiText(message.text, nextContent),
-                  links: nextLinks ?? message.links ?? null,
-                }
-              : message
-          );
-        }
-      }
-
-      return [
-        ...prev,
-        {
-          id: `${Date.now()}-${crypto.randomUUID()}`,
-          messageId: payload.messageId,
-          role: 'ai',
-          text: nextContent,
-          links: nextLinks,
-          reaction: null,
-        },
-      ];
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    requestAnimationFrame(() => {
+      const root = scrollRootRef.current;
+      if (!root) return;
+      root.scrollTo({ top: root.scrollHeight, behavior });
     });
   }, []);
+
+  const queueScrollToBottom = useCallback(() => {
+    shouldScrollToBottomRef.current = true;
+  }, []);
+
+  const appendAiMessage = useCallback(
+    (payload: ChatSocketMessage) => {
+      queueScrollToBottom();
+      setMessages(prev => {
+        const nextContent = payload.content ?? '';
+        const nextLinks = payload.links ?? null;
+
+        if (payload.messageId !== null) {
+          const sameMessageIndex = prev.findIndex(
+            message => message.role === 'ai' && message.messageId === payload.messageId
+          );
+
+          if (sameMessageIndex >= 0) {
+            return prev.map((message, index) =>
+              index === sameMessageIndex
+                ? {
+                    ...message,
+                    text: mergeAiText(message.text, nextContent),
+                    links: nextLinks ?? message.links ?? null,
+                  }
+                : message
+            );
+          }
+
+          const unresolvedIndex = [...prev]
+            .reverse()
+            .findIndex(message => message.role === 'ai' && (message.messageId ?? null) === null);
+
+          if (unresolvedIndex >= 0) {
+            const targetIndex = prev.length - 1 - unresolvedIndex;
+            return prev.map((message, index) =>
+              index === targetIndex
+                ? {
+                    ...message,
+                    messageId: payload.messageId,
+                    text: mergeAiText(message.text, nextContent),
+                    links: nextLinks ?? message.links ?? null,
+                  }
+                : message
+            );
+          }
+        } else {
+          const lastAiIndex = [...prev]
+            .reverse()
+            .findIndex(message => message.role === 'ai' && (message.messageId ?? null) === null);
+
+          if (lastAiIndex >= 0) {
+            const targetIndex = prev.length - 1 - lastAiIndex;
+            return prev.map((message, index) =>
+              index === targetIndex
+                ? {
+                    ...message,
+                    text: mergeAiText(message.text, nextContent),
+                    links: nextLinks ?? message.links ?? null,
+                  }
+                : message
+            );
+          }
+        }
+
+        return [
+          ...prev,
+          {
+            id: `${Date.now()}-${crypto.randomUUID()}`,
+            messageId: payload.messageId,
+            role: 'ai',
+            text: nextContent,
+            links: nextLinks,
+            reaction: null,
+          },
+        ];
+      });
+    },
+    [queueScrollToBottom]
+  );
 
   const { connected, send } = useChatStream({
     chatId,
@@ -209,6 +226,7 @@ export default function Chat() {
       clearResponseUnlockTimer();
       setIsAwaitingResponse(false);
       setStreamError('답변 생성에 실패했습니다.');
+      queueScrollToBottom();
       setMessages(prev => [
         ...prev,
         {
@@ -224,6 +242,7 @@ export default function Chat() {
       if (!initialQuestion || initialSentRef.current) return;
       initialSentRef.current = true;
       setIsAwaitingResponse(true);
+      queueScrollToBottom();
       setMessages(prev => [
         ...prev,
         { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'user', text: initialQuestion },
@@ -275,7 +294,7 @@ export default function Chat() {
       requestAnimationFrame(() => {
         const root = scrollRootRef.current;
         if (!root) return;
-        root.scrollTop = root.scrollHeight;
+        root.scrollTo({ top: root.scrollHeight, behavior: 'auto' });
       });
     } catch (err) {
       if (requestSeq !== historyRequestSeqRef.current) return;
@@ -331,6 +350,7 @@ export default function Chat() {
   useEffect(() => {
     historyRequestSeqRef.current += 1;
     olderHistoryInFlightRef.current = false;
+    shouldScrollToBottomRef.current = false;
     initialSentRef.current = false;
     clearResponseUnlockTimer();
     setStreamError(null);
@@ -351,16 +371,23 @@ export default function Chat() {
 
   useEffect(() => {
     const adjust = pendingScrollAdjustRef.current;
-    if (!adjust) return;
     const root = scrollRootRef.current;
     if (!root) return;
 
+    if (!adjust) {
+      if (!shouldScrollToBottomRef.current) return;
+      shouldScrollToBottomRef.current = false;
+      scrollToBottom();
+      return;
+    }
+
+    shouldScrollToBottomRef.current = false;
     requestAnimationFrame(() => {
       const newHeight = root.scrollHeight;
       root.scrollTop = newHeight - adjust.oldHeight + adjust.oldTop;
       pendingScrollAdjustRef.current = null;
     });
-  }, [messages]);
+  }, [messages, isAwaitingResponse, scrollToBottom]);
 
   const handleSubmit = (value: string) => {
     if (!connected) {
@@ -374,6 +401,7 @@ export default function Chat() {
 
     setIsAwaitingResponse(true);
     clearResponseUnlockTimer();
+    queueScrollToBottom();
     setMessages(prev => [
       ...prev,
       { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'user', text: trimmedValue },
