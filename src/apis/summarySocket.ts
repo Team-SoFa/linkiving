@@ -67,9 +67,10 @@ export type SummaryStatusPayload = {
   linkId: number;
   status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
   progress?: number;
-  summary?: string;
+  summary?: { id?: number; content?: string } | string | null;
   errorMessage?: string;
   updatedAt?: string;
+  data?: { id?: number; content?: string } | string | null;
 };
 
 export type LinkSummaryStatus = 'idle' | 'generating' | 'ready' | 'failed';
@@ -118,6 +119,16 @@ const coerceSummaryStatus = (status: SummaryStatusPayload['status']): LinkSummar
   throw new Error(`Invalid summary status event: unsupported status "${String(status)}".`);
 };
 
+const resolveSummaryText = (
+  rawSummary: SummaryStatusPayload['summary'] | SummaryStatusPayload['data']
+): string | undefined => {
+  if (rawSummary !== null && typeof rawSummary === 'object') {
+    return typeof rawSummary.content === 'string' ? rawSummary.content : undefined;
+  }
+
+  return typeof rawSummary === 'string' ? rawSummary : undefined;
+};
+
 const parsePayload = (rawBody: string): SummaryStatusEvent => {
   const payload = JSON.parse(rawBody) as SummaryStatusPayload;
   if (typeof payload !== 'object' || payload === null) {
@@ -137,8 +148,13 @@ const parsePayload = (rawBody: string): SummaryStatusEvent => {
     linkId,
     status: coerceSummaryStatus(payload.status as SummaryStatusPayload['status']),
     progress: typeof payload.progress === 'number' ? payload.progress : undefined,
-    summary: typeof payload.summary === 'string' ? payload.summary : undefined,
-    errorMessage: typeof payload.errorMessage === 'string' ? payload.errorMessage : undefined,
+    summary: resolveSummaryText(payload.summary ?? payload.data),
+    errorMessage:
+      typeof payload.errorMessage === 'string'
+        ? payload.errorMessage
+        : payload.status === 'FAILED' && typeof payload.data === 'string'
+          ? payload.data
+          : undefined,
     updatedAt: typeof payload.updatedAt === 'string' ? payload.updatedAt : undefined,
   };
 };

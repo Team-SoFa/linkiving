@@ -57,16 +57,27 @@ const resolveLinkSummaryStatus = (
   statusInfo?: SummaryStatusInfo
 ): LinkSummaryStatus | undefined => {
   const summaryText = statusInfo?.summary ?? link.summary ?? '';
-  const errorMessage = statusInfo?.errorMessage;
+  const errorMessage = statusInfo?.errorMessage ?? link.summaryErrorMessage;
 
   if (statusInfo?.status) return statusInfo.status;
-  if (link.summaryStatus !== undefined) {
-    return normalizeLinkSummaryStatus(link.summaryStatus, summaryText, errorMessage);
-  }
+  if (link.summaryStatus !== undefined) return link.summaryStatus;
   if (typeof errorMessage === 'string' && errorMessage.trim()) return 'failed';
   if (hasSummaryText(summaryText)) return 'ready';
 
   return undefined;
+};
+
+const shouldHydrateMissingSummaryStatus = (link: Link, statusInfo?: SummaryStatusInfo): boolean => {
+  if (statusInfo?.status) return false;
+  if (link.summaryStatus !== undefined) return false;
+
+  const summaryText = statusInfo?.summary ?? link.summary ?? '';
+  const errorMessage = statusInfo?.errorMessage ?? link.summaryErrorMessage;
+
+  if (hasSummaryText(summaryText)) return false;
+  if (typeof errorMessage === 'string' && errorMessage.trim()) return false;
+
+  return true;
 };
 
 const toPanelSummaryState = (status: LinkSummaryStatus): 'idle' | 'loading' | 'error' | 'ready' => {
@@ -294,6 +305,149 @@ export default function AllLink() {
   });
 
   useEffect(() => {
+    let cancelled = false;
+    let inFlight = false;
+
+    const hydrateUnknownSummaryStatus = async () => {
+      if (cancelled || inFlight) return;
+
+      const linksSnapshot = linksRef.current;
+      const statusSnapshot = summaryStatusByLinkIdRef.current;
+      const targetIds: number[] = [];
+
+      for (const link of linksSnapshot) {
+        if (polledUnknownLinkIdsRef.current.has(link.id)) continue;
+        if (nonRetryablePollLinkIdsRef.current.has(link.id)) continue;
+
+        const statusInfo = statusSnapshot[link.id];
+        if (!shouldHydrateMissingSummaryStatus(link, statusInfo)) continue;
+
+        polledUnknownLinkIdsRef.current.add(link.id);
+        targetIds.push(link.id);
+      }
+
+      if (targetIds.length === 0) return;
+
+      inFlight = true;
+      try {
+        const results = await Promise.all(
+          targetIds.map(async linkId => {
+            try {
+              const data = await fetchLinkSummaryStatus(linkId);
+              return { linkId, data, retryable: false };
+            } catch (error) {
+              return {
+                linkId,
+                data: null,
+                retryable: isRetryableSummaryStatusError(error),
+              };
+            }
+          })
+        );
+
+        if (cancelled) return;
+
+        let shouldRefetchLinks = false;
+        let shouldRefetchSelectedLink = false;
+        const summaryUpdates: Array<{
+          linkId: number;
+          data: NonNullable<Awaited<ReturnType<typeof fetchLinkSummaryStatus>>>;
+          status: LinkSummaryStatus;
+          summaryText: string;
+        }> = [];
+
+        for (const result of results) {
+          if (result.data) {
+            const summaryText = resolveSummaryContent(result.data.summary);
+            const status = normalizeLinkSummaryStatus(
+              result.data.status,
+              summaryText,
+              result.data.errorMessage
+            );
+
+            nonRetryablePollLinkIdsRef.current.delete(result.linkId);
+
+            summaryUpdates.push({
+              linkId: result.linkId,
+              data: result.data,
+              summaryText,
+              status,
+            });
+            continue;
+          }
+
+          if (result.retryable) {
+            polledUnknownLinkIdsRef.current.delete(result.linkId);
+            continue;
+          }
+
+          nonRetryablePollLinkIdsRef.current.add(result.linkId);
+        }
+
+        for (const { linkId, status } of summaryUpdates) {
+          if (status === 'generating') {
+            processingLinkIdsRef.current.add(linkId);
+          }
+
+          if (status === 'ready' || status === 'failed') {
+            processingLinkIdsRef.current.delete(linkId);
+            shouldRefetchLinks = true;
+            if (selectedLinkIdRef.current === linkId) {
+              shouldRefetchSelectedLink = true;
+            }
+          }
+        }
+
+        setSummaryStatusByLinkId(prev => {
+          let changed = false;
+          const next = { ...prev };
+
+          for (const { linkId, data, status, summaryText } of summaryUpdates) {
+            const previous = prev[linkId];
+            const merged: SummaryStatusInfo = {
+              status,
+              progress: typeof data.progress === 'number' ? data.progress : previous?.progress,
+              summary: summaryText || previous?.summary,
+              errorMessage:
+                typeof data.errorMessage === 'string' ? data.errorMessage : previous?.errorMessage,
+            };
+
+            if (
+              previous?.status === merged.status &&
+              previous?.progress === merged.progress &&
+              previous?.summary === merged.summary &&
+              previous?.errorMessage === merged.errorMessage
+            ) {
+              continue;
+            }
+
+            changed = true;
+            next[linkId] = merged;
+          }
+
+          return changed ? next : prev;
+        });
+
+        if (shouldRefetchLinks) {
+          void refetch();
+        }
+
+        if (shouldRefetchSelectedLink) {
+          void refetchSelectedLink();
+        }
+      } finally {
+        inFlight = false;
+      }
+    };
+
+    void hydrateUnknownSummaryStatus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [links, refetch, refetchSelectedLink]);
+
+  useEffect(() => {
     if (isSocketConnected) return;
 
     let cancelled = false;
@@ -333,7 +487,7 @@ export default function AllLink() {
           continue;
         }
 
-        if (resolvedStatus !== undefined) continue;
+        if (!shouldHydrateMissingSummaryStatus(link, statusInfo)) continue;
         if (polledUnknownLinkIdsRef.current.has(link.id)) continue;
 
         polledUnknownLinkIdsRef.current.add(link.id);
@@ -555,7 +709,7 @@ export default function AllLink() {
           isSelected={selectedIds.has(link.id)}
           summaryStatus={summaryStatus}
           summaryText={summaryText}
-          summaryErrorMessage={statusInfo?.errorMessage}
+          summaryErrorMessage={statusInfo?.errorMessage ?? link.summaryErrorMessage}
           onSelect={handleToggleSelect}
           onOpen={handleSelectLink}
         />
@@ -647,7 +801,9 @@ export default function AllLink() {
                 memo={selectedLinkDetail.memo ?? ''}
                 imageUrl={selectedLinkDetail.imageUrl}
                 summaryState={toPanelSummaryState(selectedSummaryStatus)}
-                summaryErrorMessage={selectedStatusInfo?.errorMessage}
+                summaryErrorMessage={
+                  selectedStatusInfo?.errorMessage ?? selectedLinkDetail.summaryErrorMessage
+                }
                 onClose={() => {
                   setIsPanelOpen(false);
                   selectLink(null);

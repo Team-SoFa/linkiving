@@ -20,6 +20,14 @@ export type SummaryData = {
   comparison: string;
 };
 
+export type RetrySummaryResponse = {
+  success: boolean;
+  status: string;
+  message: string;
+  data?: SummaryData | null;
+  timestamp?: string;
+};
+
 // 요약 선택 응답 데이터
 export type SelectSummaryData = {
   id: number;

@@ -59,7 +59,6 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
       ? imageUrl
       : '';
   const safeImageUrl = getSafeUrl(normalizedImageUrl) || '/images/default_linkcard_image.png';
-  const showUnknownSummarySkeleton = summaryStatus === 'idle' && isSummaryEmpty;
 
   return (
     <div
@@ -138,15 +137,6 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
           if (summaryStatus === 'generating') {
             return (
               <div className="mt-8.75 flex flex-col gap-2">
-                <div className="bg-gray200 h-4 w-full rounded" />
-                <div className="bg-gray200 h-4 w-3/4 rounded" />
-              </div>
-            );
-          }
-
-          if (showUnknownSummarySkeleton) {
-            return (
-              <div className="flex flex-col gap-2">
                 <div className="bg-gray200 h-4 w-full rounded" />
                 <div className="bg-gray200 h-4 w-3/4 rounded" />
               </div>
