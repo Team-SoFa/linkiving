@@ -27,7 +27,7 @@ export default function ReSummaryModal({ linkId }: ReSummaryProps) {
 
   const prevContent = data?.existingSummary ?? '';
   const newContent = data?.newSummary ?? '';
-  const comparison = data?.comparison ?? '';
+  const difference = data?.difference ?? '';
 
   const handleSelectNew = () => {
     if (!data) return;
@@ -67,7 +67,7 @@ export default function ReSummaryModal({ linkId }: ReSummaryProps) {
             <div className="flex flex-col gap-2">
               <span className="relative flex items-center gap-2 rounded-lg bg-white p-2">
                 <Badge icon="IC_SumGenerate" label="어떻게 바뀌었나요?" className="h-fit" />
-                <span className="font-label-md w-full truncate">{comparison}</span>
+                <span className="font-label-md w-full truncate">{difference}</span>
               </span>
             </div>
             <div className="flex gap-2">

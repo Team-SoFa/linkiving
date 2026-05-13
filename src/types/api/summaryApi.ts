@@ -17,7 +17,7 @@ export type SelectSummaryParams = {
 export type SummaryData = {
   existingSummary: string;
   newSummary: string;
-  comparison: string;
+  difference: string;
 };
 
 export type RetrySummaryResponse = {
