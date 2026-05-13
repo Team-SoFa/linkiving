@@ -4,6 +4,7 @@ export interface LinkSummaryState {
   summaryStatus?: LinkSummaryStatus;
   summaryProgress?: number;
   summaryUpdatedAt?: string;
+  summaryErrorMessage?: string;
 }
 
 export interface Link extends LinkSummaryState {

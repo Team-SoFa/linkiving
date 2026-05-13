@@ -124,6 +124,18 @@ export default function SummarySection({
     }
 
     if (!summary) {
+      if (summaryState === 'idle') {
+        return (
+          <div className="flex min-h-[172px] flex-col gap-2 px-3 py-3">
+            <ProgressNotification
+              label="요약이 아직 생성되지 않았습니다."
+              icon="IC_Info"
+              tone="default"
+            />
+          </div>
+        );
+      }
+
       return (
         <div className="flex min-h-[172px] flex-col gap-2 px-3 py-3">
           <ProgressNotification
@@ -175,6 +187,10 @@ export default function SummarySection({
   };
 
   const renderActions = () => {
+    if (summaryState === 'error') {
+      return null;
+    }
+
     return (
       <div className="flex items-center justify-end gap-2 pt-2">
         <Button

@@ -121,6 +121,7 @@ const normalizeLink = (data: LinkSource): Link => {
     summaryStatus,
     summaryProgress: typeof data.summaryProgress === 'number' ? data.summaryProgress : undefined,
     summaryUpdatedAt: data.summaryUpdatedAt ?? undefined,
+    summaryErrorMessage: data.summaryErrorMessage ?? undefined,
   };
 };
 

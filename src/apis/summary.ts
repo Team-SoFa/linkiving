@@ -1,21 +1,22 @@
 import { clientApiClient } from '@/lib/client/apiClient';
 import type {
   RegenerateSummaryParams,
+  RetrySummaryResponse,
   SelectSummaryParams,
   SelectSummaryResponse,
   SummaryResponse,
 } from '@/types/api/summaryApi';
 
 export const retrySummary = async (id: number) => {
-  const body = await clientApiClient<SummaryResponse>(`/api/links/${id}/retry-summary`, {
+  const body = await clientApiClient<RetrySummaryResponse>(`/api/links/${id}/retry-summary`, {
     method: 'POST',
   });
 
-  if (!body?.data || !body.success) {
+  if (!body || typeof body.success !== 'boolean' || !body.success) {
     throw new Error(body?.message ?? 'Invalid response structure');
   }
 
-  return body.data;
+  return body.data ?? null;
 };
 
 export const fetchNewSummary = async (params: RegenerateSummaryParams) => {
