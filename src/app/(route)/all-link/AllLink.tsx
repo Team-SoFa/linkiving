@@ -20,6 +20,7 @@ import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
 import type { LinkSummaryStatus } from '@/types/link';
 import { type Link } from '@/types/link';
+import { useQueryClient } from '@tanstack/react-query';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type SummaryStatusInfo = {
@@ -157,6 +158,7 @@ export default function AllLink() {
   const summaryStatusByLinkIdRef = useRef<Record<number, SummaryStatusInfo>>({});
   const selectedLinkIdRef = useRef<number | null>(selectedLinkId);
 
+  const queryClient = useQueryClient();
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
     useGetInfiniteLinks();
 
@@ -664,8 +666,20 @@ export default function AllLink() {
   }, [isSocketConnected, refetch, refetchSelectedLink]);
 
   const handleLoadMore = useCallback(
-    (_signal?: AbortSignal) => fetchNextPage().then(() => undefined),
-    [fetchNextPage]
+    (signal?: AbortSignal) => {
+      if (signal) {
+        const onAbort = () => {
+          void queryClient.cancelQueries({ queryKey: ['links', 'infinite'] });
+        };
+        if (signal.aborted) {
+          onAbort();
+        } else {
+          signal.addEventListener('abort', onAbort, { once: true });
+        }
+      }
+      return fetchNextPage().then(() => undefined);
+    },
+    [fetchNextPage, queryClient]
   );
 
   const handleSelectLink = useCallback(

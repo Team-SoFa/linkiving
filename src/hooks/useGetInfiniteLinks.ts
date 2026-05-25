@@ -24,12 +24,15 @@ export function useGetInfiniteLinks(
     number | null
   >({
     queryKey: ['links', 'infinite', params, size],
-    queryFn: ({ pageParam }) =>
-      fetchLinks({
-        ...params,
-        lastId: pageParam,
-        size,
-      }),
+    queryFn: ({ pageParam, signal }) =>
+      fetchLinks(
+        {
+          ...params,
+          lastId: pageParam,
+          size,
+        },
+        signal
+      ),
     initialPageParam: null,
     getNextPageParam: lastPage => {
       if (!lastPage.hasNext) return undefined;
