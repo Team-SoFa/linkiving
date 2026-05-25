@@ -126,8 +126,13 @@ const normalizeLink = (data: LinkSource): Link => {
 };
 
 // 전체 링크 fetch
-export const fetchLinks = async (params?: LinkListParams): Promise<LinkListViewData> => {
-  const body = await clientApiClient<LinkListApiResponse>(`${LINKS_BFF}${buildQuery(params)}`);
+export const fetchLinks = async (
+  params?: LinkListParams,
+  signal?: AbortSignal
+): Promise<LinkListViewData> => {
+  const body = await clientApiClient<LinkListApiResponse>(`${LINKS_BFF}${buildQuery(params)}`, {
+    signal,
+  });
 
   if (!body?.data || !body.success) {
     throw new Error(body?.message ?? 'Invalid response');
