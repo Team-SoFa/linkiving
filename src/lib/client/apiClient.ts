@@ -16,6 +16,10 @@ export async function clientApiClient<T>(
     controller.abort(new DOMException(`Request timed out after ${timeout}ms`, 'TimeoutError'));
   }, timeout);
 
+  const signal = fetchOptions.signal
+    ? AbortSignal.any([fetchOptions.signal, controller.signal])
+    : controller.signal;
+
   try {
     const res = await fetch(endpoint, {
       ...fetchOptions,
@@ -23,7 +27,7 @@ export async function clientApiClient<T>(
         'Content-Type': 'application/json',
         ...fetchOptions.headers,
       },
-      signal: fetchOptions.signal ?? controller.signal,
+      signal,
     });
 
     if (!res.ok) {
