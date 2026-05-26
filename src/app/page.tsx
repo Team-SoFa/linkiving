@@ -1,6 +1,6 @@
+import HeroSection from '@/components/layout/Landing/HeroSection';
+import LandingHeader from '@/components/layout/Landing/LandingHeader';
 import type { Metadata } from 'next';
-
-import Landing from './LandingPage';
 
 export const metadata: Metadata = {
   title: 'Linkiving - 북마크들을 더 똑똑하게 관리해요',
@@ -72,5 +72,10 @@ export default async function Page({
 }) {
   const params = await searchParams;
 
-  return <Landing error={params?.error} />;
+  return (
+    <div>
+      <LandingHeader />
+      <HeroSection />
+    </div>
+  );
 }
