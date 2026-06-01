@@ -1,10 +1,8 @@
-import { COOKIES_KEYS } from '@/lib/constants/cookies';
-import { cookies } from 'next/headers';
+import { getValidAccessToken } from '@/lib/server/apiClient';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIES_KEYS.ACCESS_TOKEN)?.value;
+  const token = await getValidAccessToken();
 
   if (!token) {
     return NextResponse.json(
