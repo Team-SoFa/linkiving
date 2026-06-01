@@ -1,8 +1,7 @@
 'use client';
 
 import { clientApiClient } from '@/lib/client/apiClient';
-import { COOKIES_KEYS } from '@/lib/constants/cookies';
-import { getAccessToken } from '@/stores/tokenStore';
+import { getClientAuthorization } from '@/lib/client/authToken';
 import {
   Client,
   type IFrame,
@@ -24,18 +23,6 @@ const envUseSockJs = process.env.NEXT_PUBLIC_WS_USE_SOCKJS;
 const DEFAULT_USE_SOCKJS = envUseSockJs === undefined ? true : envUseSockJs === 'true';
 const WS_DEBUG = process.env.NEXT_PUBLIC_WS_DEBUG === 'true';
 
-const authHeaderFromClientState = (): string | null => {
-  const tokenEntry = document.cookie
-    .split('; ')
-    .find(row => row.startsWith(`${COOKIES_KEYS.ACCESS_TOKEN}=`));
-  const cookieToken = tokenEntry
-    ? decodeURIComponent(tokenEntry.substring(`${COOKIES_KEYS.ACCESS_TOKEN}=`.length))
-    : '';
-  const token = cookieToken || getAccessToken() || '';
-
-  return token ? `Bearer ${token}` : null;
-};
-
 const withAuthorizationHeader = (authorization: string | null): StompHeaders =>
   authorization ? { Authorization: authorization } : {};
 
@@ -47,7 +34,7 @@ type SocketAuthResponse = {
 };
 
 const fetchSocketAuthorization = async (): Promise<string | null> => {
-  const clientAuthorization = authHeaderFromClientState();
+  const clientAuthorization = getClientAuthorization();
   if (clientAuthorization) return clientAuthorization;
 
   try {

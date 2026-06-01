@@ -1,6 +1,5 @@
 import { clientApiClient } from '@/lib/client/apiClient';
-import { COOKIES_KEYS } from '@/lib/constants/cookies';
-import { getAccessToken } from '@/stores/tokenStore';
+import { getClientAuthorization } from '@/lib/client/authToken';
 import {
   Client,
   type IFrame,
@@ -16,18 +15,6 @@ if (!WS_BASE_URL) {
   throw new Error('Missing environment variable: NEXT_PUBLIC_WS_BASE_URL');
 }
 
-const authHeaderFromClientState = (): string | null => {
-  const tokenEntry = document.cookie
-    .split('; ')
-    .find(row => row.startsWith(`${COOKIES_KEYS.ACCESS_TOKEN}=`));
-  const cookieToken = tokenEntry
-    ? decodeURIComponent(tokenEntry.substring(`${COOKIES_KEYS.ACCESS_TOKEN}=`.length))
-    : '';
-  const token = cookieToken || getAccessToken() || '';
-
-  return token ? `Bearer ${token}` : null;
-};
-
 type SocketAuthResponse = {
   success: boolean;
   data?: {
@@ -36,7 +23,7 @@ type SocketAuthResponse = {
 };
 
 const fetchSocketAuthorization = async (): Promise<string | null> => {
-  const clientAuthorization = authHeaderFromClientState();
+  const clientAuthorization = getClientAuthorization();
   if (clientAuthorization) return clientAuthorization;
 
   try {

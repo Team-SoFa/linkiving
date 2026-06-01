@@ -1,3 +1,4 @@
+import { isExpiredJwt } from '@/lib/auth/jwt';
 import { COOKIES_KEYS } from '@/lib/constants/cookies';
 import { useChatStore } from '@/stores/chatStore';
 import { Client, type StompHeaders, type StompSubscription } from '@stomp/stompjs';
@@ -11,7 +12,7 @@ if (!WS_BASE_URL) {
 }
 
 const resolveAuthorization = (token?: string) => {
-  if (token) return `Bearer ${token}`;
+  if (token && !isExpiredJwt(token)) return `Bearer ${token}`;
 
   if (typeof document !== 'undefined') {
     const tokenEntry = document.cookie
@@ -20,7 +21,7 @@ const resolveAuthorization = (token?: string) => {
     const cookieToken = tokenEntry
       ? decodeURIComponent(tokenEntry.substring(`${COOKIES_KEYS.ACCESS_TOKEN}=`.length))
       : '';
-    if (cookieToken) return `Bearer ${cookieToken}`;
+    if (cookieToken && !isExpiredJwt(cookieToken)) return `Bearer ${cookieToken}`;
   }
 
   return null;

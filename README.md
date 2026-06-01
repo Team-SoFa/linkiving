@@ -85,6 +85,7 @@ _이제 Linkiving과 함께 스마트하고 효율적인 북마크 관리를 시
 | -------------------------- | ------------------------------------------------------------------------ | ------------------------------------ |
 | `NEXT_PUBLIC_BASE_API_URL` | Linkiving API 베이스 URL                                                 | App / CI / Vercel / Chromatic        |
 | `NEXT_PUBLIC_WS_BASE_URL`  | Linkiving API WebSocket 베이스 URL                                       | App / CI / Vercel / Chromatic        |
+| `AUTH_REFRESH_ENDPOINT`    | Access/Refresh Token 재발급 API 경로 (기본값: `/v1/auth/reissue`)        | App / CI / Vercel                    |
 | `NEXT_PUBLIC_API_TOKEN`    | API Bearer 토큰                                                          | App / CI / Vercel / Chromatic        |
 | `CHROMATIC_PROJECT_TOKEN`  | Chromatic 퍼블리시 토큰                                                  | Chromatic 워크플로우 / 로컬 퍼블리시 |
 | `STORYBOOK_TOKEN`          | Chromatic 토큰 대체용 (로컬/CI에서 CHROMATIC_PROJECT_TOKEN 부재 시 대체) | Chromatic 로컬 퍼블리시              |
