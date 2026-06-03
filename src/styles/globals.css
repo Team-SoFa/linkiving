@@ -124,3 +124,17 @@
 .ring-b {
   animation: ring-b 2.6s ease-in-out infinite;
 }
+
+/* ========== MODAL BOTTOM SHEET (MOBILE) ========== */
+@keyframes modal-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@utility modal-slide-up {
+  animation: modal-slide-up 0.25s ease-out;
+}
