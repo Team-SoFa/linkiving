@@ -2,6 +2,7 @@
 
 import IcLandingLogo from '@/components/Icons/svgs/ic_landing_ic_logo.svg';
 import IcLandingTextLogo from '@/components/Icons/svgs/ic_landing_text_logo.svg';
+import { redirectToGoogleOAuth } from '@/lib/oauth';
 
 const CHROME_STORE_URL =
   'https://chromewebstore.google.com/detail/dbbkgbbhhhhfpclfdkmomidnkgffpbod?utm_source=item-share-cb';
@@ -12,14 +13,7 @@ export default function LandingHeader() {
   };
 
   const handleStart = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
-
-    if (!baseUrl) {
-      console.error('NEXT_PUBLIC_BASE_API_URL is not configured');
-      return;
-    }
-
-    window.location.href = `${baseUrl}/oauth2/authorization/google`;
+    redirectToGoogleOAuth();
   };
 
   return (
@@ -33,16 +27,16 @@ export default function LandingHeader() {
           <button
             type="button"
             onClick={handleAddToChrome}
-            className="font-title-sm rounded-full bg-black px-4 py-2 text-white"
+            className="font-label-md cursor-pointer rounded-lg bg-black px-4 py-2.5 text-white hover:bg-gray-800"
           >
-            Chrome에 추가하기
+            Chrome에 추가
           </button>
           <button
             type="button"
             onClick={handleStart}
-            className="font-title-sm rounded-full border border-gray-300 bg-white px-4 py-2 text-black"
+            className="font-label-md cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-black hover:bg-gray-100"
           >
-            시작하기
+            로그인/회원가입
           </button>
         </div>
       </div>

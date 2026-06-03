@@ -14,7 +14,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
     <ReactQueryProvider>
       <div className="flex min-h-screen bg-white">
         {showSideNav && <SideNavigation />}
-        <main className="min-h-screen flex-1 overflow-x-hidden">{children}</main>
+        <main className="min-h-screen flex-1 overflow-x-clip">{children}</main>
       </div>
     </ReactQueryProvider>
   );

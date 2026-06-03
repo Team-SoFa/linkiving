@@ -1,7 +1,5 @@
 'use client';
 
-import Image from 'next/image';
-
 const CHROME_STORE_URL =
   'https://chromewebstore.google.com/detail/dbbkgbbhhhhfpclfdkmomidnkgffpbod?utm_source=item-share-cb';
 
@@ -13,16 +11,9 @@ export function ChromeButton() {
   return (
     <button
       onClick={handleClick}
-      className="flex items-center justify-center rounded-full bg-black py-3 text-white"
+      className="hover:bg-gray800 flex cursor-pointer items-center justify-center rounded-full bg-black py-[14.5px] text-white"
     >
-      <Image
-        src="/images/google-icon.png"
-        alt="Chrome 로고"
-        width={20}
-        height={20}
-        className="mr-2 inline-block"
-      />
-      <span>Chrome 웹스토어 추가</span>
+      <span className="text-[18px] font-semibold">Chrome 웹스토어로 바로가기</span>
     </button>
   );
 }
