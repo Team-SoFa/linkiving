@@ -1,4 +1,6 @@
+import FeatureSection from '@/components/layout/Landing/FeatureSection';
 import HeroSection from '@/components/layout/Landing/HeroSection';
+import LandingFooter from '@/components/layout/Landing/LandingFooter';
 import LandingHeader from '@/components/layout/Landing/LandingHeader';
 import type { Metadata } from 'next';
 
@@ -76,6 +78,8 @@ export default async function Page({
     <div>
       <LandingHeader />
       <HeroSection />
+      <FeatureSection />
+      <LandingFooter />
     </div>
   );
 }

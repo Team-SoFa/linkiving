@@ -13,7 +13,7 @@ export function ChromeButton() {
   return (
     <button
       onClick={handleClick}
-      className="flex items-center justify-center rounded-full bg-black py-3 text-white"
+      className="flex cursor-pointer items-center justify-center rounded-full bg-black py-3 text-white"
     >
       <Image
         src="/images/google-icon.png"

@@ -33,14 +33,14 @@ export default function LandingHeader() {
           <button
             type="button"
             onClick={handleAddToChrome}
-            className="font-title-sm rounded-full bg-black px-4 py-2 text-white"
+            className="font-title-sm cursor-pointer rounded-full bg-black px-4 py-2 text-white"
           >
             Chrome에 추가하기
           </button>
           <button
             type="button"
             onClick={handleStart}
-            className="font-title-sm rounded-full border border-gray-300 bg-white px-4 py-2 text-black"
+            className="font-title-sm cursor-pointer rounded-full border border-gray-300 bg-white px-4 py-2 text-black"
           >
             시작하기
           </button>
