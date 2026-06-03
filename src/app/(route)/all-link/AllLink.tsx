@@ -666,20 +666,12 @@ export default function AllLink() {
   }, [isSocketConnected, refetch, refetchSelectedLink]);
 
   const handleLoadMore = useCallback(
-    (signal?: AbortSignal) => {
-      if (signal) {
-        const onAbort = () => {
-          void queryClient.cancelQueries({ queryKey: ['links', 'infinite'] });
-        };
-        if (signal.aborted) {
-          onAbort();
-        } else {
-          signal.addEventListener('abort', onAbort, { once: true });
-        }
-      }
-      return fetchNextPage().then(() => undefined);
+    async (signal?: AbortSignal) => {
+      // React Query propagates its own AbortSignal via queryFn; skip only if already superseded.
+      if (signal?.aborted) return;
+      await fetchNextPage();
     },
-    [fetchNextPage, queryClient]
+    [fetchNextPage]
   );
 
   const handleSelectLink = useCallback(

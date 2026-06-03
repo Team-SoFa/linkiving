@@ -131,6 +131,7 @@ export const fetchLinks = async (
   signal?: AbortSignal
 ): Promise<LinkListViewData> => {
   const body = await clientApiClient<LinkListApiResponse>(`${LINKS_BFF}${buildQuery(params)}`, {
+    method: 'GET',
     signal,
   });
 
