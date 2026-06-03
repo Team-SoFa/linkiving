@@ -94,6 +94,7 @@ export const IconSizes = {
   md: 18,
   lg: 20,
   xl: 24,
+  '2xl': 44,
 } as const;
 
 export type IconSizeTypes = keyof typeof IconSizes;

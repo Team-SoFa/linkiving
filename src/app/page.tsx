@@ -1,3 +1,4 @@
+import FeatureSection from '@/components/layout/Landing/FeatureSection';
 import HeroSection from '@/components/layout/Landing/HeroSection';
 import LandingHeader from '@/components/layout/Landing/LandingHeader';
 import type { Metadata } from 'next';
@@ -65,17 +66,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string }>;
-}) {
-  const params = await searchParams;
-
+export default function Page() {
   return (
-    <div>
+    <div className="bg-gray50">
       <LandingHeader />
       <HeroSection />
+      <FeatureSection />
     </div>
   );
 }
