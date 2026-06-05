@@ -7,6 +7,7 @@ import Label from '@/components/basics/Label/Label';
 import TextArea from '@/components/basics/TextArea/TextArea';
 import { useChatStream } from '@/hooks/server/Chats/useChatStream';
 import type { ChatRoom } from '@/types/api/chatApi';
+import type { EntityId } from '@/types/id';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const defaultForm = { firstChat: '' };
@@ -41,7 +42,7 @@ export default function ChatApiDemo() {
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
-  const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+  const [selectedChatId, setSelectedChatId] = useState<EntityId | null>(null);
   const [streamLog, setStreamLog] = useState<StreamLogItem[]>([]);
   const [question, setQuestion] = useState('');
   const [streamEnabled, setStreamEnabled] = useState(false);
@@ -53,7 +54,7 @@ export default function ChatApiDemo() {
     chatId: chatIdForSocket,
     enabled: streamEnabled && Boolean(chatIdForSocket),
     onMessage: payload => {
-      if (payload.chatId !== selectedChatId) return;
+      if (selectedChatId !== null && payload.chatId !== selectedChatId) return;
 
       setStreamLog(prev => [
         ...prev,

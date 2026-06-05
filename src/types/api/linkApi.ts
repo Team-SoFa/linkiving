@@ -1,3 +1,4 @@
+import type { EntityId } from '@/types/id';
 import type { Link } from '@/types/link';
 import { z } from 'zod';
 
@@ -17,10 +18,10 @@ export type LinkCountApiResponse = ApiResponseBase<LinkCountResponse>;
 export type SummaryStatusResponse = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
 
 export interface LinkRes {
-  id: number;
+  id: EntityId;
   url: string;
   title: string;
-  summary?: { id: number; content: string } | string;
+  summary?: { id: EntityId; content: string } | string;
   summaryStatus?: SummaryStatusResponse | Link['summaryStatus'];
   summaryProgress?: number;
   summaryUpdatedAt?: string;
@@ -37,7 +38,7 @@ export type LinkApiResponse = ApiResponseBase<LinkApiData>;
 export interface LinkListApiData {
   links: LinkApiData[];
   hasNext: boolean;
-  lastId: number | null;
+  lastId: EntityId | null;
 }
 
 export type LinkListApiResponse = ApiResponseBase<LinkListApiData>;
@@ -58,7 +59,7 @@ export type DuplicateLinkQuery = z.infer<typeof DuplicateLinkQuerySchema>;
 
 export type DuplicateLinkApiResponse = ApiResponseBase<{
   exists: boolean;
-  linkId?: number;
+  linkId?: EntityId;
 }>;
 
 export interface LinkMetaScrapeData {
@@ -81,9 +82,9 @@ export interface LinkSummaryRegenerateData {
 export type LinkSummaryRegenerateApiResponse = ApiResponseBase<LinkSummaryRegenerateData>;
 
 export interface LinkSummaryStatusData {
-  linkId: number;
+  linkId: EntityId;
   status: SummaryStatusResponse | Link['summaryStatus'];
-  summary?: { id: number; content: string } | string | null;
+  summary?: { id: EntityId; content: string } | string | null;
   errorMessage?: string | null;
   progress?: number | null;
   updatedAt?: string | null;

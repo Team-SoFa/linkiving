@@ -1,11 +1,12 @@
 import { fetchLink } from '@/apis/linkApi';
 import { useDuplicateLinkMutation } from '@/hooks/useCheckDuplicateLink';
+import type { EntityId } from '@/types/id';
 import type { Link } from '@/types/link';
 import { useEffect, useState } from 'react';
 
 interface UseDuplicateCheckResult {
   isDuplicate: boolean;
-  duplicateLinkId: number | null;
+  duplicateLinkId: EntityId | null;
   duplicateLinkData: Link | null;
 }
 
@@ -15,7 +16,7 @@ export function useDuplicateCheck(
 ): UseDuplicateCheckResult {
   const duplicateCheck = useDuplicateLinkMutation();
   const [isDuplicate, setIsDuplicate] = useState(false);
-  const [duplicateLinkId, setDuplicateLinkId] = useState<number | null>(null);
+  const [duplicateLinkId, setDuplicateLinkId] = useState<EntityId | null>(null);
   const [duplicateLinkData, setDuplicateLinkData] = useState<Link | null>(null);
 
   useEffect(() => {

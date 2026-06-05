@@ -1,8 +1,9 @@
 import { type ChatSocket, type ChatSocketMessage, createChatSocket } from '@/apis/chatSocket';
+import type { EntityId } from '@/types/id';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type UseChatStreamOptions = {
-  chatId: string | number;
+  chatId: EntityId;
   enabled?: boolean;
   onMessage?: (payload: ChatSocketMessage) => void;
   onError?: (err: unknown) => void;

@@ -7,13 +7,14 @@ import ProgressNotification from '@/components/basics/ProgressNotification/Progr
 import useReSummary from '@/hooks/useReSummary';
 import useSelectSummary from '@/hooks/useSelectSummary';
 import MarkdownRenderer from '@/hooks/util/parseMarkdown';
+import type { EntityId } from '@/types/id';
 import clsx from 'clsx';
 import { useEffect } from 'react';
 
 import PostReSummaryButton from './PostReSummaryButton';
 
 interface ReSummaryProps {
-  linkId: number;
+  linkId: EntityId;
 }
 
 export default function ReSummaryModal({ linkId }: ReSummaryProps) {

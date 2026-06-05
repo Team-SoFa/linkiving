@@ -3,6 +3,7 @@
 import { styles } from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel.style';
 import { getSafeUrl } from '@/hooks/util/getSafeUrl';
 import { useModalStore } from '@/stores/modalStore';
+import type { EntityId } from '@/types/id';
 
 import ReSummaryModal from '../ReSummaryModal/ReSummaryModal';
 import HeaderSection from './Sections/HeaderSection';
@@ -14,7 +15,7 @@ import TitleSection from './Sections/TitleSection';
 export type SummaryState = 'idle' | 'loading' | 'writing' | 'error' | 'ready';
 
 interface LinkCardDetailPanelProps {
-  id: number;
+  id: EntityId;
   url: string;
   title: string;
   summary: string;

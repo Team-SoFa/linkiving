@@ -4,11 +4,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id: rawId } = await params;
-    const id = Number(rawId);
-    if (!id || isNaN(id)) {
-      return NextResponse.json({ success: false, message: 'Invalid id.' }, { status: 400 });
-    }
+    const { id } = await params;
 
     const { searchParams } = new URL(req.url);
     const format = searchParams.get('format') ?? 'CONCISE';
@@ -29,11 +25,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id: rawId } = await params;
-    const id = Number(rawId);
-    if (!id || isNaN(id)) {
-      return NextResponse.json({ success: false, message: 'Invalid id.' }, { status: 400 });
-    }
+    const { id } = await params;
 
     let body;
     try {

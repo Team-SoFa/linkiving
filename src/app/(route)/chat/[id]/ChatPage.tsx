@@ -13,6 +13,7 @@ import { useChatStream } from '@/hooks/server/Chats/useChatStream';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
 import type { ChatHistoryMessage } from '@/types/api/chatApi';
+import type { EntityId } from '@/types/id';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -21,7 +22,7 @@ import ChatQueryBox from '../_components/ChatQueryBox';
 
 type ChatMessage = {
   id: string;
-  messageId?: number | null;
+  messageId?: EntityId | null;
   role: 'user' | 'ai' | 'system';
   text: string;
   links?: ChatSocketLink[] | null;
@@ -71,7 +72,6 @@ export default function Chat() {
   const params = useParams();
   const searchParams = useSearchParams();
   const chatId = useMemo(() => (typeof params?.id === 'string' ? params.id : ''), [params]);
-  const chatIdNum = useMemo(() => Number(chatId), [chatId]);
   const initialQuestion = useMemo(() => searchParams.get('q')?.trim() ?? '', [searchParams]);
   const initialSentRef = useRef(false);
   const modal = useModalStore(state => state.modal);
@@ -81,7 +81,7 @@ export default function Chat() {
   const [isAwaitingResponse, setIsAwaitingResponse] = useState(false);
   const [streamError, setStreamError] = useState<string | null>(null);
   const [selectedLink, setSelectedLink] = useState<ChatSocketLink | null>(null);
-  const [historyCursor, setHistoryCursor] = useState<number | null>(null);
+  const [historyCursor, setHistoryCursor] = useState<EntityId | null>(null);
   const [historyHasNext, setHistoryHasNext] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyBootstrapped, setHistoryBootstrapped] = useState(false);
@@ -269,14 +269,14 @@ export default function Chat() {
   });
 
   const loadInitialHistory = useCallback(async () => {
-    if (!chatId || Number.isNaN(chatIdNum)) return;
+    if (!chatId) return;
 
     const requestSeq = historyRequestSeqRef.current + 1;
     historyRequestSeqRef.current = requestSeq;
     setHistoryLoading(true);
     setHistoryBootstrapped(false);
     try {
-      const data = await fetchChatMessages({ chatId: chatIdNum, size: PAGE_SIZE, lastId: null });
+      const data = await fetchChatMessages({ chatId, size: PAGE_SIZE, lastId: null });
       if (requestSeq !== historyRequestSeqRef.current) return;
       const normalized = data.messages.map(mapHistoryMessage).reverse();
       setMessages(prev => {
@@ -311,10 +311,10 @@ export default function Chat() {
         setHistoryLoading(false);
       }
     }
-  }, [chatId, chatIdNum]);
+  }, [chatId]);
 
   const loadOlderHistory = useCallback(async () => {
-    if (!chatId || Number.isNaN(chatIdNum)) return;
+    if (!chatId) return;
     if (!historyHasNext || olderHistoryInFlightRef.current) return;
 
     const root = scrollRootRef.current;
@@ -326,7 +326,7 @@ export default function Chat() {
     setHistoryLoading(true);
     try {
       const data = await fetchChatMessages({
-        chatId: chatIdNum,
+        chatId,
         size: PAGE_SIZE,
         lastId: historyCursor,
       });
@@ -351,7 +351,7 @@ export default function Chat() {
         setHistoryLoading(false);
       }
     }
-  }, [chatId, chatIdNum, historyCursor, historyHasNext]);
+  }, [chatId, historyCursor, historyHasNext]);
 
   useEffect(() => {
     historyRequestSeqRef.current += 1;
