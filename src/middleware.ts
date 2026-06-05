@@ -9,7 +9,7 @@ import { COOKIES_KEYS } from '@/lib/constants/cookies';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const publicRoutes = ['/'];
+const publicRoutes = ['/', '/signup'];
 const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 const AUTH_REFRESH_ENDPOINT = process.env.AUTH_REFRESH_ENDPOINT ?? '/v1/auth/reissue';
 const DEV_BYPASS_LOGIN =
