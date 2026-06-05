@@ -1,6 +1,7 @@
 'use client';
 
 import { fetchSocketAuthState, isSocketAuthFailure } from '@/lib/client/socketAuth';
+import type { EntityId } from '@/types/id';
 import {
   Client,
   type IFrame,
@@ -26,19 +27,19 @@ const withAuthorizationHeader = (authorization: string | null): StompHeaders =>
   authorization ? { Authorization: authorization } : {};
 
 export type SummaryStatusPayload = {
-  linkId: number;
+  linkId: EntityId;
   status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
   progress?: number;
-  summary?: { id?: number; content?: string } | string | null;
+  summary?: { id?: EntityId; content?: string } | string | null;
   errorMessage?: string;
   updatedAt?: string;
-  data?: { id?: number; content?: string } | string | null;
+  data?: { id?: EntityId; content?: string } | string | null;
 };
 
 export type LinkSummaryStatus = 'idle' | 'generating' | 'ready' | 'failed';
 
 export type SummaryStatusEvent = {
-  linkId: number;
+  linkId: EntityId;
   status: LinkSummaryStatus;
   progress?: number;
   summary?: string;
@@ -91,14 +92,20 @@ const resolveSummaryText = (
   return typeof rawSummary === 'string' ? rawSummary : undefined;
 };
 
+const toEntityIdOrNull = (value: unknown): EntityId | null => {
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+  if (typeof value === 'string' && value.trim().length > 0) return value;
+  return null;
+};
+
 const parsePayload = (rawBody: string): SummaryStatusEvent => {
   const payload = JSON.parse(rawBody) as SummaryStatusPayload;
   if (typeof payload !== 'object' || payload === null) {
     throw new Error('Invalid summary status event payload');
   }
 
-  const linkId = Number(payload.linkId);
-  if (!Number.isFinite(linkId)) {
+  const linkId = toEntityIdOrNull(payload.linkId);
+  if (linkId === null) {
     throw new Error('Invalid summary status event: missing linkId.');
   }
 

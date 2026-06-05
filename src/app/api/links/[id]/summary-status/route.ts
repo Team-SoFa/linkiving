@@ -23,17 +23,8 @@ const isEndpointMissing404 = (error: unknown): boolean => getErrorStatus(error) 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const parsedId = Number(id);
+    const safeId = encodeURIComponent(id);
     const triedEndpoints = new Set<SummaryStatusEndpointResolver>();
-
-    if (!Number.isSafeInteger(parsedId) || parsedId <= 0) {
-      return NextResponse.json({ success: false, message: 'Invalid id.' }, { status: 400 });
-    }
-
-    // Use the normalized numeric value for upstream requests so inputs like
-    // "01", " 123 ", "1e3", or "+5" yield consistent routing, logging, and cache keys.
-    const safeId = String(parsedId);
-
     if (resolvedSummaryStatusEndpoint) {
       triedEndpoints.add(resolvedSummaryStatusEndpoint);
 

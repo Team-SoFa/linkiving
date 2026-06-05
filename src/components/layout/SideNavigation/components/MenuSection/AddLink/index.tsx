@@ -10,6 +10,7 @@ import { MAX_MEMO_LENGTH } from '@/lib/constants/link';
 import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
 import { hideToast, showToast } from '@/stores/toastStore';
+import type { EntityId } from '@/types/id';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
@@ -75,7 +76,7 @@ const AddLinkModal = () => {
   }, [isDuplicate, duplicateLinkData, metaLoading, form]);
 
   const handleCreateSuccess = useCallback(
-    (createdLink: { id: number }) => {
+    (createdLink: { id: EntityId }) => {
       const toastId = showToast({
         message: '링크가 저장되었습니다. 요약 생성을 시작합니다.',
         variant: 'success',

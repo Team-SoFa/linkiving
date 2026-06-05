@@ -42,11 +42,11 @@ export const Default: Story = {
       const handleOpen = () => {
         // 타입에 따라 적절한 props 전달
         if (args.type === 'DELETE_CHAT') {
-          open('DELETE_CHAT', { chatId: 1, title: '어쩌구' }); // DELETE_CHAT은 props 필수
+          open('DELETE_CHAT', { chatId: '1', title: '어쩌구' });
         } else if (args.type === 'ADD_LINK') {
           open('ADD_LINK');
         } else if (args.type === 'RE_SUMMARY') {
-          open('RE_SUMMARY', { linkId: 123 });
+          open('RE_SUMMARY', { linkId: '123' });
         } else if (args.type === 'REPORT') {
           open('REPORT');
         }

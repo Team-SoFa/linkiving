@@ -6,8 +6,9 @@ import type {
   SelectSummaryResponse,
   SummaryResponse,
 } from '@/types/api/summaryApi';
+import type { EntityId } from '@/types/id';
 
-export const retrySummary = async (id: number) => {
+export const retrySummary = async (id: EntityId) => {
   const body = await clientApiClient<RetrySummaryResponse>(`/api/links/${id}/retry-summary`, {
     method: 'POST',
   });

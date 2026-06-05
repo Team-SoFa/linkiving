@@ -11,6 +11,7 @@ import type {
   CreateChatPayload,
   DeleteChatApiResponse,
 } from '@/types/api/chatApi';
+import type { EntityId } from '@/types/id';
 
 export const fetchChats = async (): Promise<ChatRoom[]> => {
   const response = await clientApiClient<ChatListApiResponse>('/api/chats');
@@ -41,7 +42,7 @@ export const createChat = async (payload: CreateChatPayload): Promise<ChatRoom> 
   return response.data;
 };
 
-export const deleteChat = async (id: number): Promise<DeleteChatApiResponse> => {
+export const deleteChat = async (id: EntityId): Promise<DeleteChatApiResponse> => {
   const response = await clientApiClient<DeleteChatApiResponse>(`/api/chats/${id}`, {
     method: 'DELETE',
   });
@@ -54,9 +55,9 @@ export const deleteChat = async (id: number): Promise<DeleteChatApiResponse> => 
 };
 
 type FetchChatMessagesParams = {
-  chatId: number;
+  chatId: EntityId;
   size?: number;
-  lastId?: number | null;
+  lastId?: EntityId | null;
 };
 
 export const fetchChatMessages = async ({
@@ -84,7 +85,7 @@ export const fetchChatMessages = async ({
 };
 
 export const addMessageFeedback = async (
-  messageId: number,
+  messageId: EntityId,
   payload: AddMessageFeedbackPayload
 ): Promise<AddMessageFeedbackApiResponse> => {
   const response = await clientApiClient<AddMessageFeedbackApiResponse>(

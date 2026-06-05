@@ -9,7 +9,7 @@ const meta = {
     layout: 'centered',
   },
   argTypes: {
-    id: { control: 'number' },
+    id: { control: 'text' },
     url: { control: 'text' },
     title: { control: 'text' },
     summary: { control: 'text' },
@@ -23,7 +23,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const ControlledPanel = (props: Story['args']) => {
-  const id = props?.id ?? 1;
+  const id = props?.id ?? '1';
   const title = props?.title ?? '';
   const memo = props?.memo ?? '';
 
@@ -52,7 +52,7 @@ export const SummaryError: Story = {
   render: args => <ControlledPanel {...args} />,
   args: {
     ...baseArgs,
-    id: 1,
+    id: '1',
     summary: '',
     summaryState: 'error',
     summaryErrorMessage: '일시적 오류로 요약을 생성하지 못했습니다.',
@@ -64,7 +64,7 @@ export const SummaryLoading: Story = {
   render: args => <ControlledPanel {...args} />,
   args: {
     ...baseArgs,
-    id: 1,
+    id: '1',
     summary: '',
     summaryState: 'loading',
   },
@@ -75,7 +75,7 @@ export const SummaryReady: Story = {
   render: args => <ControlledPanel {...args} />,
   args: {
     ...baseArgs,
-    id: 1,
+    id: '1',
     summaryState: 'ready',
   },
 };
