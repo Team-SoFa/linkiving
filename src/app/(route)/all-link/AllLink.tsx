@@ -18,6 +18,7 @@ import { useSummaryStatusSocket } from '@/hooks/useSummaryStatusSocket';
 import { ApiError } from '@/lib/errors/ApiError';
 import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
+import type { EntityId } from '@/types/id';
 import type { LinkSummaryStatus } from '@/types/link';
 import { type Link } from '@/types/link';
 import { useQueryClient } from '@tanstack/react-query';
@@ -103,8 +104,8 @@ const LinkCardItem = memo(
     summaryStatus: LinkSummaryStatus;
     summaryText: string;
     summaryErrorMessage?: string;
-    onSelect: (id: number) => void;
-    onOpen: (id: number) => void;
+    onSelect: (id: EntityId) => void;
+    onOpen: (id: EntityId) => void;
   }) {
     const handleClick = useCallback(() => onOpen(item.id), [item.id, onOpen]);
     const handleSelect = useCallback(() => onSelect(item.id), [item.id, onSelect]);
@@ -138,9 +139,9 @@ export default function AllLink() {
   const { selectedLinkId, selectLink } = useLinkStore();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<EntityId>>(new Set());
   const [summaryStatusByLinkId, setSummaryStatusByLinkId] = useState<
-    Record<number, SummaryStatusInfo>
+    Record<EntityId, SummaryStatusInfo>
   >({});
   const { modal, open } = useModalStore();
 
@@ -148,15 +149,15 @@ export default function AllLink() {
   const deleteButtonRef = useRef<HTMLButtonElement>(null);
 
   const { count } = useLinkCount();
-  const processingLinkIdsRef = useRef<Set<number>>(new Set());
-  const polledUnknownLinkIdsRef = useRef<Set<number>>(new Set());
-  const nonRetryablePollLinkIdsRef = useRef<Set<number>>(new Set());
-  const generatingPollAttemptsRef = useRef<Map<number, number>>(new Map());
-  const generatingPollSnapshotsRef = useRef<Map<number, GeneratingPollSnapshot>>(new Map());
-  const exhaustedGeneratingLinkIdsRef = useRef<Set<number>>(new Set());
+  const processingLinkIdsRef = useRef<Set<EntityId>>(new Set());
+  const polledUnknownLinkIdsRef = useRef<Set<EntityId>>(new Set());
+  const nonRetryablePollLinkIdsRef = useRef<Set<EntityId>>(new Set());
+  const generatingPollAttemptsRef = useRef<Map<EntityId, number>>(new Map());
+  const generatingPollSnapshotsRef = useRef<Map<EntityId, GeneratingPollSnapshot>>(new Map());
+  const exhaustedGeneratingLinkIdsRef = useRef<Set<EntityId>>(new Set());
   const linksRef = useRef<Link[]>([]);
-  const summaryStatusByLinkIdRef = useRef<Record<number, SummaryStatusInfo>>({});
-  const selectedLinkIdRef = useRef<number | null>(selectedLinkId);
+  const summaryStatusByLinkIdRef = useRef<Record<EntityId, SummaryStatusInfo>>({});
+  const selectedLinkIdRef = useRef<EntityId | null>(selectedLinkId);
 
   const queryClient = useQueryClient();
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
@@ -315,7 +316,7 @@ export default function AllLink() {
 
       const linksSnapshot = linksRef.current;
       const statusSnapshot = summaryStatusByLinkIdRef.current;
-      const targetIds: number[] = [];
+      const targetIds: EntityId[] = [];
 
       for (const link of linksSnapshot) {
         if (polledUnknownLinkIdsRef.current.has(link.id)) continue;
@@ -352,7 +353,7 @@ export default function AllLink() {
         let shouldRefetchLinks = false;
         let shouldRefetchSelectedLink = false;
         const summaryUpdates: Array<{
-          linkId: number;
+          linkId: EntityId;
           data: NonNullable<Awaited<ReturnType<typeof fetchLinkSummaryStatus>>>;
           status: LinkSummaryStatus;
           summaryText: string;
@@ -460,8 +461,8 @@ export default function AllLink() {
 
       const linksSnapshot = linksRef.current;
       const statusSnapshot = summaryStatusByLinkIdRef.current;
-      const targetModes = new Map<number, 'generating' | 'unknown'>();
-      const targetIds: number[] = [];
+      const targetModes = new Map<EntityId, 'generating' | 'unknown'>();
+      const targetIds: EntityId[] = [];
 
       for (const link of linksSnapshot) {
         if (nonRetryablePollLinkIdsRef.current.has(link.id)) continue;
@@ -521,7 +522,7 @@ export default function AllLink() {
         let shouldRefetchLinks = false;
         let shouldRefetchSelectedLink = false;
         const summaryUpdates: Array<{
-          linkId: number;
+          linkId: EntityId;
           data: NonNullable<Awaited<ReturnType<typeof fetchLinkSummaryStatus>>>;
           status: LinkSummaryStatus;
           summaryText: string;
@@ -683,7 +684,7 @@ export default function AllLink() {
   );
 
   const handleSelectLink = useCallback(
-    (id: number) => {
+    (id: EntityId) => {
       selectLink(id);
       setIsPanelOpen(true);
     },
@@ -696,7 +697,7 @@ export default function AllLink() {
     }
   }, [selectedLinkId]);
 
-  const handleToggleSelect = useCallback((id: number) => {
+  const handleToggleSelect = useCallback((id: EntityId) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
 

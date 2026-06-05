@@ -1,5 +1,6 @@
 import { type LinkListParams, fetchLinks } from '@/apis/linkApi';
 import type { LinkListViewData } from '@/types/api/linkApi';
+import type { EntityId } from '@/types/id';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import type { InfiniteData } from '@tanstack/react-query';
 
@@ -21,7 +22,7 @@ export function useGetInfiniteLinks(
     Error,
     InfiniteData<LinkListViewData>,
     ['links', 'infinite', Omit<LinkListParams, 'lastId' | 'size'> | undefined, number], // useGetLinks와 캐시 섞이는 걸 방지하기 위해 'infinite'키를 가짐
-    number | null
+    EntityId | null
   >({
     queryKey: ['links', 'infinite', params, size],
     queryFn: ({ pageParam, signal }) =>

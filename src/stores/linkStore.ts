@@ -1,12 +1,13 @@
 import type { LinkApiData } from '@/types/api/linkApi';
+import type { EntityId } from '@/types/id';
 import { create } from 'zustand';
 
 type LinkStoreState = {
   links: LinkApiData[];
-  selectedLinkId: number | null;
+  selectedLinkId: EntityId | null;
   setLinks: (links: LinkApiData[]) => void;
-  selectLink: (id: number | null) => void;
-  updateLink: (id: number, updates: Partial<LinkApiData>) => void;
+  selectLink: (id: EntityId | null) => void;
+  updateLink: (id: EntityId, updates: Partial<LinkApiData>) => void;
 };
 
 export const useLinkStore = create<LinkStoreState>(set => ({

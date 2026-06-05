@@ -5,13 +5,14 @@ import TextArea from '@/components/basics/TextArea/TextArea';
 import Tooltip from '@/components/basics/Tooltip/Tooltip';
 import { useUpdateLinkMemo } from '@/hooks/useUpdateLinkMemo';
 import { MAX_MEMO_LENGTH } from '@/lib/constants/link';
+import type { EntityId } from '@/types/id';
 import { useEffect, useRef, useState } from 'react';
 
 import CopyButton from '../../CopyButton';
 import { styles } from '../LinkCardDetailPanel.style';
 
 interface MemoSectionProps {
-  linkId: number;
+  linkId: EntityId;
   memo: string;
 }
 

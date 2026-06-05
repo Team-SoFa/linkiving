@@ -3,13 +3,14 @@ import TextArea from '@/components/basics/TextArea/TextArea';
 import Tooltip from '@/components/basics/Tooltip/Tooltip';
 import { useUpdateLinkTitle } from '@/hooks/useUpdateLinkTitle';
 import { MAX_TITLE_LENGTH } from '@/lib/constants/link';
+import type { EntityId } from '@/types/id';
 import { useEffect, useRef, useState } from 'react';
 
 import CopyButton from '../../CopyButton';
 import { styles } from '../LinkCardDetailPanel.style';
 
 interface TitleSectionProps {
-  linkId: number;
+  linkId: EntityId;
   title: string;
   onTitleChange?: (value: string) => void;
 }

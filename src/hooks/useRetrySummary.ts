@@ -3,9 +3,10 @@
 import { retrySummary } from '@/apis/summary';
 import { FetchError } from '@/hooks/util/api/error/errors';
 import { showToast } from '@/stores/toastStore';
+import type { EntityId } from '@/types/id';
 import { useMutation } from '@tanstack/react-query';
 
-export default function useRetrySummary(id: number) {
+export default function useRetrySummary(id: EntityId) {
   const mutation = useMutation({
     mutationFn: () => retrySummary(id),
 

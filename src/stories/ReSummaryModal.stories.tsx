@@ -25,9 +25,9 @@ const StoryWrapper = () => {
       <Button
         label="모달 열기"
         variant="primary"
-        onClick={() => open('RE_SUMMARY', { linkId: 123 })}
+        onClick={() => open('RE_SUMMARY', { linkId: '123' })}
       />
-      {modal.type === 'RE_SUMMARY' && <ReSummaryModal linkId={123} />}
+      {modal.type === 'RE_SUMMARY' && <ReSummaryModal linkId="123" />}
     </QueryClientProvider>
   );
 };

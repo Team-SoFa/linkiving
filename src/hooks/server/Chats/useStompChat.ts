@@ -1,6 +1,7 @@
 import { isExpiredJwt } from '@/lib/auth/jwt';
 import { COOKIES_KEYS } from '@/lib/constants/cookies';
 import { useChatStore } from '@/stores/chatStore';
+import type { EntityId } from '@/types/id';
 import { Client, type StompHeaders, type StompSubscription } from '@stomp/stompjs';
 import { useEffect, useRef } from 'react';
 import SockJS from 'sockjs-client';
@@ -47,26 +48,26 @@ const toWebSocketUrl = (url: string) => {
 type IncomingMessage = {
   success: boolean;
   content: string;
-  chatId: number | null;
+  chatId: EntityId | null;
 };
 
 const parseIncoming = (rawBody: string): IncomingMessage => {
   const parsed = JSON.parse(rawBody) as {
     success?: boolean;
     content?: string;
-    chatId?: number;
+    chatId?: string | number;
     data?: {
       content?: string;
-      chatId?: number;
+      chatId?: string | number;
     };
   };
   const data = parsed.data ?? parsed;
   const rawChatId = data.chatId;
   const normalizedChatId =
     typeof rawChatId === 'number' && Number.isFinite(rawChatId)
-      ? rawChatId
-      : typeof rawChatId === 'string' && /^\d+$/.test(rawChatId)
-        ? Number(rawChatId)
+      ? String(rawChatId)
+      : typeof rawChatId === 'string' && rawChatId.trim().length > 0
+        ? rawChatId.trim()
         : null;
   return {
     success: parsed.success === true,
@@ -179,7 +180,7 @@ export const useStompChat = () => {
     const authorization = resolveAuthorization(tokenRef.current);
     clientRef.current.publish({
       destination: SEND_DEST,
-      body: JSON.stringify({ chatId: Number(chatId), message: content }),
+      body: JSON.stringify({ chatId: String(chatId), message: content }),
       headers: toStompHeaders(authorization),
     });
   };
@@ -189,7 +190,7 @@ export const useStompChat = () => {
     const authorization = resolveAuthorization(tokenRef.current);
     clientRef.current.publish({
       destination: CANCEL_DEST,
-      body: JSON.stringify({ chatId: Number(chatId) }),
+      body: JSON.stringify({ chatId: String(chatId) }),
       headers: toStompHeaders(authorization),
     });
   };

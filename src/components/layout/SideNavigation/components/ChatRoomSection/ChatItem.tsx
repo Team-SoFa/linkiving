@@ -4,10 +4,11 @@ import Button from '@/components/basics/Button/Button';
 import IconButton from '@/components/basics/IconButton/IconButton';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/basics/Popover';
 import { useModalStore } from '@/stores/modalStore';
+import type { EntityId } from '@/types/id';
 import { useRouter } from 'next/navigation';
 
 interface Props {
-  id: number;
+  id: EntityId;
   label: string;
 }
 

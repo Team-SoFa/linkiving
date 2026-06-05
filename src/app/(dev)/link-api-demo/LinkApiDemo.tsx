@@ -10,6 +10,7 @@ import { useGetLinks } from '@/hooks/useGetLinks';
 import { usePostLinks } from '@/hooks/usePostLinks';
 import { useUpdateLinkMemo } from '@/hooks/useUpdateLinkMemo';
 import { useUpdateLinkTitle } from '@/hooks/useUpdateLinkTitle';
+import type { EntityId } from '@/types/id';
 import type { Link } from '@/types/link';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -53,19 +54,15 @@ export default function LinkApiDemo() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    try {
-      await deleteMut.mutateAsync(id);
-    } catch {
-      // 에러는 LinkCardRow 혹은 deleteMut.isError를 통해 표시
-    }
+  const handleDelete = async (id: EntityId) => {
+    await deleteMut.mutateAsync(id);
   };
 
-  const handleUpdateTitle = async (id: number, title: string) => {
+  const handleUpdateTitle = async (id: EntityId, title: string) => {
     await updateTitleMut.mutateAsync({ id, title });
   };
 
-  const handleUpdateMemo = async (id: number, memo: string) => {
+  const handleUpdateMemo = async (id: EntityId, memo: string) => {
     await updateMemoMut.mutateAsync({ id, memo });
   };
 
@@ -200,9 +197,9 @@ function LinkCardRow({
   onUpdateMemo,
 }: {
   link: Link;
-  onDelete: (id: number) => Promise<void>;
-  onUpdateTitle: (id: number, title: string) => Promise<void>;
-  onUpdateMemo: (id: number, memo: string) => Promise<void>;
+  onDelete: (id: EntityId) => Promise<void>;
+  onUpdateTitle: (id: EntityId, title: string) => Promise<void>;
+  onUpdateMemo: (id: EntityId, memo: string) => Promise<void>;
 }) {
   const [nextTitle, setNextTitle] = useState(link.title);
   const [nextMemo, setNextMemo] = useState(link.memo ?? '');

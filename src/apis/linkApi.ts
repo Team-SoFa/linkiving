@@ -12,12 +12,13 @@ import type {
   LinkSummaryStatusData,
   SummaryStatusResponse,
 } from '@/types/api/linkApi';
+import type { EntityId } from '@/types/id';
 import type { CreateLinkPayload, Link, LinkSummaryStatus, UpdateLinkPayload } from '@/types/link';
 
 const LINKS_BFF = '/api/links';
 
 export type LinkListParams = {
-  lastId?: number | null;
+  lastId?: EntityId | null;
   size?: number;
 };
 
@@ -39,7 +40,7 @@ const hasText = (value: string | null | undefined): value is string =>
   typeof value === 'string' && value.trim().length > 0;
 
 export const resolveSummaryContent = (
-  rawSummary: { id?: number; content?: string } | string | null | undefined
+  rawSummary: { id?: EntityId; content?: string } | string | null | undefined
 ): string => {
   if (rawSummary !== null && typeof rawSummary === 'object') {
     return typeof rawSummary.content === 'string' ? rawSummary.content : '';
@@ -86,10 +87,10 @@ function buildQuery(params?: LinkListParams) {
 }
 
 type LinkSource = {
-  id?: number;
+  id?: EntityId;
   url?: string;
   title?: string;
-  summary?: { id: number; content: string } | string | null;
+  summary?: { id: EntityId; content: string } | string | null;
   summaryStatus?: unknown;
   summaryErrorMessage?: string | null;
   summaryProgress?: number | null;
@@ -110,7 +111,7 @@ const normalizeLink = (data: LinkSource): Link => {
   );
 
   return {
-    id: data.id ?? 0,
+    id: data.id ?? '',
     url: data.url ?? '',
     title: data.title ?? '',
     summary,
@@ -168,7 +169,7 @@ export const createLink = async (payload: CreateLinkPayload): Promise<Link> => {
   return normalizeLink(body.data);
 };
 
-export const fetchLink = async (id: number): Promise<Link> => {
+export const fetchLink = async (id: EntityId): Promise<Link> => {
   const body = await clientApiClient<LinkApiResponse>(`${LINKS_BFF}/${id}`);
 
   if (!body?.data || !body.success) {
@@ -178,7 +179,7 @@ export const fetchLink = async (id: number): Promise<Link> => {
   return normalizeLink(body.data);
 };
 
-export const updateLink = async (id: number, payload: UpdateLinkPayload): Promise<Link> => {
+export const updateLink = async (id: EntityId, payload: UpdateLinkPayload): Promise<Link> => {
   const body = await clientApiClient<LinkApiResponse>(`${LINKS_BFF}/${id}`, {
     method: 'PUT',
     body: JSON.stringify(payload),
@@ -191,7 +192,7 @@ export const updateLink = async (id: number, payload: UpdateLinkPayload): Promis
   return normalizeLink(body.data);
 };
 
-export const updateLinkTitle = async (id: number, title: string): Promise<Link> => {
+export const updateLinkTitle = async (id: EntityId, title: string): Promise<Link> => {
   const body = await clientApiClient<LinkApiResponse>(`${LINKS_BFF}/${id}/title`, {
     method: 'PATCH',
     body: JSON.stringify({ title }),
@@ -204,7 +205,7 @@ export const updateLinkTitle = async (id: number, title: string): Promise<Link> 
   return normalizeLink(body.data);
 };
 
-export const updateLinkMemo = async (id: number, memo: string): Promise<Link> => {
+export const updateLinkMemo = async (id: EntityId, memo: string): Promise<Link> => {
   const body = await clientApiClient<LinkApiResponse>(`${LINKS_BFF}/${id}/memo`, {
     method: 'PATCH',
     body: JSON.stringify({ memo }),
@@ -217,7 +218,7 @@ export const updateLinkMemo = async (id: number, memo: string): Promise<Link> =>
   return normalizeLink(body.data);
 };
 
-export const deleteLink = async (id: number): Promise<DeleteLinkApiResponse> => {
+export const deleteLink = async (id: EntityId): Promise<DeleteLinkApiResponse> => {
   const body = await clientApiClient<DeleteLinkApiResponse>(`${LINKS_BFF}/${id}`, {
     method: 'DELETE',
   });
@@ -256,7 +257,7 @@ export const scrapeLinkMeta = async (url: string) => {
   return response.data;
 };
 
-export const fetchLinkSummaryStatus = async (id: number): Promise<LinkSummaryStatusData> => {
+export const fetchLinkSummaryStatus = async (id: EntityId): Promise<LinkSummaryStatusData> => {
   const body = await clientApiClient<LinkSummaryStatusApiResponse>(
     `/api/links/${id}/summary-status`,
     {
