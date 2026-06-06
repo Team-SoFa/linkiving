@@ -90,7 +90,7 @@ export const addMessageFeedback = async (
   const response = await clientApiClient<AddMessageFeedbackApiResponse>(
     `/api/messages/${messageId}/feedback`,
     {
-      method: 'POST',
+      method: 'PUT',
       body: JSON.stringify(payload),
     }
   );
