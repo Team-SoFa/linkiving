@@ -16,7 +16,7 @@ const feedbackBodySchema = z.object({
   text: z.string().max(20).optional(),
 });
 
-export async function POST(req: Request, { params }: { params: Promise<{ messageId: string }> }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ messageId: string }> }) {
   try {
     const { messageId } = await params;
     const parsedId = parseRequiredInt(messageId);
@@ -34,7 +34,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ message
     const rawBody = await req.json();
     const body = feedbackBodySchema.parse(rawBody);
     const data = await serverApiClient(`/v1/messages/${messageId}/feedback`, {
-      method: 'POST',
+      method: 'PUT',
       body: JSON.stringify(body),
     });
 
