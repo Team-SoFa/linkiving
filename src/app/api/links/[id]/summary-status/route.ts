@@ -9,6 +9,7 @@ const UPSTREAM_SUMMARY_STATUS_ENDPOINTS = [
 ];
 type SummaryStatusEndpointResolver = (typeof UPSTREAM_SUMMARY_STATUS_ENDPOINTS)[number];
 
+// Best-effort memo — per runtime instance, so cold starts in serverless environments reset it.
 let resolvedSummaryStatusEndpoint: SummaryStatusEndpointResolver | null = null;
 
 const getErrorStatus = (error: unknown): number | null => {
@@ -25,15 +26,21 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const parsedId = Number(id);
     const triedEndpoints = new Set<SummaryStatusEndpointResolver>();
 
-    if (!Number.isFinite(parsedId) || parsedId <= 0) {
+    if (!Number.isSafeInteger(parsedId) || parsedId <= 0) {
       return NextResponse.json({ success: false, message: 'Invalid id.' }, { status: 400 });
     }
+
+    // Use the normalized numeric value for upstream requests so inputs like
+    // "01", " 123 ", "1e3", or "+5" yield consistent routing, logging, and cache keys.
+    const safeId = String(parsedId);
 
     if (resolvedSummaryStatusEndpoint) {
       triedEndpoints.add(resolvedSummaryStatusEndpoint);
 
       try {
-        const data = await serverApiClient(resolvedSummaryStatusEndpoint(id), { method: 'GET' });
+        const data = await serverApiClient(resolvedSummaryStatusEndpoint(safeId), {
+          method: 'GET',
+        });
         return NextResponse.json(data, { status: 200 });
       } catch (error) {
         if (!isEndpointMissing404(error)) {
@@ -48,7 +55,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       if (triedEndpoints.has(endpointResolver)) continue;
 
       try {
-        const data = await serverApiClient(endpointResolver(id), { method: 'GET' });
+        const data = await serverApiClient(endpointResolver(safeId), { method: 'GET' });
         resolvedSummaryStatusEndpoint = endpointResolver;
         return NextResponse.json(data, { status: 200 });
       } catch (error) {

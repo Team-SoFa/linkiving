@@ -27,7 +27,9 @@ export async function clientApiClient<T>(
         'Content-Type': 'application/json',
         ...fetchOptions.headers,
       },
-      signal,
+      signal: fetchOptions.signal
+        ? AbortSignal.any([fetchOptions.signal, controller.signal])
+        : controller.signal,
     });
 
     if (!res.ok) {
