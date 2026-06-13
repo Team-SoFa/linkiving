@@ -77,16 +77,16 @@ export const useChatStream = ({
   }, [chatId, enabled, useSockJS]);
 
   const send = useCallback(
-    (message: string) => {
+    async (message: string) => {
       if (!enabled) return;
-      socketRef.current?.send(message);
+      await socketRef.current?.send(message);
     },
     [enabled]
   );
 
-  const cancel = useCallback(() => {
+  const cancel = useCallback(async () => {
     if (!enabled) return;
-    socketRef.current?.cancel();
+    await socketRef.current?.cancel();
   }, [enabled]);
 
   return { send, cancel, connected };
