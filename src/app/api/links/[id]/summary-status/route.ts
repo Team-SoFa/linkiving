@@ -22,12 +22,7 @@ const isEndpointMissing404 = (error: unknown): boolean => getErrorStatus(error) 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const parsedId = Number(id);
     const triedEndpoints = new Set<SummaryStatusEndpointResolver>();
-
-    if (!Number.isFinite(parsedId) || parsedId <= 0) {
-      return NextResponse.json({ success: false, message: 'Invalid id.' }, { status: 400 });
-    }
 
     if (resolvedSummaryStatusEndpoint) {
       triedEndpoints.add(resolvedSummaryStatusEndpoint);

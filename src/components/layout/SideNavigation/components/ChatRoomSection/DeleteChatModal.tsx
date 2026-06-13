@@ -3,9 +3,10 @@ import Modal from '@/components/basics/Modal/Modal';
 import { useDeleteChat } from '@/hooks/server/Chats/useDeleteChat';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
+import type { EntityId } from '@/types/id';
 
 interface Props {
-  chatId: number;
+  chatId: EntityId;
   title: string;
 }
 

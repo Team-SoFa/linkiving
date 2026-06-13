@@ -3,11 +3,12 @@ import { FetchError } from '@/hooks/util/api/error/errors';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
 import type { LinkListViewData, LinkSummaryFormat } from '@/types/api/linkApi';
+import type { EntityId } from '@/types/id';
 import type { Link } from '@/types/link';
 import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 
 type Params = {
-  id: number;
+  id: EntityId;
   summary: string;
   format: LinkSummaryFormat;
 };

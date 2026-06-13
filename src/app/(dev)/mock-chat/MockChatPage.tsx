@@ -9,13 +9,14 @@ import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkC
 import ReportModal from '@/components/wrappers/ReportModal/ReportModal';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
+import type { EntityId } from '@/types/id';
 import { useState } from 'react';
 
 import AnswerActions, { type AnswerReaction } from '../../(route)/chat/_components/AnswerActions';
 import ChatQueryBox from '../../(route)/chat/_components/ChatQueryBox';
 
 type ChatLink = {
-  linkId: number;
+  linkId: EntityId;
   title: string;
   url: string;
   imageUrl: string | null;
@@ -24,7 +25,7 @@ type ChatLink = {
 
 type ChatMessage = {
   id: string;
-  messageId?: number | null;
+  messageId?: EntityId | null;
   role: 'user' | 'ai';
   text: string;
   links?: ChatLink[] | null;
@@ -36,7 +37,7 @@ const MOCK_RESPONSE = {
     '네이버 쇼핑(플러스 스토어) 접속 오류가 반복될 때는 서비스 공지 확인, 앱/브라우저 재시도, 고객센터 문의 순서로 점검하는 것이 좋습니다. 계정 자체 문제보다는 일시적인 장애일 가능성이 높습니다.',
   links: [
     {
-      linkId: 46,
+      linkId: '46',
       title: '네이버 쇼핑',
       url: 'https://shopping.naver.com/',
       imageUrl:
@@ -49,7 +50,7 @@ const MOCK_RESPONSE = {
 
 const createAiMockMessage = (): ChatMessage => ({
   id: `${Date.now()}-${crypto.randomUUID()}`,
-  messageId: Date.now(),
+  messageId: String(Date.now()),
   role: 'ai',
   text: MOCK_RESPONSE.content,
   links: MOCK_RESPONSE.links,
@@ -62,7 +63,7 @@ export default function MockChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'mock-initial',
-      messageId: 1,
+      messageId: '1',
       role: 'ai',
       text: '목업 채팅 페이지입니다. 질문을 보내면 API 없이 고정 응답이 바로 표시됩니다.',
       links: MOCK_RESPONSE.links,

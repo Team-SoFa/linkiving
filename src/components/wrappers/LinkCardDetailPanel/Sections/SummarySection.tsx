@@ -6,6 +6,7 @@ import ProgressNotification from '@/components/basics/ProgressNotification/Progr
 import useRetrySummary from '@/hooks/useRetrySummary';
 import MarkdownRenderer from '@/hooks/util/parseMarkdown';
 import { useModalStore } from '@/stores/modalStore';
+import type { EntityId } from '@/types/id';
 import { useEffect, useRef, useState } from 'react';
 
 import CopyButton from '../../CopyButton';
@@ -13,7 +14,7 @@ import { SummaryState } from '../LinkCardDetailPanel';
 import { styles } from '../LinkCardDetailPanel.style';
 
 interface SummarySectionProps {
-  linkId: number;
+  linkId: EntityId;
   summary: string;
   summaryState: SummaryState;
   summaryErrorMessage?: string;

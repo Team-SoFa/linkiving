@@ -1,3 +1,5 @@
+import type { EntityId } from './id';
+
 export type LinkSummaryStatus = 'idle' | 'generating' | 'ready' | 'failed';
 
 export interface LinkSummaryState {
@@ -8,7 +10,7 @@ export interface LinkSummaryState {
 }
 
 export interface Link extends LinkSummaryState {
-  id: number;
+  id: EntityId;
   url: string;
   title: string;
   summary: string;

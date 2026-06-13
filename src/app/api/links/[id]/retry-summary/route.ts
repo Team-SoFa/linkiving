@@ -4,12 +4,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id: rawId } = await params;
-    const id = Number(rawId);
-
-    if (!Number.isInteger(id) || id <= 0) {
-      return NextResponse.json({ success: false, message: 'Invalid id.' }, { status: 400 });
-    }
+    const { id } = await params;
 
     const data = await serverApiClient(`/v1/links/${id}/retry-summary`, {
       method: 'POST',

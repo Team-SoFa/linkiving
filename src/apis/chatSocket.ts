@@ -1,5 +1,6 @@
 import { clientApiClient } from '@/lib/client/apiClient';
 import { getClientAuthorization } from '@/lib/client/authToken';
+import type { EntityId } from '@/types/id';
 import {
   Client,
   type IFrame,
@@ -45,7 +46,7 @@ const withAuthorizationHeader = (authorization: string | null): StompHeaders =>
 type Callback = () => void;
 
 export type ChatSocketLink = {
-  linkId: number;
+  linkId: EntityId;
   title: string;
   url: string;
   imageUrl: string | null;
@@ -54,8 +55,8 @@ export type ChatSocketLink = {
 
 export type ChatSocketMessage = {
   success: boolean;
-  chatId: number;
-  messageId: number | null;
+  chatId: EntityId;
+  messageId: EntityId | null;
   content: string;
   isEnd: boolean;
   step: string | string[] | null;
@@ -63,7 +64,7 @@ export type ChatSocketMessage = {
 };
 
 export type ChatSocketOptions = {
-  chatId: string | number;
+  chatId: EntityId;
   useSockJS?: boolean;
   onMessage: (payload: ChatSocketMessage) => void;
   onError?: (err: unknown) => void;
@@ -97,12 +98,9 @@ const toWebSocketUrl = (url: string) => {
   return url.replace(/^http(s?):\/\//i, (_, secure) => `ws${secure ?? ''}://`);
 };
 
-const toNumberOrNull = (value: unknown) => {
-  if (typeof value === 'number' && Number.isFinite(value)) return value;
-  if (typeof value === 'string') {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
+const toEntityIdOrNull = (value: unknown): EntityId | null => {
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+  if (typeof value === 'string' && value.trim().length > 0) return value;
   return null;
 };
 
@@ -121,7 +119,7 @@ const toLinksOrNull = (value: unknown): ChatSocketLink[] | null => {
     .map(item => {
       if (!item || typeof item !== 'object') return null;
       const link = item as Record<string, unknown>;
-      const linkId = toNumberOrNull(link.linkId) ?? toNumberOrNull(link.id);
+      const linkId = toEntityIdOrNull(link.linkId) ?? toEntityIdOrNull(link.id);
       const title = typeof link.title === 'string' ? link.title : '';
       const url = typeof link.url === 'string' ? link.url : '';
       if (linkId === null || !title || !url) return null;
@@ -147,13 +145,13 @@ const parseIncomingMessage = (rawBody: string): ChatSocketMessage => {
     throw new Error('Invalid socket payload: success is missing.');
   }
 
-  const chatId = toNumberOrNull(data.chatId);
+  const chatId = toEntityIdOrNull(data.chatId);
   if (chatId === null) {
     throw new Error('Invalid socket payload: chatId is missing.');
   }
 
   const content = typeof data.content === 'string' ? data.content : '';
-  const messageId = toNumberOrNull(data.messageId);
+  const messageId = toEntityIdOrNull(data.messageId);
   const isEnd = typeof data.isEnd === 'boolean' ? data.isEnd : false;
   const step = toStepOrNull(data.step);
   const links = toLinksOrNull(data.links);
@@ -264,7 +262,7 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
       onError?.(error);
       throw error;
     }
-    const body = JSON.stringify({ chatId: Number(chatId), message });
+    const body = JSON.stringify({ chatId: String(chatId), message });
     logWsDebug('send', { destination: SEND_DEST, body });
     client.publish({
       destination: SEND_DEST,
@@ -279,7 +277,7 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
       onError?.(error);
       throw error;
     }
-    const body = JSON.stringify({ chatId: Number(chatId) });
+    const body = JSON.stringify({ chatId: String(chatId) });
     logWsDebug('cancel', { destination: CANCEL_DEST, body });
     client.publish({
       destination: CANCEL_DEST,

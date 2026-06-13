@@ -1,7 +1,9 @@
+import type { EntityId } from '@/types/id';
+
 import type { ApiResponseBase } from './linkApi';
 
 export interface ChatRoom {
-  id: number;
+  id: EntityId;
   title: string;
   firstChat?: string;
 }
@@ -21,13 +23,13 @@ export type CreateChatApiResponse = ApiResponseBase<ChatRoom>;
 export type DeleteChatApiResponse = ApiResponseBase<null>;
 
 export interface ChatMessageChunk {
-  chatId: number;
+  chatId: EntityId;
   content: string;
   isEnd: boolean;
 }
 
 export interface ChatHistoryLink {
-  id: number;
+  id: EntityId;
   url: string;
   title: string;
   imageUrl?: string | null;
@@ -35,7 +37,7 @@ export interface ChatHistoryLink {
 }
 
 export interface ChatHistoryMessage {
-  id: number;
+  id: EntityId;
   content: string;
   type: string;
   feedback?: string | null;
@@ -46,7 +48,7 @@ export interface ChatHistoryMessage {
 export interface ChatHistoryData {
   messages: ChatHistoryMessage[];
   hasNext: boolean;
-  lastId: number | null;
+  lastId: EntityId | null;
 }
 
 export type ChatHistoryApiResponse = ApiResponseBase<ChatHistoryData>;
@@ -59,7 +61,7 @@ export interface AddMessageFeedbackPayload {
 }
 
 export interface AddMessageFeedbackData {
-  id: number;
+  id: EntityId;
 }
 
 export type AddMessageFeedbackApiResponse = ApiResponseBase<AddMessageFeedbackData>;

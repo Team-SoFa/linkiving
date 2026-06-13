@@ -6,19 +6,20 @@ import { useDeleteLink } from '@/hooks/useDeleteLink';
 import { getSafeUrl } from '@/hooks/util/getSafeUrl';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
+import type { EntityId } from '@/types/id';
 import { useState } from 'react';
 
 import Anchor from '../../Anchor/Anchor';
 
 interface DeleteLinkItem {
-  id: number;
+  id: EntityId;
   title: string;
   url: string;
 }
 
 interface DeleteLinkModalProps {
   links: DeleteLinkItem[];
-  onSuccess?: (succeededIds: number[]) => void;
+  onSuccess?: (succeededIds: EntityId[]) => void;
 }
 
 const DeleteLinkModal = ({ links, onSuccess }: DeleteLinkModalProps) => {

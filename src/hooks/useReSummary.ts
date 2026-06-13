@@ -4,9 +4,10 @@ import { fetchNewSummary } from '@/apis/summary';
 import { FetchError } from '@/hooks/util/api/error/errors';
 import { showToast } from '@/stores/toastStore';
 import type { LinkSummaryFormat } from '@/types/api/linkApi';
+import type { EntityId } from '@/types/id';
 import { useMutation } from '@tanstack/react-query';
 
-export default function useReSummary(id: number, format: LinkSummaryFormat = 'CONCISE') {
+export default function useReSummary(id: EntityId, format: LinkSummaryFormat = 'CONCISE') {
   const mutation = useMutation({
     mutationFn: () =>
       fetchNewSummary({
