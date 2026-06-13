@@ -1,7 +1,6 @@
 'use client';
 
-import { clientApiClient } from '@/lib/client/apiClient';
-import { getClientAuthorization } from '@/lib/client/authToken';
+import { fetchSocketAuthState, isSocketAuthFailure } from '@/lib/client/socketAuth';
 import {
   Client,
   type IFrame,
@@ -25,30 +24,6 @@ const WS_DEBUG = process.env.NEXT_PUBLIC_WS_DEBUG === 'true';
 
 const withAuthorizationHeader = (authorization: string | null): StompHeaders =>
   authorization ? { Authorization: authorization } : {};
-
-type SocketAuthResponse = {
-  success: boolean;
-  data?: {
-    authorization?: string;
-  };
-};
-
-const fetchSocketAuthorization = async (): Promise<string | null> => {
-  const clientAuthorization = getClientAuthorization();
-  if (clientAuthorization) return clientAuthorization;
-
-  try {
-    const response = await clientApiClient<SocketAuthResponse>('/api/socket-auth', {
-      cache: 'no-store',
-    });
-
-    if (!response.success) return null;
-    return response.data?.authorization ?? null;
-  } catch (error) {
-    logWsDebug('auth-fetch-error', error);
-    return null;
-  }
-};
 
 export type SummaryStatusPayload = {
   linkId: number;
@@ -164,10 +139,12 @@ export const createSummarySocket = ({
   onDisconnect,
 }: SummarySocketOptions): SummarySocket => {
   let currentAuthorization: string | null = null;
+  let currentToken: string | null = null;
   let connectAttempt = 0;
   let disconnected = false;
   let hasNotifiedDisconnect = false;
   let subscription: StompSubscription | null = null;
+  let reconnectPromise: Promise<void> | null = null;
 
   const socketEndpoint = useSockJS
     ? toSockJsUrl(WS_SUMMARY_ENDPOINT)
@@ -179,33 +156,93 @@ export const createSummarySocket = ({
     onDisconnect?.();
   };
 
+  const deactivateClient = async () => {
+    subscription?.unsubscribe();
+    subscription = null;
+    await client.deactivate();
+  };
+
+  const connectWithLatestAuth = async (attempt: number) => {
+    const authState = await fetchSocketAuthState();
+
+    if (disconnected || attempt !== connectAttempt) {
+      logWsDebug('connect-aborted', { attempt, connectAttempt, disconnected });
+      console.warn('[summary-socket] connect aborted', { attempt, connectAttempt, disconnected });
+      return;
+    }
+
+    if (authState.kind === 'fetch-error') {
+      currentAuthorization = null;
+      currentToken = null;
+      logWsDebug('connect-auth-fetch-failed', authState.error);
+      onError?.(authState.error);
+      return;
+    }
+
+    if (authState.kind === 'missing') {
+      currentAuthorization = null;
+      currentToken = null;
+      const error = new Error(
+        '세션이 만료되어 요약 소켓에 연결할 수 없습니다. 다시 로그인해 주세요.'
+      );
+      logWsDebug('connect-auth-missing');
+      onError?.(error);
+      return;
+    }
+
+    currentAuthorization = authState.authorization;
+    currentToken = authState.token;
+    client.activate();
+  };
+
+  const reconnectWithLatestAuth = async (reason: string) => {
+    if (disconnected) return;
+    if (reconnectPromise) return reconnectPromise;
+
+    reconnectPromise = (async () => {
+      logWsDebug('reconnect', { reason });
+      connectAttempt += 1;
+      currentAuthorization = null;
+      currentToken = null;
+      await deactivateClient();
+
+      if (disconnected) return;
+
+      const nextAttempt = ++connectAttempt;
+      await connectWithLatestAuth(nextAttempt);
+    })().finally(() => {
+      reconnectPromise = null;
+    });
+
+    return reconnectPromise;
+  };
+
   const client = new Client({
     webSocketFactory: () => {
       console.log('[summary-socket] creating socket to', socketEndpoint);
       return useSockJS ? new SockJS(socketEndpoint) : new WebSocket(socketEndpoint);
     },
     connectHeaders: {},
-    beforeConnect: async stompClient => {
-      currentAuthorization = await fetchSocketAuthorization();
-
-      if (!currentAuthorization) {
-        const error = new Error('Cannot connect: authentication token is unavailable.');
-        logWsDebug('connect-auth-missing');
-        console.error('[summary-socket] auth missing');
-        onError?.(error);
-        throw error;
-      }
-
+    beforeConnect: stompClient => {
       stompClient.connectHeaders = withAuthorizationHeader(currentAuthorization);
     },
     reconnectDelay: 5000,
     onStompError: (frame: IFrame) => {
+      const message = frame.body || frame.headers.message || 'Socket error';
+      if (isSocketAuthFailure(message)) {
+        onError?.(
+          new Error('요약 소켓 인증이 만료되어 다시 연결합니다. 잠시 후 상태를 다시 확인해 주세요.')
+        );
+        void reconnectWithLatestAuth('stomp-auth-error');
+        return;
+      }
+
       console.error('[summary-socket] stomp error', {
         command: frame.command,
         headers: frame.headers,
         body: frame.body,
       });
-      onError?.(frame);
+      onError?.(new Error(message));
     },
     onWebSocketError: err => {
       console.error('[summary-socket] websocket error', {
@@ -218,6 +255,8 @@ export const createSummarySocket = ({
     onWebSocketClose: () => {
       console.warn('[summary-socket] websocket closed');
       notifyDisconnect();
+      if (disconnected) return;
+      void reconnectWithLatestAuth('websocket-close');
     },
   });
 
@@ -257,17 +296,16 @@ export const createSummarySocket = ({
       return;
     }
 
-    client.activate();
+    await connectWithLatestAuth(attempt);
   };
 
   const disconnect = () => {
     connectAttempt += 1;
     disconnected = true;
     currentAuthorization = null;
+    currentToken = null;
     console.log('[summary-socket] disconnected');
-    subscription?.unsubscribe();
-    subscription = null;
-    client.deactivate();
+    void deactivateClient();
     notifyDisconnect();
   };
 

@@ -243,11 +243,17 @@ export default function Chat() {
       initialSentRef.current = true;
       setIsAwaitingResponse(true);
       queueScrollToBottom();
+      const optimisticMessageId = `${Date.now()}-${crypto.randomUUID()}`;
       setMessages(prev => [
         ...prev,
-        { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'user', text: initialQuestion },
+        { id: optimisticMessageId, role: 'user', text: initialQuestion },
       ]);
-      send(initialQuestion);
+      void send(initialQuestion).catch(err => {
+        clearResponseUnlockTimer();
+        setIsAwaitingResponse(false);
+        setMessages(prev => prev.filter(message => message.id !== optimisticMessageId));
+        setStreamError((err as Error).message ?? '메시지 전송에 실패했습니다.');
+      });
       window.history.replaceState(window.history.state, '', `/chat/${chatId}`);
     },
     onDisconnect: () => {
@@ -389,7 +395,7 @@ export default function Chat() {
     });
   }, [messages, isAwaitingResponse, scrollToBottom]);
 
-  const handleSubmit = (value: string) => {
+  const handleSubmit = async (value: string) => {
     if (!connected) {
       setStreamError('소켓이 연결되지 않았습니다.');
       return;
@@ -402,16 +408,15 @@ export default function Chat() {
     setIsAwaitingResponse(true);
     clearResponseUnlockTimer();
     queueScrollToBottom();
-    setMessages(prev => [
-      ...prev,
-      { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'user', text: trimmedValue },
-    ]);
+    const optimisticMessageId = `${Date.now()}-${crypto.randomUUID()}`;
+    setMessages(prev => [...prev, { id: optimisticMessageId, role: 'user', text: trimmedValue }]);
 
     try {
-      send(trimmedValue);
+      await send(trimmedValue);
     } catch (err) {
       clearResponseUnlockTimer();
       setIsAwaitingResponse(false);
+      setMessages(prev => prev.filter(message => message.id !== optimisticMessageId));
       setStreamError((err as Error).message ?? '메시지 전송에 실패했습니다.');
     }
   };
