@@ -1,5 +1,4 @@
-import { clientApiClient } from '@/lib/client/apiClient';
-import { getClientAuthorization } from '@/lib/client/authToken';
+import { fetchSocketAuthState, isSocketAuthFailure } from '@/lib/client/socketAuth';
 import {
   Client,
   type IFrame,
@@ -14,30 +13,6 @@ const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE_URL;
 if (!WS_BASE_URL) {
   throw new Error('Missing environment variable: NEXT_PUBLIC_WS_BASE_URL');
 }
-
-type SocketAuthResponse = {
-  success: boolean;
-  data?: {
-    authorization?: string;
-  };
-};
-
-const fetchSocketAuthorization = async (): Promise<string | null> => {
-  const clientAuthorization = getClientAuthorization();
-  if (clientAuthorization) return clientAuthorization;
-
-  try {
-    const response = await clientApiClient<SocketAuthResponse>('/api/socket-auth', {
-      cache: 'no-store',
-    });
-
-    if (!response.success) return null;
-    return response.data?.authorization ?? null;
-  } catch (error) {
-    logWsDebug('auth-fetch-error', error);
-    return null;
-  }
-};
 
 const withAuthorizationHeader = (authorization: string | null): StompHeaders =>
   authorization ? { Authorization: authorization } : {};
@@ -83,8 +58,8 @@ const WS_DEBUG = process.env.NEXT_PUBLIC_WS_DEBUG === 'true';
 export type ChatSocket = {
   connect: () => Promise<void>;
   disconnect: () => void;
-  send: (message: string) => void;
-  cancel: () => void;
+  send: (message: string) => Promise<void>;
+  cancel: () => Promise<void>;
 };
 
 const toSockJsUrl = (url: string) => {
@@ -185,12 +160,106 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
   } = options;
   let subscription: StompSubscription | null = null;
   let currentAuthorization: string | null = null;
+  let currentToken: string | null = null;
   let connectAttempt = 0;
   let disconnected = false;
+  let reconnectPromise: Promise<void> | null = null;
 
   const socketEndpoint = useSockJS
     ? toSockJsUrl(WS_CHAT_ENDPOINT)
     : toWebSocketUrl(WS_CHAT_ENDPOINT);
+
+  const deactivateClient = async () => {
+    subscription?.unsubscribe();
+    subscription = null;
+    await client.deactivate();
+  };
+
+  const connectWithLatestAuth = async (attempt: number) => {
+    const authState = await fetchSocketAuthState();
+
+    if (disconnected || attempt !== connectAttempt) {
+      logWsDebug('connect-aborted', { attempt, connectAttempt, disconnected });
+      return;
+    }
+
+    if (authState.kind === 'fetch-error') {
+      currentAuthorization = null;
+      currentToken = null;
+      logWsDebug('connect-auth-fetch-failed', authState.error);
+      onError?.(authState.error);
+      return;
+    }
+
+    if (authState.kind === 'missing') {
+      const error = new Error('세션이 만료되어 소켓에 연결할 수 없습니다. 다시 로그인해 주세요.');
+      currentAuthorization = null;
+      currentToken = null;
+      logWsDebug('connect-auth-missing');
+      onError?.(error);
+      return;
+    }
+
+    currentAuthorization = authState.authorization;
+    currentToken = authState.token;
+    client.activate();
+  };
+
+  const reconnectWithLatestAuth = async (reason: string) => {
+    if (disconnected) return;
+    if (reconnectPromise) return reconnectPromise;
+
+    reconnectPromise = (async () => {
+      logWsDebug('reconnect', { reason });
+      connectAttempt += 1;
+      currentAuthorization = null;
+      currentToken = null;
+      await deactivateClient();
+
+      if (disconnected) return;
+
+      const nextAttempt = ++connectAttempt;
+      await connectWithLatestAuth(nextAttempt);
+    })().finally(() => {
+      reconnectPromise = null;
+    });
+
+    return reconnectPromise;
+  };
+
+  const ensureReadyToPublish = async () => {
+    if (!client.connected) {
+      const error = new Error('Cannot send: socket is not connected.');
+      onError?.(error);
+      throw error;
+    }
+
+    const authState = await fetchSocketAuthState();
+    if (authState.kind === 'fetch-error') {
+      onError?.(authState.error);
+      throw authState.error;
+    }
+
+    if (authState.kind === 'missing') {
+      disconnect();
+      const error = new Error(
+        '세션이 만료되어 소켓 연결을 유지할 수 없습니다. 다시 로그인해 주세요.'
+      );
+      onError?.(error);
+      throw error;
+    }
+
+    currentAuthorization = authState.authorization;
+
+    if (currentToken !== authState.token) {
+      await reconnectWithLatestAuth('token-changed');
+      const error = new Error(
+        '인증 세션이 갱신되어 소켓을 다시 연결했습니다. 잠시 후 다시 시도해 주세요.'
+      );
+      onError?.(error);
+      throw error;
+    }
+  };
 
   const client = new Client({
     webSocketFactory: () =>
@@ -200,7 +269,16 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
       stompClient.connectHeaders = withAuthorizationHeader(currentAuthorization);
     },
     reconnectDelay: 5000,
-    onStompError: (frame: IFrame) => onError?.(frame),
+    onStompError: (frame: IFrame) => {
+      const message = frame.body || frame.headers.message || 'Socket error';
+      if (isSocketAuthFailure(message)) {
+        onError?.(new Error('인증이 만료되어 소켓을 다시 연결합니다. 잠시 후 다시 시도해 주세요.'));
+        void reconnectWithLatestAuth('stomp-auth-error');
+        return;
+      }
+
+      onError?.(new Error(message));
+    },
     onWebSocketError: err => onError?.(err),
     onWebSocketClose: () => onDisconnect?.(),
   });
@@ -231,39 +309,20 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
   const connect = async () => {
     const attempt = ++connectAttempt;
     disconnected = false;
-    currentAuthorization = await fetchSocketAuthorization();
-
-    if (disconnected || attempt !== connectAttempt) {
-      logWsDebug('connect-aborted', { attempt, connectAttempt, disconnected });
-      return;
-    }
-
-    if (!currentAuthorization) {
-      const error = new Error('Cannot connect: authentication token is unavailable.');
-      logWsDebug('connect-auth-missing');
-      onError?.(error);
-      return;
-    }
-
-    client.activate();
+    await connectWithLatestAuth(attempt);
   };
 
   const disconnect = () => {
     connectAttempt += 1;
     disconnected = true;
     currentAuthorization = null;
+    currentToken = null;
     logWsDebug('disconnect');
-    subscription?.unsubscribe();
-    subscription = null;
-    client.deactivate();
+    void deactivateClient();
   };
 
-  const send = (message: string) => {
-    if (!client.connected) {
-      const error = new Error('Cannot send: socket is not connected.');
-      onError?.(error);
-      throw error;
-    }
+  const send = async (message: string) => {
+    await ensureReadyToPublish();
     const body = JSON.stringify({ chatId: Number(chatId), message });
     logWsDebug('send', { destination: SEND_DEST, body });
     client.publish({
@@ -273,12 +332,8 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
     });
   };
 
-  const cancel = () => {
-    if (!client.connected) {
-      const error = new Error('Cannot cancel: socket is not connected.');
-      onError?.(error);
-      throw error;
-    }
+  const cancel = async () => {
+    await ensureReadyToPublish();
     const body = JSON.stringify({ chatId: Number(chatId) });
     logWsDebug('cancel', { destination: CANCEL_DEST, body });
     client.publish({

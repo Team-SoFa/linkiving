@@ -141,7 +141,7 @@ export default function ChatApiDemo() {
     ]);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const text = question.trim();
     if (!text || !selectedChatId) return;
     if (!connected) {
@@ -153,20 +153,20 @@ export default function ChatApiDemo() {
       ...prev,
       { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'system', text: `질문 전송: ${text}` },
     ]);
-    setQuestion('');
 
     try {
-      send(text);
+      await send(text);
+      setQuestion('');
     } catch (err) {
       setStreamError((err as Error).message);
     }
   };
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
     if (!selectedChatId || !connected) return;
 
     try {
-      cancel();
+      await cancel();
       setStreamLog(prev => [
         ...prev,
         { id: `${Date.now()}-${crypto.randomUUID()}`, role: 'system', text: '취소 요청 전송' },
