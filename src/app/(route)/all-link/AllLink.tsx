@@ -21,7 +21,15 @@ import { useModalStore } from '@/stores/modalStore';
 import type { LinkSummaryStatus } from '@/types/link';
 import { type Link } from '@/types/link';
 import { useQueryClient } from '@tanstack/react-query';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type WheelEvent as ReactWheelEvent,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 type SummaryStatusInfo = {
   status: LinkSummaryStatus;
@@ -702,6 +710,30 @@ export default function AllLink() {
     });
   }, []);
 
+  const handleLeftPaneWheel = useCallback((event: ReactWheelEvent<HTMLDivElement>) => {
+    const scrollContainer = listRef.current;
+    if (!scrollContainer || event.ctrlKey) return;
+    if (scrollContainer.contains(event.target as Node)) return;
+
+    const lineHeight = 16;
+    const pageHeight = scrollContainer.clientHeight;
+    const deltaY =
+      event.deltaMode === WheelEvent.DOM_DELTA_LINE
+        ? event.deltaY * lineHeight
+        : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+          ? event.deltaY * pageHeight
+          : event.deltaY;
+
+    if (deltaY === 0) return;
+
+    const maxScrollTop = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+    const nextScrollTop = Math.min(Math.max(scrollContainer.scrollTop + deltaY, 0), maxScrollTop);
+    if (nextScrollTop === scrollContainer.scrollTop) return;
+
+    event.preventDefault();
+    scrollContainer.scrollTop = nextScrollTop;
+  }, []);
+
   const renderItem = useCallback(
     (link: Link) => {
       const statusInfo = summaryStatusByLinkId[link.id];
@@ -753,7 +785,7 @@ export default function AllLink() {
   return (
     <div className="h-screen min-w-0">
       <div className="flex h-screen min-w-0 flex-col xl:flex-row">
-        <div className="min-w-0 flex-1 px-10 py-15">
+        <div className="min-w-0 flex-1 px-10 py-15" onWheel={handleLeftPaneWheel}>
           <div className="mx-auto flex h-full w-full max-w-200 flex-col gap-5">
             <header className="flex items-center justify-between">
               <div className="flex items-center gap-1">
@@ -769,11 +801,12 @@ export default function AllLink() {
               )}
             </header>
 
-            <div ref={listRef} className="min-h-0 flex-1">
+            <div className="min-h-0 flex-1">
               {links.length === 0 ? (
                 <p className="text-gray600">표시할 링크가 없습니다.</p>
               ) : (
                 <InfiniteScroll
+                  ref={listRef}
                   className="custom-scrollbar h-full overflow-y-auto p-1"
                   items={links}
                   getKey={item => item.id}
