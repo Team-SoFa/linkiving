@@ -14,7 +14,7 @@ import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
 import type { ChatHistoryMessage } from '@/types/api/chatApi';
 import { useParams, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import AnswerActions, { type AnswerReaction } from '../_components/AnswerActions';
 import ChatQueryBox from '../_components/ChatQueryBox';
@@ -30,6 +30,8 @@ type ChatMessage = {
 
 const PAGE_SIZE = 5;
 const RESPONSE_IDLE_UNLOCK_MS = 500;
+const BOTTOM_GAP_DISMISS_THRESHOLD = 80;
+const LATEST_QUESTION_TOP_OFFSET = 48;
 
 const toLinks = (links: ChatHistoryMessage['links']): ChatSocketLink[] | null => {
   if (!links || links.length === 0) return null;
@@ -85,10 +87,14 @@ export default function Chat() {
   const [historyHasNext, setHistoryHasNext] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyBootstrapped, setHistoryBootstrapped] = useState(false);
+  const [showResponseBottomGap, setShowResponseBottomGap] = useState(false);
+  const [responseBottomGapHeight, setResponseBottomGapHeight] = useState(0);
 
   const scrollRootRef = useRef<HTMLDivElement | null>(null);
+  const latestUserMessageRef = useRef<HTMLDivElement | null>(null);
   const pendingScrollAdjustRef = useRef<{ oldHeight: number; oldTop: number } | null>(null);
   const shouldScrollToBottomRef = useRef(false);
+  const hasScrolledAwayFromResponseGapRef = useRef(false);
   const olderHistoryInFlightRef = useRef(false);
   const historyRequestSeqRef = useRef(0);
   const reactionRequestSeqRef = useRef<Record<string, number>>({});
@@ -113,6 +119,20 @@ export default function Chat() {
       const root = scrollRootRef.current;
       if (!root) return;
       root.scrollTo({ top: root.scrollHeight, behavior });
+    });
+  }, []);
+
+  const scrollLatestQuestionToTop = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    requestAnimationFrame(() => {
+      const root = scrollRootRef.current;
+      const latestUserMessage = latestUserMessageRef.current;
+      if (!root || !latestUserMessage) return;
+      const latestQuestionTop =
+        latestUserMessage.getBoundingClientRect().top -
+        root.getBoundingClientRect().top +
+        root.scrollTop -
+        LATEST_QUESTION_TOP_OFFSET;
+      root.scrollTo({ top: latestQuestionTop, behavior });
     });
   }, []);
 
@@ -242,6 +262,8 @@ export default function Chat() {
       if (!initialQuestion || initialSentRef.current) return;
       initialSentRef.current = true;
       setIsAwaitingResponse(true);
+      setShowResponseBottomGap(true);
+      hasScrolledAwayFromResponseGapRef.current = false;
       queueScrollToBottom();
       setMessages(prev => [
         ...prev,
@@ -351,10 +373,12 @@ export default function Chat() {
     historyRequestSeqRef.current += 1;
     olderHistoryInFlightRef.current = false;
     shouldScrollToBottomRef.current = false;
+    hasScrolledAwayFromResponseGapRef.current = false;
     initialSentRef.current = false;
     clearResponseUnlockTimer();
     setStreamError(null);
     setIsAwaitingResponse(false);
+    setShowResponseBottomGap(false);
     setSelectedLink(null);
     setMessages([]);
     setHistoryCursor(null);
@@ -369,6 +393,21 @@ export default function Chat() {
     [clearResponseUnlockTimer]
   );
 
+  useLayoutEffect(() => {
+    if (!showResponseBottomGap) {
+      setResponseBottomGapHeight(0);
+      return;
+    }
+
+    const root = scrollRootRef.current;
+    const latestUserMessage = latestUserMessageRef.current;
+    if (!root || !latestUserMessage) return;
+
+    const nextGapHeight = Math.max(root.clientHeight - latestUserMessage.offsetHeight, 0);
+    setResponseBottomGapHeight(prev => (Math.abs(prev - nextGapHeight) < 1 ? prev : nextGapHeight));
+    scrollLatestQuestionToTop('auto');
+  }, [messages, scrollLatestQuestionToTop, showResponseBottomGap]);
+
   useEffect(() => {
     const adjust = pendingScrollAdjustRef.current;
     const root = scrollRootRef.current;
@@ -377,7 +416,11 @@ export default function Chat() {
     if (!adjust) {
       if (!shouldScrollToBottomRef.current) return;
       shouldScrollToBottomRef.current = false;
-      scrollToBottom();
+      if (showResponseBottomGap) {
+        scrollLatestQuestionToTop('auto');
+      } else {
+        scrollToBottom();
+      }
       return;
     }
 
@@ -387,7 +430,13 @@ export default function Chat() {
       root.scrollTop = newHeight - adjust.oldHeight + adjust.oldTop;
       pendingScrollAdjustRef.current = null;
     });
-  }, [messages, isAwaitingResponse, scrollToBottom]);
+  }, [
+    messages,
+    isAwaitingResponse,
+    scrollLatestQuestionToTop,
+    scrollToBottom,
+    showResponseBottomGap,
+  ]);
 
   const handleSubmit = (value: string) => {
     if (!connected) {
@@ -400,6 +449,8 @@ export default function Chat() {
     if (!trimmedValue) return;
 
     setIsAwaitingResponse(true);
+    setShowResponseBottomGap(true);
+    hasScrolledAwayFromResponseGapRef.current = false;
     clearResponseUnlockTimer();
     queueScrollToBottom();
     setMessages(prev => [
@@ -422,7 +473,20 @@ export default function Chat() {
     if (root.scrollTop <= 40) {
       void loadOlderHistory();
     }
-  }, [loadOlderHistory]);
+
+    if (!showResponseBottomGap || isAwaitingResponse) return;
+
+    const distanceFromBottom = root.scrollHeight - root.scrollTop - root.clientHeight;
+    if (distanceFromBottom > BOTTOM_GAP_DISMISS_THRESHOLD) {
+      hasScrolledAwayFromResponseGapRef.current = true;
+      return;
+    }
+
+    if (hasScrolledAwayFromResponseGapRef.current) {
+      hasScrolledAwayFromResponseGapRef.current = false;
+      setShowResponseBottomGap(false);
+    }
+  }, [isAwaitingResponse, loadOlderHistory, showResponseBottomGap]);
 
   const handleReactionChange = useCallback(
     async (message: ChatMessage, reaction: AnswerReaction) => {
@@ -503,6 +567,18 @@ export default function Chat() {
     openModal('REPORT');
   }, [openModal]);
 
+  const latestUserMessageIndex = useMemo(
+    () => messages.findLastIndex(message => message.role === 'user'),
+    [messages]
+  );
+
+  const hasResponseAfterLatestQuestion = useMemo(() => {
+    if (latestUserMessageIndex < 0) return false;
+    return messages.some(
+      (message, index) => index > latestUserMessageIndex && message.role !== 'user'
+    );
+  }, [latestUserMessageIndex, messages]);
+
   return (
     <div className="h-screen w-full xl:flex">
       <div className="relative h-full min-w-0 flex-1">
@@ -530,9 +606,14 @@ export default function Chat() {
               {messages.map((message, index) => (
                 <div
                   key={message.id}
-                  className={`flex ${
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
-                  } ${index > 0 ? 'mt-[2rem]' : ''}`}
+                  ref={
+                    index === latestUserMessageIndex && message.role === 'user'
+                      ? latestUserMessageRef
+                      : null
+                  }
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} ${
+                    index > 0 ? 'mt-[2rem]' : ''
+                  }`}
                 >
                   {message.role === 'user' ? (
                     <div className="max-w-[70%]">
@@ -616,13 +697,21 @@ export default function Chat() {
                 </div>
               ))}
 
-              {isAwaitingResponse && (
+              {isAwaitingResponse && !hasResponseAfterLatestQuestion && (
                 <div className="flex justify-start">
                   <div className="flex items-center gap-2 px-3 py-2">
                     <Spinner width={18} height={18} />
                     <span className="font-body-md text-gray500">답변을 생성하고 있어요.</span>
                   </div>
                 </div>
+              )}
+
+              {showResponseBottomGap && (
+                <div
+                  aria-hidden="true"
+                  className="shrink-0"
+                  style={{ height: responseBottomGapHeight }}
+                />
               )}
             </div>
           </div>
