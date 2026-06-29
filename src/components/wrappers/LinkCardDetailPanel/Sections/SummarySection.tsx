@@ -20,12 +20,7 @@ interface SummarySectionProps {
   summaryErrorMessage?: string;
 }
 
-export default function SummarySection({
-  linkId,
-  summary,
-  summaryState,
-  summaryErrorMessage,
-}: SummarySectionProps) {
+export default function SummarySection({ linkId, summary, summaryState }: SummarySectionProps) {
   const { section, summaryWrapper } = styles();
 
   const summaryRef = useRef<HTMLDivElement>(null);
@@ -106,10 +101,7 @@ export default function SummarySection({
     if (summaryState === 'error') {
       return (
         <div className="flex flex-col items-center gap-2 py-6 text-center">
-          <ProgressNotification
-            icon="IC_Info"
-            label={summaryErrorMessage || '일시적 오류로 요약을 생성하지 못했습니다.'}
-          />
+          <ProgressNotification icon="IC_Info" label="일시적 오류로 요약을 생성하지 못했습니다." />
 
           <Button
             size="sm"
