@@ -24,7 +24,10 @@ export const fetchNewSummary = async (params: RegenerateSummaryParams) => {
   const format = params.format ?? 'CONCISE';
   const body = await clientApiClient<SummaryResponse>(
     `/api/links/${params.id}/summary?format=${format}`,
-    { method: 'POST' }
+    {
+      method: 'POST',
+      timeout: 30_000,
+    }
   );
 
   if (!body?.data || !body.success) {
