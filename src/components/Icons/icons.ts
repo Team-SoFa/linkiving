@@ -11,6 +11,7 @@ import IC_Close from './svgs/ic_close.svg';
 import IC_Complete from './svgs/ic_complete.svg';
 import IC_Copy from './svgs/ic_copy.svg';
 import IC_Delete from './svgs/ic_delete.svg';
+import IC_Document from './svgs/ic_document.svg';
 import IC_Down from './svgs/ic_down.svg';
 import IC_Download from './svgs/ic_download.svg';
 import IC_Error from './svgs/ic_error.svg';
@@ -39,6 +40,7 @@ import IC_ThumbUpFilled from './svgs/ic_thumb_up_filled.svg';
 import IC_ThumbUpOutline from './svgs/ic_thumb_up_outline.svg';
 import IC_Undo from './svgs/ic_undo.svg';
 import IC_Up from './svgs/ic_up.svg';
+import IC_UserCheck from './svgs/ic_user_check.svg';
 import IC_Warning from './svgs/ic_warning.svg';
 
 export const IconMap = {
@@ -56,6 +58,7 @@ export const IconMap = {
   IC_Copy,
   IC_Delete,
   IC_Down,
+  IC_Document,
   IC_Download,
   IC_Error,
   IC_Forward,
@@ -83,6 +86,7 @@ export const IconMap = {
   IC_ThumbUpOutline,
   IC_Undo,
   IC_Up,
+  IC_UserCheck,
   IC_Warning,
 } as const;
 
