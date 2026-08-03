@@ -1,3 +1,4 @@
+import { withAnalyticsContext } from '@/lib/client/analytics';
 import { clientApiClient } from '@/lib/client/apiClient';
 import { ApiError } from '@/lib/errors/ApiError';
 import type {
@@ -158,9 +159,10 @@ export const fetchLinksCount = async (): Promise<number> => {
 
 // 링크 추가
 export const createLink = async (payload: CreateLinkPayload): Promise<Link> => {
+  const analyticsPayload = await withAnalyticsContext(payload);
   const body = await clientApiClient<LinkApiResponse>(LINKS_BFF, {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify(analyticsPayload),
   });
 
   if (!body?.data || !body.success) {
