@@ -627,6 +627,9 @@ export default function Chat() {
   }, []);
 
   const handleReport = useCallback(() => {
+    trackEvent('feedback_form_open', {
+      entry_point: 'chat_answer_more',
+    });
     openModal('REPORT');
   }, [openModal]);
 

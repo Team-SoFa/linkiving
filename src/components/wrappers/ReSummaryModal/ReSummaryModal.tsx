@@ -7,6 +7,7 @@ import ProgressNotification from '@/components/basics/ProgressNotification/Progr
 import useReSummary from '@/hooks/useReSummary';
 import useSelectSummary from '@/hooks/useSelectSummary';
 import MarkdownRenderer from '@/hooks/util/parseMarkdown';
+import { trackEvent } from '@/lib/client/analytics';
 import type { EntityId } from '@/types/id';
 import clsx from 'clsx';
 import { useEffect } from 'react';
@@ -22,6 +23,9 @@ export default function ReSummaryModal({ linkId }: ReSummaryProps) {
   const { mutate: selectSummary, isPending: isSaving } = useSelectSummary();
 
   useEffect(() => {
+    trackEvent('summary_regenerate', {
+      link_id: linkId,
+    });
     mutate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [linkId]);

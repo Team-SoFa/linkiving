@@ -4,6 +4,7 @@ import Button from '@/components/basics/Button/Button';
 import Modal from '@/components/basics/Modal/Modal';
 import { useDeleteLink } from '@/hooks/useDeleteLink';
 import { getSafeUrl } from '@/hooks/util/getSafeUrl';
+import { trackEvent } from '@/lib/client/analytics';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
 import type { EntityId } from '@/types/id';
@@ -15,6 +16,7 @@ interface DeleteLinkItem {
   id: EntityId;
   title: string;
   url: string;
+  createdAt?: string;
 }
 
 interface DeleteLinkModalProps {
@@ -37,6 +39,13 @@ const DeleteLinkModal = ({ links, onSuccess }: DeleteLinkModalProps) => {
       const failed = links.filter((_, i) => results[i].status === 'rejected');
 
       if (succeeded.length > 0) {
+        succeeded.forEach(link => {
+          const daysSinceSave = getDaysSinceSave(link.createdAt);
+          trackEvent('link_delete', {
+            link_id: link.id,
+            ...(daysSinceSave === undefined ? {} : { days_since_save: daysSinceSave }),
+          });
+        });
         onSuccess?.(succeeded.map(l => l.id));
       }
 
@@ -95,6 +104,16 @@ const DeleteLinkModal = ({ links, onSuccess }: DeleteLinkModalProps) => {
       </div>
     </Modal>
   );
+};
+
+const getDaysSinceSave = (createdAt?: string): number | undefined => {
+  if (!createdAt) return undefined;
+
+  const createdTime = new Date(createdAt).getTime();
+  if (Number.isNaN(createdTime)) return undefined;
+
+  const elapsedMs = Date.now() - createdTime;
+  return Math.max(0, Math.floor(elapsedMs / 86_400_000));
 };
 
 export default DeleteLinkModal;
