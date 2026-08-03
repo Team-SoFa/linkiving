@@ -61,7 +61,7 @@ export default function RootLayout({
         <LayoutClient>{children}</LayoutClient>
         <ToastContainer />
       </body>
-      <GoogleAnalytics gaId="G-XRQZMERGZ5" />
+      <GoogleAnalytics gaId="G-Q714Z1ZKWF" />
     </html>
   );
 }
