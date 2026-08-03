@@ -39,6 +39,7 @@ export interface ChatHistoryLink {
 export interface ChatHistoryMessage {
   id: EntityId;
   content: string;
+  queryId?: string | null;
   type: string;
   feedback?: string | null;
   time?: string | null;
