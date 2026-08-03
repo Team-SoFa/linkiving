@@ -862,7 +862,7 @@ export default function AllLink() {
         <DeleteLinkModal
           links={links
             .filter(l => modal.props.linkIds.includes(l.id))
-            .map(l => ({ id: l.id, title: l.title, url: l.url }))}
+            .map(l => ({ id: l.id, title: l.title, url: l.url, createdAt: l.createdAt }))}
           onSuccess={succeededIds => {
             setSelectedIds(prev => {
               const next = new Set(prev);
