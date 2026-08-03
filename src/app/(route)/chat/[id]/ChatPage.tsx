@@ -63,6 +63,17 @@ const mapHistoryMessage = (message: ChatHistoryMessage): ChatMessage => ({
 
 const normalizeMessageText = (text: string) => text.trim();
 
+const buildInitialQuestionMessages = (chatId: EntityId, initialQuestion: string): ChatMessage[] =>
+  initialQuestion
+    ? [
+        {
+          id: `initial-question-${chatId}`,
+          role: 'user',
+          text: initialQuestion,
+        },
+      ]
+    : [];
+
 const mergeAiText = (prevText: string, nextText: string) => {
   if (!prevText) return nextText;
   if (!nextText) return prevText;
@@ -77,6 +88,7 @@ export default function Chat() {
   const queryClient = useQueryClient();
   const chatId = useMemo(() => (typeof params?.id === 'string' ? params.id : ''), [params]);
   const initialQuestion = useMemo(() => searchParams.get('q')?.trim() ?? '', [searchParams]);
+  const initialQuestionRef = useRef(initialQuestion);
   const initialSentRef = useRef(false);
   const modal = useModalStore(state => state.modal);
   const openModal = useModalStore(state => state.open);
@@ -102,6 +114,10 @@ export default function Chat() {
   const reactionRequestSeqRef = useRef<Record<string, number>>({});
   const responseUnlockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const chatListInvalidatedChatIdsRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    initialQuestionRef.current = initialQuestion;
+  }, [initialQuestion]);
 
   const clearResponseUnlockTimer = useCallback(() => {
     if (!responseUnlockTimerRef.current) return;
@@ -282,10 +298,15 @@ export default function Chat() {
       hasScrolledAwayFromResponseGapRef.current = false;
       queueScrollToBottom();
       const optimisticMessageId = `${Date.now()}-${crypto.randomUUID()}`;
-      setMessages(prev => [
-        ...prev,
-        { id: optimisticMessageId, role: 'user', text: initialQuestion },
-      ]);
+      setMessages(prev => {
+        const hasInitialQuestion = prev.some(
+          message =>
+            message.role === 'user' &&
+            normalizeMessageText(message.text) === normalizeMessageText(initialQuestion)
+        );
+        if (hasInitialQuestion) return prev;
+        return [...prev, { id: optimisticMessageId, role: 'user', text: initialQuestion }];
+      });
       void send(initialQuestion).catch(err => {
         clearResponseUnlockTimer();
         setIsAwaitingResponse(false);
@@ -402,7 +423,7 @@ export default function Chat() {
     setIsAwaitingResponse(false);
     setShowResponseBottomGap(false);
     setSelectedLink(null);
-    setMessages([]);
+    setMessages(buildInitialQuestionMessages(chatId, initialQuestionRef.current));
     setHistoryCursor(null);
     setHistoryHasNext(false);
     void loadInitialHistory();

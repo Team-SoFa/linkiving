@@ -10,7 +10,7 @@ type CreateChatHook = ReturnType<typeof useCreateChatRoom>;
 
 interface Props {
   createChat: CreateChatHook;
-  onRedirecting: () => void;
+  onRedirecting: (question: string) => void;
 }
 
 export default function HomeQueryBox({ createChat, onRedirecting }: Props) {
@@ -24,7 +24,7 @@ export default function HomeQueryBox({ createChat, onRedirecting }: Props) {
     const chatRoom = await submit({ firstChat: trimmedValue });
     if (!chatRoom) return;
 
-    onRedirecting();
+    onRedirecting(trimmedValue);
     if (chatRoom) route.push(`/chat/${chatRoom.id}?q=${encodeURIComponent(trimmedValue)}`);
   };
 
