@@ -10,6 +10,7 @@ import CopyButton from '@/components/wrappers/CopyButton';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
 import ReportModal from '@/components/wrappers/ReportModal/ReportModal';
 import { useChatStream } from '@/hooks/server/Chats/useChatStream';
+import { trackEvent } from '@/lib/client/analytics';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
 import type { ChatHistoryMessage } from '@/types/api/chatApi';
@@ -24,6 +25,7 @@ import ChatQueryBox from '../_components/ChatQueryBox';
 type ChatMessage = {
   id: string;
   messageId?: EntityId | null;
+  queryId?: string | null;
   role: 'user' | 'ai' | 'system';
   text: string;
   links?: ChatSocketLink[] | null;
@@ -55,6 +57,7 @@ const toReaction = (feedback?: string | null): AnswerReaction => {
 const mapHistoryMessage = (message: ChatHistoryMessage): ChatMessage => ({
   id: `history-${message.id}`,
   messageId: message.id,
+  queryId: message.queryId ?? null,
   role: message.type === 'USER' ? 'user' : 'ai',
   text: message.content,
   links: toLinks(message.links),
@@ -165,6 +168,7 @@ export default function Chat() {
       setMessages(prev => {
         const nextContent = payload.content ?? '';
         const nextLinks = payload.links ?? null;
+        const nextQueryId = payload.queryId ?? null;
 
         if (payload.messageId !== null) {
           const sameMessageIndex = prev.findIndex(
@@ -176,6 +180,7 @@ export default function Chat() {
               index === sameMessageIndex
                 ? {
                     ...message,
+                    queryId: nextQueryId ?? message.queryId ?? null,
                     text: mergeAiText(message.text, nextContent),
                     links: nextLinks ?? message.links ?? null,
                   }
@@ -194,6 +199,7 @@ export default function Chat() {
                 ? {
                     ...message,
                     messageId: payload.messageId,
+                    queryId: nextQueryId ?? message.queryId ?? null,
                     text: mergeAiText(message.text, nextContent),
                     links: nextLinks ?? message.links ?? null,
                   }
@@ -224,6 +230,7 @@ export default function Chat() {
           {
             id: `${Date.now()}-${crypto.randomUUID()}`,
             messageId: payload.messageId,
+            queryId: nextQueryId,
             role: 'ai',
             text: nextContent,
             links: nextLinks,
@@ -565,6 +572,13 @@ export default function Chat() {
         if (reactionRequestSeqRef.current[message.id] !== requestSeq) return;
 
         if (reaction === 'up') {
+          if (message.queryId) {
+            trackEvent('query_feedback', {
+              query_id: message.queryId,
+              value: 'up',
+            });
+          }
+
           showToast({
             message: '감사합니다. 제공해 주신 피드백은 Linkiving을 개선하는 데 도움이 됩니다.',
             variant: 'info',
@@ -573,6 +587,13 @@ export default function Chat() {
         }
 
         if (reaction === 'down') {
+          if (message.queryId) {
+            trackEvent('query_feedback', {
+              query_id: message.queryId,
+              value: 'down',
+            });
+          }
+
           showToast({
             message: '아쉬운 점을 알려주셔서 감사합니다. 더 나은 답변을 위해 개선하겠습니다.',
             variant: 'info',
@@ -608,6 +629,20 @@ export default function Chat() {
   const handleReport = useCallback(() => {
     openModal('REPORT');
   }, [openModal]);
+
+  const handleResultClick = useCallback(
+    (message: ChatMessage, link: ChatSocketLink, resultRank: number) => {
+      if (message.queryId) {
+        trackEvent('query_result_click', {
+          query_id: message.queryId,
+          result_rank: resultRank,
+        });
+      }
+
+      setSelectedLink(link);
+    },
+    []
+  );
 
   const latestUserMessageIndex = useMemo(
     () => messages.findLastIndex(message => message.role === 'user'),
@@ -683,14 +718,16 @@ export default function Chat() {
                               {message.links && message.links.length > 0 && (
                                 <div className="mt-4">
                                   <CardList>
-                                    {message.links.map(link => (
+                                    {message.links.map((link, linkIndex) => (
                                       <LinkCard
                                         key={link.linkId}
                                         title={link.title}
                                         link={link.url}
                                         summary={link.summary ?? ''}
                                         imageUrl={link.imageUrl ?? ''}
-                                        onClick={() => setSelectedLink(link)}
+                                        onClick={() =>
+                                          handleResultClick(message, link, linkIndex + 1)
+                                        }
                                       />
                                     ))}
                                   </CardList>
@@ -716,14 +753,16 @@ export default function Chat() {
                             <div className="pt-1">
                               {message.links && message.links.length > 0 ? (
                                 <CardList>
-                                  {message.links.map(link => (
+                                  {message.links.map((link, linkIndex) => (
                                     <LinkCard
                                       key={link.linkId}
                                       title={link.title}
                                       link={link.url}
                                       summary={link.summary ?? ''}
                                       imageUrl={link.imageUrl ?? ''}
-                                      onClick={() => setSelectedLink(link)}
+                                      onClick={() =>
+                                        handleResultClick(message, link, linkIndex + 1)
+                                      }
                                     />
                                   ))}
                                 </CardList>

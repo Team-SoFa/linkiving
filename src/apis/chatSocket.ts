@@ -33,6 +33,7 @@ export type ChatSocketMessage = {
   success: boolean;
   chatId: EntityId;
   messageId: EntityId | null;
+  queryId: string | null;
   content: string;
   isEnd: boolean;
   step: string | string[] | null;
@@ -128,6 +129,7 @@ const parseIncomingMessage = (rawBody: string): ChatSocketMessage => {
 
   const content = typeof data.content === 'string' ? data.content : '';
   const messageId = toEntityIdOrNull(data.messageId);
+  const queryId = toEntityIdOrNull(data.queryId) ?? toEntityIdOrNull(data.query_id);
   const isEnd = typeof data.isEnd === 'boolean' ? data.isEnd : false;
   const step = toStepOrNull(data.step);
   const links = toLinksOrNull(data.links);
@@ -136,6 +138,7 @@ const parseIncomingMessage = (rawBody: string): ChatSocketMessage => {
     success: parsed.success,
     chatId,
     messageId,
+    queryId,
     content,
     isEnd,
     step,
