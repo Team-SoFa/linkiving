@@ -13,6 +13,8 @@ export default function Home() {
   const createChat = useCreateChatRoom();
   const { creating, form, error } = createChat;
   const [redirecting, setRedirecting] = useState(false);
+  const [redirectingQuestion, setRedirectingQuestion] = useState('');
+  const pendingQuestion = redirectingQuestion || form.firstChat;
 
   // 로딩중 화면
   if (creating || redirecting) {
@@ -21,11 +23,11 @@ export default function Home() {
         <div className="relative flex h-full w-full max-w-[816px] flex-1 flex-col px-4">
           <div className="absolute top-15 right-4 max-w-[70%]">
             <span className="bg-blue50 block rounded-2xl px-4 py-3 whitespace-pre-wrap">
-              {form.firstChat}
+              {pendingQuestion}
             </span>
             <div className="mt-2 flex justify-end">
               <CopyButton
-                value={form.firstChat}
+                value={pendingQuestion}
                 successMsg="질문을 복사했습니다."
                 failMsg="질문 복사에 실패했습니다."
                 tooltipMsg="질문 복사하기"
@@ -63,7 +65,13 @@ export default function Home() {
             {error}
           </p>
         )}
-        <HomeQueryBox createChat={createChat} onRedirecting={() => setRedirecting(true)} />
+        <HomeQueryBox
+          createChat={createChat}
+          onRedirecting={question => {
+            setRedirectingQuestion(question);
+            setRedirecting(true);
+          }}
+        />
       </div>
     </div>
   );
