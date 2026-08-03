@@ -14,6 +14,7 @@ import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
 import type { ChatHistoryMessage } from '@/types/api/chatApi';
 import type { EntityId } from '@/types/id';
+import { useQueryClient } from '@tanstack/react-query';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
@@ -73,6 +74,7 @@ const mergeAiText = (prevText: string, nextText: string) => {
 export default function Chat() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const chatId = useMemo(() => (typeof params?.id === 'string' ? params.id : ''), [params]);
   const initialQuestion = useMemo(() => searchParams.get('q')?.trim() ?? '', [searchParams]);
   const initialSentRef = useRef(false);
@@ -99,6 +101,7 @@ export default function Chat() {
   const historyRequestSeqRef = useRef(0);
   const reactionRequestSeqRef = useRef<Record<string, number>>({});
   const responseUnlockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const chatListInvalidatedChatIdsRef = useRef<Set<string>>(new Set());
 
   const clearResponseUnlockTimer = useCallback(() => {
     if (!responseUnlockTimerRef.current) return;
@@ -216,11 +219,24 @@ export default function Chat() {
     [queueScrollToBottom]
   );
 
+  const invalidateChatListOnce = useCallback(
+    (targetChatId: EntityId) => {
+      const normalizedChatId = String(targetChatId);
+      if (chatListInvalidatedChatIdsRef.current.has(normalizedChatId)) return;
+
+      chatListInvalidatedChatIdsRef.current.add(normalizedChatId);
+      void queryClient.invalidateQueries({ queryKey: ['chats'] });
+    },
+    [queryClient]
+  );
+
   const { connected, send } = useChatStream({
     chatId,
     enabled: Boolean(chatId),
     onMessage: payload => {
       if (String(payload.chatId) !== chatId) return;
+
+      invalidateChatListOnce(payload.chatId);
 
       if (payload.success) {
         setStreamError(null);
