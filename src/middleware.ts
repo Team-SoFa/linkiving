@@ -1,4 +1,4 @@
-import { isExpiredJwt } from '@/lib/auth/jwt';
+import { isExpiredJwt, needsTermsAgreement } from '@/lib/auth/jwt';
 import {
   AuthTokenData,
   TokenResponse,
@@ -10,6 +10,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const publicRoutes = ['/', '/signup'];
+const TERMS_ROUTE = '/terms';
 const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 const AUTH_REFRESH_ENDPOINT = process.env.AUTH_REFRESH_ENDPOINT ?? '/v1/auth/reissue';
 const DEV_BYPASS_LOGIN =
@@ -57,6 +58,7 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get(COOKIES_KEYS.ACCESS_TOKEN)?.value;
   const refreshToken = req.cookies.get(COOKIES_KEYS.REFRESH_TOKEN)?.value;
   const { pathname } = req.nextUrl;
+  const isTermsRoute = pathname === TERMS_ROUTE;
 
   if (DEV_BYPASS_LOGIN) {
     if (publicRoutes.includes(pathname)) {
@@ -77,6 +79,10 @@ export async function middleware(req: NextRequest) {
         sameSite: 'lax',
       });
       return response;
+    }
+
+    if (isTermsRoute) {
+      return NextResponse.next();
     }
 
     return NextResponse.next();
@@ -100,11 +106,34 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  if (isTermsRoute) {
+    if (token && !isExpiredJwt(token)) {
+      return needsTermsAgreement(token)
+        ? NextResponse.next()
+        : NextResponse.redirect(new URL('/home', req.url));
+    }
+
+    if (refreshToken) {
+      const tokens = await reissueTokens(refreshToken);
+      if (tokens) {
+        const response = needsTermsAgreement(tokens.accessToken)
+          ? NextResponse.next()
+          : NextResponse.redirect(new URL('/home', req.url));
+        setAuthCookies(response, tokens);
+        return response;
+      }
+    }
+
+    return NextResponse.redirect(new URL('/', req.url));
+  }
+
   if (!token || isExpiredJwt(token)) {
     if (refreshToken) {
       const tokens = await reissueTokens(refreshToken);
       if (tokens) {
-        const response = NextResponse.next();
+        const response = needsTermsAgreement(tokens.accessToken)
+          ? NextResponse.redirect(new URL(TERMS_ROUTE, req.url))
+          : NextResponse.next();
         setAuthCookies(response, tokens);
         return response;
       }
@@ -113,6 +142,10 @@ export async function middleware(req: NextRequest) {
     const loginUrl = new URL('/', req.url);
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  if (needsTermsAgreement(token)) {
+    return NextResponse.redirect(new URL(TERMS_ROUTE, req.url));
   }
 
   return NextResponse.next();
