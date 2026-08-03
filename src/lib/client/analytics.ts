@@ -2,12 +2,16 @@ export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? 'G
 
 const GA_CLIENT_ID_TIMEOUT_MS = 1000;
 
-type Gtag = (
-  command: 'config' | 'event' | 'get' | 'set',
-  targetId: string,
-  fieldOrParams?: string | Record<string, unknown>,
-  callback?: (value: string | undefined) => void
-) => void;
+type Gtag = {
+  (command: 'config' | 'event', targetId: string, params?: Record<string, unknown>): void;
+  (
+    command: 'get',
+    targetId: string,
+    fieldName: string,
+    callback: (value: string | undefined) => void
+  ): void;
+  (command: 'set', params: Record<string, unknown>): void;
+};
 
 declare global {
   interface Window {
@@ -34,29 +38,41 @@ export const getGaClientId = (timeoutMs = GA_CLIENT_ID_TIMEOUT_MS): Promise<stri
       resolve(null);
     }, timeoutMs);
 
-    gtag('get', GA_MEASUREMENT_ID, 'client_id', clientId => {
+    try {
+      gtag('get', GA_MEASUREMENT_ID, 'client_id', clientId => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeoutId);
+        resolve(typeof clientId === 'string' && clientId.trim() ? clientId : null);
+      });
+    } catch {
       if (settled) return;
       settled = true;
       window.clearTimeout(timeoutId);
-      resolve(typeof clientId === 'string' && clientId.trim() ? clientId : null);
-    });
+      resolve(null);
+    }
   });
 };
 
 export const setGaUserId = (userId: string | null | undefined) => {
   if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
-  if (!userId) return;
 
   const gtag = window.gtag;
-  gtag('config', GA_MEASUREMENT_ID, {
-    user_id: userId,
+  gtag('set', {
+    user_id: userId ?? null,
   });
+};
+
+export const trackEvent = (name: string, params?: Record<string, unknown>) => {
+  if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
+
+  window.gtag('event', name, params ?? {});
 };
 
 export const withAnalyticsContext = async <T extends object>(
   payload: T
 ): Promise<T & { clientId?: string; source: 'web' }> => {
-  const clientId = await getGaClientId();
+  const clientId = await getGaClientId().catch(() => null);
 
   return {
     ...payload,
