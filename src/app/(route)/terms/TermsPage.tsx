@@ -7,7 +7,7 @@ import Button from '@/components/basics/Button/Button';
 import Checkbox from '@/components/basics/Checkbox/Checkbox';
 import { useTermsAgreementSubmit } from '@/hooks/server/useTermsAgreement';
 import Image from 'next/image';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 const TERMS_VERSION = '2026-08-03';
 const PRIVACY_VERSION = '2026-08-03';
@@ -36,8 +36,7 @@ const TermsPage = () => {
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const { submit, isPending } = useTermsAgreementSubmit();
 
-  const allRequiredAgreed = serviceAgreed && privacyAgreed;
-  const allAgreed = useMemo(() => serviceAgreed && privacyAgreed, [privacyAgreed, serviceAgreed]);
+  const allAgreed = serviceAgreed && privacyAgreed;
 
   const handleAllAgreementChange = (checked: boolean) => {
     setServiceAgreed(checked);
@@ -45,7 +44,7 @@ const TermsPage = () => {
   };
 
   const handleSubmit = () => {
-    if (!allRequiredAgreed || isPending) return;
+    if (!allAgreed || isPending) return;
 
     submit({
       termsAgreed: true,
@@ -158,7 +157,7 @@ const TermsPage = () => {
           size="lg"
           type="button"
           label={COPY.submit}
-          disabled={!allRequiredAgreed}
+          disabled={!allAgreed}
           loading={isPending}
           onClick={handleSubmit}
         />

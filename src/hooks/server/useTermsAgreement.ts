@@ -20,8 +20,8 @@ export function useTermsAgreementSubmit() {
         variant: 'success',
         duration: 2000,
       });
-      router.push('/home');
       router.refresh();
+      router.push('/home');
     },
     onError: () => {
       showToast({

@@ -34,6 +34,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(function Chec
   const checkboxSizeClassName =
     checkboxSize === 'lg' ? 'size-6 rounded-[4px]' : 'size-5 rounded-md';
   const checkIconClassName = checkboxSize === 'lg' ? 'h-3 w-3.5' : 'h-2.5 w-3';
+  const errorId = error ? `${inputId}-error` : undefined;
 
   return (
     <div className={clsx('flex flex-col gap-1.5', className)}>
@@ -58,6 +59,8 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(function Chec
             checked={checked}
             defaultChecked={defaultChecked}
             disabled={disabled}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={errorId}
             className="peer sr-only"
             {...rest}
           />
@@ -91,7 +94,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(function Chec
         </span>
       </label>
       {error && (
-        <span role="alert" className="text-red500 pl-8 text-xs">
+        <span id={errorId} role="alert" className="text-red500 pl-8 text-xs">
           {error}
         </span>
       )}
