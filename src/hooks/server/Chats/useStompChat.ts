@@ -1,4 +1,5 @@
 import { isExpiredJwt } from '@/lib/auth/jwt';
+import { getGaClientId } from '@/lib/client/analytics';
 import { COOKIES_KEYS } from '@/lib/constants/cookies';
 import { useChatStore } from '@/stores/chatStore';
 import type { EntityId } from '@/types/id';
@@ -170,17 +171,25 @@ export const useStompChat = () => {
     setGenerating(false);
   };
 
-  const sendMessage = (chatId: string | number, content: string) => {
-    if (!clientRef.current?.connected) return;
+  const sendMessage = async (chatId: string | number, content: string) => {
+    const client = clientRef.current;
+    if (!client?.connected) return;
 
     addMessage({ id: `${Date.now()}`, role: 'user', content });
     addMessage({ id: `${Date.now() + 1}`, role: 'ai', content: '...' });
     setGenerating(true);
 
     const authorization = resolveAuthorization(tokenRef.current);
-    clientRef.current.publish({
+    const clientId = await getGaClientId();
+    if (clientRef.current !== client || !client.connected) return;
+
+    client.publish({
       destination: SEND_DEST,
-      body: JSON.stringify({ chatId: String(chatId), message: content }),
+      body: JSON.stringify({
+        chatId: String(chatId),
+        message: content,
+        ...(clientId ? { clientId } : {}),
+      }),
       headers: toStompHeaders(authorization),
     });
   };

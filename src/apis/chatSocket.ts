@@ -1,3 +1,4 @@
+import { getGaClientId } from '@/lib/client/analytics';
 import { fetchSocketAuthState, isSocketAuthFailure } from '@/lib/client/socketAuth';
 import type { EntityId } from '@/types/id';
 import {
@@ -321,7 +322,12 @@ export const createChatSocket = (options: ChatSocketOptions): ChatSocket => {
 
   const send = async (message: string) => {
     await ensureReadyToPublish();
-    const body = JSON.stringify({ chatId: String(chatId), message });
+    const clientId = await getGaClientId();
+    const body = JSON.stringify({
+      chatId: String(chatId),
+      message,
+      ...(clientId ? { clientId } : {}),
+    });
     logWsDebug('send', { destination: SEND_DEST, body });
     client.publish({
       destination: SEND_DEST,
