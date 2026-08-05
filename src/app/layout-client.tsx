@@ -9,7 +9,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
   const pathname = usePathname();
 
   // 랜딩에서는 SideNavigation 숨김
-  const showSideNav = pathname !== '/' && pathname !== '/signup';
+  const showSideNav = !['/', '/signup', '/terms'].includes(pathname);
 
   return (
     <ReactQueryProvider>
