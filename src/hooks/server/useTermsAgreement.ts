@@ -4,7 +4,7 @@ import { fetchUserInfo } from '@/apis/authApi';
 import { agreeTerms } from '@/apis/termsApi';
 import { trackGoogleSignUp } from '@/lib/client/signUpAnalytics';
 import { useToastStore } from '@/stores/toastStore';
-import type { TermsAgreementRequest } from '@/types/api/termsApi';
+import type { TermsAgreementRequest, TermsAgreementResponse } from '@/types/api/termsApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
@@ -16,8 +16,9 @@ export function useTermsAgreementSubmit() {
   const mutation = useMutation({
     mutationFn: (data: TermsAgreementRequest) => agreeTerms(data),
     retry: false,
-    onSuccess: async () => {
+    onSuccess: async response => {
       let gaUserId: string | null = null;
+      const shouldTrackSignUp = hasIssuedTermsCompletionToken(response);
 
       try {
         const user = await fetchUserInfo();
@@ -27,7 +28,9 @@ export function useTermsAgreementSubmit() {
         void queryClient.invalidateQueries({ queryKey: ['userInfo'] });
       }
 
-      trackGoogleSignUp(gaUserId);
+      if (shouldTrackSignUp) {
+        trackGoogleSignUp(gaUserId);
+      }
 
       showToast({
         id: 'alert',
@@ -54,3 +57,7 @@ export function useTermsAgreementSubmit() {
     isPending: mutation.isPending,
   };
 }
+
+const hasIssuedTermsCompletionToken = (response: TermsAgreementResponse) => {
+  return Boolean(response.data?.accessToken || response.data?.refreshToken);
+};
