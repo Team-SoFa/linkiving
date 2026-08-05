@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [v0.1.1] - 26.08.05
+
 ### Added
 
 - 프로필 메뉴를 통해 개인정보 처리방침, 이용 약관, 오류 문의 등을 확인하고 문의할 수 있도록 추가했습니다.
@@ -21,4 +23,5 @@
 - 채팅 목록을 확인하고 이전 대화를 다시 열 수 있습니다.
 - 회원가입 후 개인 보관함처럼 서비스를 사용할 수 있습니다.
 
+[v0.1.1]: https://github.com/Team-SoFa/linkiving/compare/v0.1.0...v0.1.1
 [v0.1.0]: https://github.com/Team-SoFa/linkiving/compare/0.1.0...main
