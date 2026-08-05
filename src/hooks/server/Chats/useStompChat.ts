@@ -172,7 +172,8 @@ export const useStompChat = () => {
   };
 
   const sendMessage = async (chatId: string | number, content: string) => {
-    if (!clientRef.current?.connected) return;
+    const client = clientRef.current;
+    if (!client?.connected) return;
 
     addMessage({ id: `${Date.now()}`, role: 'user', content });
     addMessage({ id: `${Date.now() + 1}`, role: 'ai', content: '...' });
@@ -180,7 +181,9 @@ export const useStompChat = () => {
 
     const authorization = resolveAuthorization(tokenRef.current);
     const clientId = await getGaClientId();
-    clientRef.current.publish({
+    if (clientRef.current !== client || !client.connected) return;
+
+    client.publish({
       destination: SEND_DEST,
       body: JSON.stringify({
         chatId: String(chatId),
