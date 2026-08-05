@@ -1,19 +1,34 @@
 ﻿'use client';
 
+import { fetchUserInfo } from '@/apis/authApi';
 import { agreeTerms } from '@/apis/termsApi';
+import { trackGoogleSignUp } from '@/lib/client/signUpAnalytics';
 import { useToastStore } from '@/stores/toastStore';
 import type { TermsAgreementRequest } from '@/types/api/termsApi';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
 export function useTermsAgreementSubmit() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { showToast } = useToastStore();
 
   const mutation = useMutation({
     mutationFn: (data: TermsAgreementRequest) => agreeTerms(data),
     retry: false,
-    onSuccess: () => {
+    onSuccess: async () => {
+      let gaUserId: string | null = null;
+
+      try {
+        const user = await fetchUserInfo();
+        queryClient.setQueryData(['userInfo'], user);
+        gaUserId = user.id;
+      } catch {
+        void queryClient.invalidateQueries({ queryKey: ['userInfo'] });
+      }
+
+      trackGoogleSignUp(gaUserId);
+
       showToast({
         id: 'alert',
         message: '\uc57d\uad00 \ub3d9\uc758\uac00 \uc644\ub8cc\ub418\uc5c8\uc2b5\ub2c8\ub2e4.',
