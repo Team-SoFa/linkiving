@@ -7,7 +7,7 @@ export const modalOverlayStyle = tv({
 
 export const modalContentStyle = tv({
   // 짧은 모바일 화면에서 긴 본문이 잘리지 않도록 최대 높이 + 자체 스크롤
-  base: 'bg-gray50 custom-scrollbar max-md:modal-slide-up relative h-auto max-h-[85dvh] w-auto overflow-y-auto overscroll-contain rounded-2xl shadow-lg max-md:m-0! max-md:w-full! max-md:max-w-none! max-md:min-w-0! max-md:rounded-b-none!',
+  base: 'bg-gray50 custom-scrollbar max-md:modal-slide-up relative h-auto max-h-[85dvh] w-auto overflow-y-auto overscroll-contain rounded-2xl shadow-lg max-md:m-0! max-md:w-full! max-md:max-w-none! max-md:min-w-0! max-md:rounded-b-none! max-md:pb-[env(safe-area-inset-bottom)]',
 });
 
 export const modalHeaderStyle = tv({

@@ -10,6 +10,7 @@ import CopyButton from '@/components/wrappers/CopyButton';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
 import ReportModal from '@/components/wrappers/ReportModal/ReportModal';
 import { useChatStream } from '@/hooks/server/Chats/useChatStream';
+import useKeyboardInset from '@/hooks/util/useKeyboardInset';
 import { trackEvent, trackQueryFeedback } from '@/lib/client/analytics';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
@@ -106,6 +107,8 @@ export default function Chat() {
   const [historyBootstrapped, setHistoryBootstrapped] = useState(false);
   const [showResponseBottomGap, setShowResponseBottomGap] = useState(false);
   const [responseBottomGapHeight, setResponseBottomGapHeight] = useState(0);
+  // iOS Safari에서 소프트 키보드가 가린 높이. Android는 dvh가 처리하므로 0이다.
+  const keyboardInset = useKeyboardInset();
 
   const scrollRootRef = useRef<HTMLDivElement | null>(null);
   const latestUserMessageRef = useRef<HTMLDivElement | null>(null);
@@ -456,7 +459,8 @@ export default function Chat() {
     const nextGapHeight = Math.max(root.clientHeight - latestUserMessage.offsetHeight, 0);
     setResponseBottomGapHeight(prev => (Math.abs(prev - nextGapHeight) < 1 ? prev : nextGapHeight));
     scrollLatestQuestionToTop('auto');
-  }, [messages, scrollLatestQuestionToTop, showResponseBottomGap]);
+    // keyboardInset이 바뀌면 스크롤 영역 높이도 바뀌므로 스페이서를 다시 계산한다.
+  }, [messages, scrollLatestQuestionToTop, showResponseBottomGap, keyboardInset]);
 
   useEffect(() => {
     const adjust = pendingScrollAdjustRef.current;
@@ -654,12 +658,21 @@ export default function Chat() {
   }, [latestUserMessageIndex, messages]);
 
   return (
-    <div className="h-full w-full xl:flex">
-      <div className="relative h-full min-w-0 flex-1">
+    <div
+      className="flex h-full w-full flex-col xl:flex-row"
+      style={{ paddingBottom: keyboardInset }}
+    >
+      <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+        {/* 스크롤되는 메시지가 좌상단 고정 메뉴 버튼 뒤로 비치지 않도록 가리는 스크림 */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 z-20 h-15 bg-gradient-to-b from-white via-white/85 to-transparent xl:hidden"
+        />
+
         <div
           ref={scrollRootRef}
           onScroll={handleScroll}
-          className="custom-scrollbar h-full overflow-x-hidden overflow-y-auto overscroll-contain pr-1"
+          className="custom-scrollbar min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain pr-1"
         >
           <div className="mx-auto flex min-h-full w-full max-w-[816px] flex-col px-4 pt-15">
             {streamError && (
@@ -668,7 +681,8 @@ export default function Chat() {
               </div>
             )}
 
-            <div className="flex min-h-0 flex-1 flex-col gap-3 pb-42">
+            {/* 입력창이 더 이상 오버레이가 아니므로 예약 여백(pb-42)이 필요 없다. */}
+            <div className="flex min-h-0 flex-1 flex-col gap-3 pb-4">
               {historyLoading && historyBootstrapped && (
                 <div className="text-gray500 text-center text-xs">이전 대화를 불러오는 중...</div>
               )}
@@ -690,8 +704,8 @@ export default function Chat() {
                   }`}
                 >
                   {message.role === 'user' ? (
-                    <div className="max-w-[70%]">
-                      <div className="bg-blue50 text-gray900 rounded-2xl px-4 py-3 whitespace-pre-wrap">
+                    <div className="max-w-[85%] md:max-w-[70%]">
+                      <div className="bg-blue50 text-gray900 rounded-2xl px-4 py-3 break-words whitespace-pre-wrap">
                         {message.text}
                       </div>
                       <div className="mt-2 flex justify-end">
@@ -710,7 +724,7 @@ export default function Chat() {
                         tabs={['답변', '링크']}
                         contents={{
                           답변: (
-                            <div className="font-body-md text-gray700 whitespace-pre-wrap">
+                            <div className="font-body-md text-gray700 break-words whitespace-pre-wrap">
                               <div>{message.text}</div>
                               {message.links && message.links.length > 0 && (
                                 <div className="mt-4">
@@ -795,8 +809,9 @@ export default function Chat() {
           </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 z-10 mb-15 flex w-full justify-center px-4">
-          <div className="w-full max-w-[816px] shrink-0">
+        {/* 입력창은 오버레이가 아니라 일반 flex 자식이라 dvh가 줄면 함께 따라 올라간다. */}
+        <div className="z-10 shrink-0 bg-white px-4 pt-2 pb-[max(env(safe-area-inset-bottom),0.75rem)] xl:pb-15">
+          <div className="mx-auto w-full max-w-[816px]">
             <ChatQueryBox onSubmit={handleSubmit} disabled={!connected || isAwaitingResponse} />
           </div>
         </div>

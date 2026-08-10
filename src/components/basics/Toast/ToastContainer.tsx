@@ -29,7 +29,8 @@ const ToastContainer = () => {
   return createPortal(
     <div
       className={clsx(
-        'pointer-events-none fixed inset-0 z-60 flex flex-col items-center justify-end gap-3 px-4 pb-30'
+        // pb-30(120px)은 하단 입력창을 피하기 위한 값. 모바일에서는 홈 인디케이터만큼 더 띄운다.
+        'pointer-events-none fixed inset-0 z-60 flex flex-col items-center justify-end gap-3 px-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))]'
       )}
     >
       <div className="flex flex-col items-center gap-3">

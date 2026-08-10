@@ -4,6 +4,8 @@ import { styles } from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetail
 import { getSafeUrl } from '@/hooks/util/getSafeUrl';
 import { useModalStore } from '@/stores/modalStore';
 import type { EntityId } from '@/types/id';
+import { useMediaQuery, useScrollLock } from '@reactuses/core';
+import { useCallback, useEffect } from 'react';
 
 import ReSummaryModal from '../ReSummaryModal/ReSummaryModal';
 import HeaderSection from './Sections/HeaderSection';
@@ -40,6 +42,20 @@ const LinkCardDetailPanel = ({
   const safeUrl = getSafeUrl(url);
   const { root, content } = styles();
   const { modal } = useModalStore();
+
+  // xl 미만에서는 패널이 전체 화면 오버레이(fixed inset-0)라 뒤 배경이 같이 스크롤되면 안 된다.
+  const isOverlay = useMediaQuery('(max-width: 1279px)');
+
+  // useScrollLock의 내부 effect는 [locked, target]에 의존하며 실행될 때마다 "복원할 원래
+  // overflow"를 현재 값으로 다시 캡처한다. 매 렌더마다 새 함수를 넘기면 잠긴 상태의
+  // 'hidden'이 복원 값으로 덮어써져 패널을 닫아도 스크롤이 살아나지 않으므로 참조를 고정한다.
+  const getBody = useCallback(() => document.body, []);
+  const [, setScrollLocked] = useScrollLock(getBody);
+
+  useEffect(() => {
+    setScrollLocked(isOverlay);
+    return () => setScrollLocked(false);
+  }, [isOverlay, setScrollLocked]);
 
   return (
     <>
