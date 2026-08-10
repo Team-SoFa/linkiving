@@ -54,6 +54,12 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  // 노치/홈 인디케이터 영역까지 그리고, env(safe-area-inset-*)를 활성화한다.
+  viewportFit: 'cover',
+  // Android Chrome: 소프트 키보드가 레이아웃 뷰포트를 축소해 dvh가 함께 줄어든다.
+  // (iOS Safari는 이 힌트를 무시하므로 useKeyboardInset으로 보정한다.)
+  interactiveWidget: 'resizes-content',
+  themeColor: '#ffffff',
 };
 
 export default function RootLayout({
