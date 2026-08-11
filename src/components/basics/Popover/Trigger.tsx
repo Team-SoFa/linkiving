@@ -22,6 +22,14 @@ interface PopoverTriggerProps {
   popoverKey: string;
   label?: string;
 }
+
+/**
+ * Button/IconButton 은 접근성 이름을 `aria-label` 이 아니라 자체 prop 인 `ariaLabel` 로 받는다.
+ * 여기서 `aria-label: undefined` 를 무조건 주입하면, 두 컴포넌트가 `{...rest}` 를
+ * `aria-label={ariaLabel}` 뒤에 펼치기 때문에 이름이 지워진다.
+ */
+type LabelledChildProps = { ariaLabel?: string; 'aria-label'?: string };
+
 const PopoverTrigger = ({ children, popoverKey, label }: PopoverTriggerProps) => {
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const { activeKey, toggle, close } = usePopover();
@@ -36,6 +44,9 @@ const PopoverTrigger = ({ children, popoverKey, label }: PopoverTriggerProps) =>
     }
   };
 
+  const childProps = children.props as LabelledChildProps;
+  const resolvedLabel = label ?? childProps.ariaLabel ?? childProps['aria-label'];
+
   return cloneElement(children, {
     ref: useMergedRefs(triggerRef, children.props.ref),
     onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -44,7 +55,8 @@ const PopoverTrigger = ({ children, popoverKey, label }: PopoverTriggerProps) =>
     },
     'aria-haspopup': true,
     'aria-expanded': isActive,
-    'aria-label': label || children.props['aria-label'],
+    // 값이 있을 때만 넘긴다. undefined 를 명시적으로 넘기면 자식이 이미 설정한 값을 덮어쓴다.
+    ...(resolvedLabel ? { 'aria-label': resolvedLabel } : {}),
   } as Partial<ButtonLikeProps>);
 };
 export default PopoverTrigger;

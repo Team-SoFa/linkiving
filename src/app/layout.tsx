@@ -3,7 +3,7 @@ import ToastContainer from '@/components/basics/Toast/ToastContainer';
 import { GA_MEASUREMENT_ID } from '@/lib/client/analytics';
 import '@/styles/globals.css';
 import { GoogleAnalytics } from '@next/third-parties/google';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 
 import LayoutClient from './layout-client';
 
@@ -49,7 +49,12 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = 'width=device-width, initial-scale=1, maximum-scale=1';
+// App Router 는 문자열이 아닌 Viewport 객체를 기대한다.
+// maximum-scale 은 의도적으로 지정하지 않는다 (확대 차단은 WCAG 1.4.4 위반).
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
 
 export default function RootLayout({
   children,
