@@ -49,14 +49,15 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
     const Comp = asChild ? Slot : 'button';
 
     return (
+      // rest 를 먼저 펼쳐 aria-label / onClick / type 이 덮이지 않게 한다
       <Comp
+        {...rest}
         ref={ref}
         className={clsx(classes, className)}
         disabled={disabled}
         type={type}
         aria-label={ariaLabel}
         onClick={onClick}
-        {...rest}
       >
         {asChild ? (
           children

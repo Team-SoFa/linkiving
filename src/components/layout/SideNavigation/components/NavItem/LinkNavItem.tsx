@@ -1,6 +1,7 @@
 import SVGIcon from '@/components/Icons/SVGIcon';
 import { IconMapTypes } from '@/components/Icons/icons';
 import { getSafeUrl } from '@/hooks/util/getSafeUrl';
+import { useCloseSideNavOnSelect } from '@/hooks/util/useCloseSideNavOnSelect';
 import { useSideNavStore } from '@/stores/sideNavStore';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
@@ -14,6 +15,7 @@ interface LinkNavItemProps {
 
 const LinkNavItem = ({ label, href, icon, ariaLabel }: LinkNavItemProps) => {
   const { isOpen } = useSideNavStore();
+  const closeSideNav = useCloseSideNavOnSelect();
   const safeUrl = getSafeUrl(href);
   const isExternal = /^https?:\/\//i.test(safeUrl);
   const linkProps = isExternal ? { target: '_blank' as const, rel: 'noopener noreferrer' } : {};
@@ -21,6 +23,8 @@ const LinkNavItem = ({ label, href, icon, ariaLabel }: LinkNavItemProps) => {
   return (
     <Link
       href={safeUrl}
+      // 같은 경로를 다시 선택해도 모바일 드로어가 닫히도록 (pathname effect 로는 못 잡는 케이스)
+      onClick={closeSideNav}
       className="bg-btn-tertiary-subtle-onpanel group text-gray500 hover:text-gray700 flex h-10 w-full cursor-pointer items-center gap-2 overflow-hidden rounded-full px-2 transition-colors"
       aria-label={ariaLabel}
       {...linkProps}

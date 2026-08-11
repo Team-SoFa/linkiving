@@ -26,7 +26,8 @@ const PopoverContent = ({ children, popoverKey, className }: PopoverContentProps
     anchorRef.current = anchorEl ?? null;
   }, [anchorEl]);
 
-  const { refs, floatingStyles } = usePopoverPosition(anchorRef.current, isActive, placement);
+  // 위치 갱신은 usePopoverPosition 내부의 autoUpdate 가 담당한다 (스크롤/리사이즈 추적)
+  const { refs, floatingStyles } = usePopoverPosition(anchorRef.current, placement);
 
   useOutsideClick([contentRef, anchorRef], close, isActive);
 

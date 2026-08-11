@@ -660,12 +660,12 @@ export default function Chat() {
   }, [latestUserMessageIndex, messages]);
 
   return (
-    <div className="h-screen w-full xl:flex">
+    <div className="h-full w-full xl:flex">
       <div className="relative h-full min-w-0 flex-1">
         <div
           ref={scrollRootRef}
           onScroll={handleScroll}
-          className="custom-scrollbar h-full overflow-x-hidden overflow-y-auto pr-1"
+          className="custom-scrollbar h-full overflow-x-hidden overflow-y-auto overscroll-contain pr-1"
         >
           <div className="mx-auto flex min-h-full w-full max-w-[816px] flex-col px-4 pt-15">
             {streamError && (
@@ -809,7 +809,7 @@ export default function Chat() {
       </div>
 
       {selectedLink && (
-        <aside className="xl:border-gray200 xl:h-screen xl:w-130 xl:shrink-0 xl:border-l">
+        <aside className="xl:border-gray200 xl:h-full xl:w-130 xl:shrink-0 xl:border-l">
           <LinkCardDetailPanel
             id={selectedLink.linkId}
             url={selectedLink.url}

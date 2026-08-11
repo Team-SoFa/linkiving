@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="flex h-screen w-screen items-center justify-center">
+    <div className="flex h-full min-h-dvh w-full items-center justify-center">
       <div className="relative h-14 w-16">
         {/* Ring A: 왼쪽 아래 고리 */}
         <svg

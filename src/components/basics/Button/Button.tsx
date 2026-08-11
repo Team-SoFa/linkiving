@@ -59,7 +59,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : 'button'; // 인터랙션 요소 중첩 방지를 위해 Slot 적용
 
     return (
+      // rest 를 먼저 펼쳐 disabled / type / aria-* 가 덮이지 않게 한다
       <Comp
+        {...rest}
         ref={ref}
         className={clsx(classes, className)}
         disabled={isDisabled}
@@ -67,7 +69,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         aria-disabled={isDisabled}
         aria-busy={loading || undefined}
         onClick={isDisabled ? undefined : onClick}
-        {...rest}
       >
         {loading ? (
           <div className="flex h-full w-full items-center justify-center">

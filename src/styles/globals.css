@@ -25,8 +25,21 @@
 @layer base {
   body {
     @apply font-pretendard;
+    /* pull-to-refresh 및 내부 스크롤러 → 문서로의 scroll chaining 차단 */
+    overscroll-behavior-y: contain;
   }
 }
+
+/* ========== Z-INDEX SCALE ==========
+ *  0–20  페이지 내부 플로팅 (QueryBox, LinkCard 배지)
+ *  30    페이지 sticky 헤더
+ *  40    모바일 사이드내비 그룹 (backdrop + drawer + trigger, 단일 스태킹 컨텍스트)
+ *  50    오버레이 티어 (Modal, LinkCardDetailPanel, Popover, Tooltip)
+ *  60    Toast
+ *
+ * 40 그룹은 반드시 50 티어보다 아래여야 한다. 그렇지 않으면 전체화면 오버레이 위에
+ * 사이드내비 트리거가 떠서, 눌러도 드로어가 오버레이 뒤에 열려 "버튼이 안 먹는" 것처럼 보인다.
+ */
 
 /* ========== CUSTOM SCROLL BAR ========== */
 .custom-scrollbar::-webkit-scrollbar {

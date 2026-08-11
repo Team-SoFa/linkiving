@@ -768,7 +768,7 @@ export default function AllLink() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center">
+      <div className="flex h-full w-full items-center justify-center">
         <Spinner size={36} />
       </div>
     );
@@ -776,7 +776,7 @@ export default function AllLink() {
 
   if (isError && !data) {
     return (
-      <div className="flex min-h-screen w-full flex-col items-center justify-center gap-2">
+      <div className="flex h-full w-full flex-col items-center justify-center gap-2">
         <p className="text-gray600">링크를 불러오지 못했습니다.</p>
         <Button onClick={() => refetch()} label="다시 시도" />
       </div>
@@ -784,8 +784,8 @@ export default function AllLink() {
   }
 
   return (
-    <div className="h-screen min-w-0">
-      <div className="flex h-screen min-w-0 flex-col xl:flex-row">
+    <div className="h-full min-w-0">
+      <div className="flex h-full min-w-0 flex-col xl:flex-row">
         <div className="min-w-0 flex-1 px-10 py-15" onWheel={handleLeftPaneWheel}>
           <div className="mx-auto flex h-full w-full max-w-200 flex-col gap-5">
             <header className="flex items-center justify-between">
@@ -808,7 +808,7 @@ export default function AllLink() {
               ) : (
                 <InfiniteScroll
                   ref={listRef}
-                  className="custom-scrollbar h-full overflow-y-auto p-1"
+                  className="custom-scrollbar h-full overflow-y-auto overscroll-contain p-1"
                   items={links}
                   getKey={item => item.id}
                   renderItem={renderItem}
@@ -822,7 +822,7 @@ export default function AllLink() {
         </div>
 
         {isPanelOpen && (
-          <aside className="xl:h-screen xl:w-130 xl:shrink-0">
+          <aside className="xl:h-full xl:w-130 xl:shrink-0">
             {isSelectedLinkLoading ? (
               <div className="border-gray200 flex h-full items-center justify-center rounded-2xl border bg-white p-6">
                 <Spinner />

@@ -3,6 +3,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/basics/Pop
 import Spinner from '@/components/basics/Spinner/Spinner';
 import { useLogout } from '@/hooks/useLogout';
 import { useUserInfo } from '@/hooks/useUserInfo';
+import { useCloseSideNavOnSelect } from '@/hooks/util/useCloseSideNavOnSelect';
 
 import NavItem from '../NavItem/NavItem';
 
@@ -27,6 +28,7 @@ const PROFILE_MENU_LINKS = [
 const SideNavigationBottom = () => {
   const { data: user, isLoading } = useUserInfo();
   const { mutate: handleLogout, isPending: isLoggingOut } = useLogout();
+  const closeSideNav = useCloseSideNavOnSelect();
   if (isLoading) {
     return (
       <div className="flex shrink-0 items-center justify-center p-2">
@@ -66,6 +68,7 @@ const SideNavigationBottom = () => {
                   onClick={() => {
                     window.open(href, '_blank', 'noopener,noreferrer');
                     close();
+                    closeSideNav();
                   }}
                 />
               ))}
@@ -77,6 +80,9 @@ const SideNavigationBottom = () => {
                 icon="IC_Logout"
                 radius="full"
                 className="w-full justify-start"
+                // 로그아웃은 드로어를 닫지 않는다. useLogout 의 성공/실패 콜백이
+                // 이 컴포넌트의 mutation observer 에 묶여 있어서, 여기서 언마운트하면
+                // '/' 로 보내는 리다이렉트가 실행되지 않는다. (성공 시 '/' 로 이동하면서 자연히 사라진다)
                 onClick={() => {
                   handleLogout();
                   close();

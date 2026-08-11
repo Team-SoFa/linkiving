@@ -143,9 +143,11 @@ export default function MockChatPage() {
   };
 
   return (
-    <div className="h-screen w-full xl:flex">
-      <div className="custom-scrollbar min-w-0 flex-1 overflow-x-hidden overflow-y-auto pr-1">
-        <div className="mx-auto flex h-screen w-full max-w-[816px] flex-col px-4 pt-6">
+    <div className="h-full w-full xl:flex">
+      {/* 부모가 xl 부터만 flex 라 모바일에서는 flex-1 이 무효 → h-full 로 직접 높이를 준다 */}
+      <div className="custom-scrollbar h-full min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain pr-1">
+        {/* QueryBox 가 스크롤 흐름 안에 있으므로 h-full 이 아니라 min-h-full (내용이 길면 늘어나야 함) */}
+        <div className="mx-auto flex min-h-full w-full max-w-[816px] flex-col px-4 pt-6">
           <div className="flex min-h-0 flex-1 flex-col gap-3 pb-42">
             {messages.map((message, index) => (
               <div
@@ -244,7 +246,7 @@ export default function MockChatPage() {
       </div>
 
       {selectedLink && (
-        <aside className="border-gray200 hidden h-screen shrink-0 border-l xl:block xl:w-130">
+        <aside className="border-gray200 hidden h-full shrink-0 border-l xl:block xl:w-130">
           <LinkCardDetailPanel
             id={selectedLink.linkId}
             url={selectedLink.url}
