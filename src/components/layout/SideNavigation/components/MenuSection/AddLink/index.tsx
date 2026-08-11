@@ -11,6 +11,7 @@ import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
 import { hideToast, showToast } from '@/stores/toastStore';
 import type { EntityId } from '@/types/id';
+import type { Link } from '@/types/link';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
@@ -95,6 +96,43 @@ const AddLinkModal = () => {
     [close, router, selectLink]
   );
 
+  // 덮어쓰기 직전 상태로 되돌리기
+  const handleUndoOverwrite = useCallback(
+    async (toastId: string, linkId: EntityId, previousLink: Link) => {
+      hideToast(toastId);
+      try {
+        await updateLink(linkId, {
+          title: previousLink.title,
+          memo: previousLink.memo?.trim() || null,
+          imageUrl: previousLink.imageUrl?.trim() || null,
+        });
+        await qc.invalidateQueries({ queryKey: ['links'], exact: false });
+        showToast({
+          message: '기존 링크로 되돌렸습니다',
+          variant: 'success',
+          showIcon: true,
+        });
+      } catch {
+        showToast({
+          message: '되돌리기에 실패했습니다. 다시 시도해 주세요.',
+          variant: 'error',
+          showIcon: true,
+        });
+      }
+    },
+    [qc]
+  );
+
+  // 기존 링크 유지하고 모달 닫기
+  const handleKeepExisting = useCallback(() => {
+    close();
+    showToast({
+      message: '기존 링크를 유지했습니다',
+      variant: 'info',
+      showIcon: true,
+    });
+  }, [close]);
+
   const { hasSubmitError, lastSubmitPayloadRef } = useCreateLinkError({
     createLink,
     trimmedUrl,
@@ -109,6 +147,8 @@ const AddLinkModal = () => {
   // 링크 저장 제출
   const onSubmit = async (data: import('./hooks/useAddLinkForm').AddLinkForm) => {
     if (isDuplicate && duplicateLinkId) {
+      // 되돌리기를 위해 덮어쓰기 이전 상태를 저장
+      const previousLink = duplicateLinkData;
       try {
         setIsUpdatingDuplicate(true);
         await updateLink(duplicateLinkId, {
@@ -118,6 +158,16 @@ const AddLinkModal = () => {
         });
         await qc.invalidateQueries({ queryKey: ['links'], exact: false });
         close();
+        const toastId = showToast({
+          message: '기존 링크를 덮어썼습니다',
+          variant: 'success',
+          showIcon: true,
+          ...(previousLink && {
+            actionLabel: '되돌리기',
+            actionLabelIcon: 'IC_Undo',
+            onAction: () => handleUndoOverwrite(toastId, duplicateLinkId, previousLink),
+          }),
+        });
       } catch {
         showToast({
           message: '링크 덮어쓰기에 실패했습니다. 다시 시도해 주세요.',
@@ -226,7 +276,8 @@ const AddLinkModal = () => {
                   variant="secondary"
                   label="기존 링크 유지하기"
                   className="flex-1"
-                  onClick={close}
+                  disabled={isSubmitting}
+                  onClick={handleKeepExisting}
                 />
               )}
               <Button
