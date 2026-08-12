@@ -1,6 +1,8 @@
 // TODO: sentry 중복 보고 발생 여부 확인 필요
 import * as Sentry from '@sentry/nextjs';
 
+import { clearInvalidSessionAndRedirect } from './apiClient';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL; // TODO: 환경변수 논의 후 BASE_API_URL로 변경
 
 export class BackendApiError extends Error {
@@ -27,12 +29,14 @@ export async function backendApiClient<T>(endpoint: string, options: RequestInit
     },
   });
 
-  if (res.status === 401) {
-    if (typeof window !== 'undefined') {
-      window.location.href = '/landing';
-    }
+  if (res.status === 401 || res.status === 403) {
+    clearInvalidSessionAndRedirect();
     const errorData = await res.json().catch(() => ({}));
-    const err = new BackendApiError(401, errorData.message || 'Unauthorized', errorData);
+    const err = new BackendApiError(
+      res.status,
+      errorData.message || 'Authentication required',
+      errorData
+    );
     Sentry.captureException(err, { extra: { endpoint } });
     throw err;
   }

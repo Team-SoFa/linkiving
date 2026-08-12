@@ -28,10 +28,11 @@ interface ModalProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   type: keyof typeof MODAL_TYPE;
   ariaLabel?: string;
+  closeDisabled?: boolean;
 }
 
 const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
-  { className, children, type, ariaLabel, ...rest },
+  { className, children, type, ariaLabel, closeDisabled = false, ...rest },
   ref
 ) {
   const { modal, close } = useModalStore();
@@ -77,7 +78,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
         // 다른 레이어(Dropdown, Popover 등)가 먼저 처리하도록 우선순위 확인
         // 또는 stopImmediatePropagation으로 후속 핸들러 차단
         e.stopImmediatePropagation();
-        close();
+        if (!closeDisabled) close();
         return;
       }
 
@@ -107,13 +108,18 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [modal.type, type, close]);
+  }, [modal.type, type, close, closeDisabled]);
 
   if (modal.type !== type) return null;
   if (!portalElement) return null;
 
   return createPortal(
-    <div ref={ref} className={modalOverlayStyle()} onClick={close} {...rest}>
+    <div
+      ref={ref}
+      className={modalOverlayStyle()}
+      {...rest}
+      onClick={closeDisabled ? undefined : close}
+    >
       <div
         ref={contentRef}
         role="dialog"
@@ -129,6 +135,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
             variant="tertiary_subtle"
             ariaLabel="모달 닫기 버튼"
             onClick={close}
+            disabled={closeDisabled}
           />
         </div>
         <Divider color="gray200" />

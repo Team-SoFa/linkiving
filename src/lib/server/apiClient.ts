@@ -133,5 +133,10 @@ export async function serverApiClient<T>(endpoint: string, options: RequestInit 
     });
   }
 
-  return response.json();
+  if (response.status === 204 || response.headers.get('content-length') === '0') {
+    return undefined as T;
+  }
+
+  const body = await response.text();
+  return body ? (JSON.parse(body) as T) : (undefined as T);
 }

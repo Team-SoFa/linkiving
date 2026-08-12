@@ -15,7 +15,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
   const isSideNavOpen = useSideNavStore(state => state.isOpen);
 
   // 랜딩에서는 SideNavigation 숨김
-  const showSideNav = !['/', '/signup', '/terms'].includes(pathname);
+  const showSideNav = !['/', '/signup', '/terms', '/account-deleted'].includes(pathname);
   const isDrawerOpen = showSideNav && isMobile && isSideNavOpen;
 
   return (

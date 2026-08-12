@@ -1,6 +1,7 @@
 'use client';
 
 import { useModalStore } from '@/stores/modalStore';
+import AccountDeleteModal from '@/components/wrappers/AccountDeleteModal/AccountDeleteModal';
 
 import DeleteChatModal from './ChatRoomSection/DeleteChatModal';
 import AddLinkModal from './MenuSection/AddLink';
@@ -20,6 +21,7 @@ export default function SideNavModals() {
       {modal.type === 'DELETE_CHAT' && (
         <DeleteChatModal chatId={modal.props.chatId} title={modal.props.title} />
       )}
+      {modal.type === 'ACCOUNT_DELETE' && <AccountDeleteModal />}
     </>
   );
 }
