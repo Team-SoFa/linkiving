@@ -34,6 +34,17 @@
     overscroll-behavior-y: contain;
   }
 
+  /*
+   * 좌우 스크롤 차단.
+   * `hidden`이 아닌 `clip`을 쓰는 이유: `overflow-x: hidden`은 스크롤 컨테이너를
+   * 만들어 데스크탑 사이드네비의 `sticky top-0`을 깨뜨린다. `clip`은 스크롤
+   * 컨테이너를 만들지 않아 sticky가 그대로 동작한다.
+   */
+  html {
+    overflow-x: clip;
+    overscroll-behavior-x: none;
+  }
+
   /* iOS Safari는 글자 크기가 16px 미만인 입력 요소에 포커스하면 화면을 자동 확대한다.
      핀치 줌(접근성)은 유지한 채, 터치 기기에서 입력 요소의 최소 글자 크기만 보장한다. */
   @media (pointer: coarse) {
