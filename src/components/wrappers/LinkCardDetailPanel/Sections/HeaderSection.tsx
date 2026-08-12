@@ -16,10 +16,14 @@ export default function HeaderSection({ safeUrl, onClose }: Props) {
   return (
     <div>
       <header className={header()}>
-        <div className="bg-gray50 flex flex-1 items-center gap-3">
-          <div className="max-w-100 flex-1">
+        <div className="bg-gray50 flex min-w-0 flex-1 items-center gap-3">
+          <div className="max-w-100 min-w-0 flex-1">
             {safeUrl ? (
-              <Anchor href={safeUrl} target="_blank" className="text-gray400 truncate">
+              <Anchor
+                href={safeUrl}
+                target="_blank"
+                className="text-gray400 min-w-0 [&>span]:max-w-full [&>span]:truncate"
+              >
                 {safeUrl}
               </Anchor>
             ) : (

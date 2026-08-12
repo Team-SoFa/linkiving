@@ -10,6 +10,7 @@ import InfiniteScroll from '@/components/basics/InfiniteScroll/InfiniteScroll';
 import LinkCard from '@/components/basics/LinkCard/LinkCard';
 import DeleteLinkModal from '@/components/basics/LinkCard/components/DeleteLinkModal';
 import Spinner from '@/components/basics/Spinner/Spinner';
+import DetailPanelShell from '@/components/wrappers/LinkCardDetailPanel/DetailPanelShell';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
 import { useGetInfiniteLinks } from '@/hooks/useGetInfiniteLinks';
 import { useGetLink } from '@/hooks/useGetLink';
@@ -144,7 +145,7 @@ const LinkCardItem = memo(
 );
 
 export default function AllLink() {
-  const { selectedLinkId, selectLink } = useLinkStore();
+  const { selectedLinkId, selectLink, setDetailPanelOpen } = useLinkStore();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<EntityId>>(new Set());
@@ -697,6 +698,17 @@ export default function AllLink() {
     }
   }, [selectedLinkId]);
 
+  // 모바일에서 상세 패널이 화면 전체를 덮으므로, 사이드네비 트리거를 숨기도록 전역에 알린다.
+  useEffect(() => {
+    setDetailPanelOpen(isPanelOpen);
+    return () => setDetailPanelOpen(false);
+  }, [isPanelOpen, setDetailPanelOpen]);
+
+  const handleClosePanel = useCallback(() => {
+    setIsPanelOpen(false);
+    selectLink(null);
+  }, [selectLink]);
+
   const handleToggleSelect = useCallback((id: EntityId) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
@@ -786,9 +798,10 @@ export default function AllLink() {
   return (
     <div className="h-full min-w-0">
       <div className="flex h-full min-w-0 flex-col xl:flex-row">
-        <div className="min-w-0 flex-1 px-10 py-15" onWheel={handleLeftPaneWheel}>
+        <div className="min-w-0 flex-1 px-4 py-6 xl:px-10 xl:py-15" onWheel={handleLeftPaneWheel}>
           <div className="mx-auto flex h-full w-full max-w-200 flex-col gap-5">
-            <header className="flex items-center justify-between">
+            {/* pl-12: 모바일에서 fixed 사이드네비 트리거(좌상단 20~60px)와 겹치지 않도록 비켜준다 */}
+            <header className="sticky top-0 z-30 flex items-center justify-between bg-white pl-12 md:pl-0">
               <div className="flex items-center gap-1">
                 <h1 className="font-title-md">전체 링크</h1>
                 <p className="font-body-md text-gray600">({count ?? links.length})</p>
@@ -808,7 +821,7 @@ export default function AllLink() {
               ) : (
                 <InfiniteScroll
                   ref={listRef}
-                  className="custom-scrollbar h-full overflow-y-auto overscroll-contain p-1"
+                  className="custom-scrollbar h-full overflow-x-hidden overflow-y-auto overscroll-contain p-1"
                   items={links}
                   getKey={item => item.id}
                   renderItem={renderItem}
@@ -823,15 +836,20 @@ export default function AllLink() {
 
         {isPanelOpen && (
           <aside className="xl:h-full xl:w-130 xl:shrink-0">
+            {/*
+             * 로딩·에러·빈 상태도 본문과 같은 DetailPanelShell을 거친다.
+             * 그래야 모바일에서 패널이 즉시 뜨고 그 안에서 로딩이 돌며,
+             * 반응형 분기가 본문과 어긋날 수 없다.
+             */}
             {isSelectedLinkLoading ? (
-              <div className="border-gray200 flex h-full items-center justify-center rounded-2xl border bg-white p-6">
-                <Spinner />
-              </div>
+              <DetailPanelShell onClose={handleClosePanel} centered>
+                <Spinner size={36} />
+              </DetailPanelShell>
             ) : isSelectedLinkError ? (
-              <div className="border-gray200 text-gray600 flex h-full flex-col items-center justify-center gap-2 rounded-2xl border bg-white p-6">
+              <DetailPanelShell onClose={handleClosePanel} centered>
                 <p>상세 정보를 불러오지 못했습니다.</p>
                 <Button onClick={() => refetchSelectedLink()} label="다시 시도" />
-              </div>
+              </DetailPanelShell>
             ) : selectedLinkDetail ? (
               <LinkCardDetailPanel
                 id={selectedLinkDetail.id}
@@ -844,15 +862,12 @@ export default function AllLink() {
                 summaryErrorMessage={
                   selectedStatusInfo?.errorMessage ?? selectedLinkDetail.summaryErrorMessage
                 }
-                onClose={() => {
-                  setIsPanelOpen(false);
-                  selectLink(null);
-                }}
+                onClose={handleClosePanel}
               />
             ) : (
-              <div className="border-gray200 text-gray600 h-full rounded-2xl border bg-white p-6">
+              <DetailPanelShell onClose={handleClosePanel} centered>
                 상세 정보를 볼 링크를 선택해 주세요.
-              </div>
+              </DetailPanelShell>
             )}
           </aside>
         )}

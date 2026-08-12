@@ -1,6 +1,5 @@
 'use client';
 
-import { styles } from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel.style';
 import { getSafeUrl } from '@/hooks/util/getSafeUrl';
 import { useModalStore } from '@/stores/modalStore';
 import type { EntityId } from '@/types/id';
@@ -8,6 +7,7 @@ import { useMediaQuery, useScrollLock } from '@reactuses/core';
 import { useCallback, useEffect } from 'react';
 
 import ReSummaryModal from '../ReSummaryModal/ReSummaryModal';
+import DetailPanelShell from './DetailPanelShell';
 import HeaderSection from './Sections/HeaderSection';
 import ImageSection from './Sections/ImageSection';
 import MemoSection from './Sections/MemoSection';
@@ -40,7 +40,6 @@ const LinkCardDetailPanel = ({
   onClose,
 }: LinkCardDetailPanelProps) => {
   const safeUrl = getSafeUrl(url);
-  const { root, content } = styles();
   const { modal } = useModalStore();
 
   // xl 미만에서는 패널이 전체 화면 오버레이(fixed inset-0)라 뒤 배경이 같이 스크롤되면 안 된다.
@@ -59,28 +58,26 @@ const LinkCardDetailPanel = ({
 
   return (
     <>
-      <aside className={root()}>
-        <div className={content()}>
-          {/* Header */}
-          <HeaderSection safeUrl={safeUrl} onClose={onClose} />
-          {/* Title */}
-          <TitleSection linkId={id} title={title} />
+      <DetailPanelShell>
+        {/* Header */}
+        <HeaderSection safeUrl={safeUrl} onClose={onClose} />
+        {/* Title */}
+        <TitleSection linkId={id} title={title} />
 
-          {/* Image */}
-          <ImageSection imageUrl={imageUrl} title={title} />
+        {/* Image */}
+        <ImageSection imageUrl={imageUrl} title={title} />
 
-          {/* Summary */}
-          <SummarySection
-            linkId={id}
-            summary={summary}
-            summaryState={summaryStateProp}
-            summaryErrorMessage={summaryErrorMessage}
-          />
+        {/* Summary */}
+        <SummarySection
+          linkId={id}
+          summary={summary}
+          summaryState={summaryStateProp}
+          summaryErrorMessage={summaryErrorMessage}
+        />
 
-          {/* Memo */}
-          <MemoSection linkId={id} memo={memo} />
-        </div>
-      </aside>
+        {/* Memo */}
+        <MemoSection linkId={id} memo={memo} />
+      </DetailPanelShell>
       {modal.type === 'RE_SUMMARY' && <ReSummaryModal linkId={modal.props.linkId} />}
     </>
   );

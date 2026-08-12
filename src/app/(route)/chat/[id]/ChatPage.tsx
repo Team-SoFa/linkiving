@@ -12,6 +12,7 @@ import ReportModal from '@/components/wrappers/ReportModal/ReportModal';
 import { useChatStream } from '@/hooks/server/Chats/useChatStream';
 import useKeyboardInset from '@/hooks/util/useKeyboardInset';
 import { trackEvent, trackQueryFeedback } from '@/lib/client/analytics';
+import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
 import type { ChatHistoryMessage } from '@/types/api/chatApi';
@@ -101,6 +102,13 @@ export default function Chat() {
   const [isAwaitingResponse, setIsAwaitingResponse] = useState(false);
   const [streamError, setStreamError] = useState<string | null>(null);
   const [selectedLink, setSelectedLink] = useState<ChatSocketLink | null>(null);
+  const setDetailPanelOpen = useLinkStore(state => state.setDetailPanelOpen);
+
+  // 모바일에서 상세 패널이 화면 전체를 덮으므로, 사이드네비 트리거를 숨기도록 전역에 알린다.
+  useEffect(() => {
+    setDetailPanelOpen(selectedLink !== null);
+    return () => setDetailPanelOpen(false);
+  }, [selectedLink, setDetailPanelOpen]);
   const [historyCursor, setHistoryCursor] = useState<EntityId | null>(null);
   const [historyHasNext, setHistoryHasNext] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
