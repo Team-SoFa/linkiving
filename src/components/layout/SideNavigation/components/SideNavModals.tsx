@@ -1,7 +1,7 @@
 'use client';
 
-import { useModalStore } from '@/stores/modalStore';
 import AccountDeleteModal from '@/components/wrappers/AccountDeleteModal/AccountDeleteModal';
+import { useModalStore } from '@/stores/modalStore';
 
 import DeleteChatModal from './ChatRoomSection/DeleteChatModal';
 import AddLinkModal from './MenuSection/AddLink';

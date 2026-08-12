@@ -2,14 +2,23 @@ import { ApiError } from '../errors/ApiError';
 
 let sessionCleanupPromise: Promise<void> | null = null;
 let intentionalSessionTermination = false;
+let deferredInvalidSessionRedirect = false;
 
 export const setIntentionalSessionTermination = (value: boolean) => {
   intentionalSessionTermination = value;
+
+  if (!value && deferredInvalidSessionRedirect) {
+    deferredInvalidSessionRedirect = false;
+    clearInvalidSessionAndRedirect();
+  }
 };
 
 export const clearInvalidSessionAndRedirect = () => {
   if (typeof window === 'undefined') return;
-  if (intentionalSessionTermination) return;
+  if (intentionalSessionTermination) {
+    deferredInvalidSessionRedirect = true;
+    return;
+  }
   if (sessionCleanupPromise) return;
 
   sessionCleanupPromise = fetch('/api/member/logout', {

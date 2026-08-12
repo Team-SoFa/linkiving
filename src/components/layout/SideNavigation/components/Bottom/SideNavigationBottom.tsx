@@ -99,6 +99,7 @@ const SideNavigationBottom = () => {
                 variant="tertiary_subtle"
                 contextStyle="onPanel"
                 label="회원 탈퇴"
+                disabled={isLoggingOut}
                 size="sm"
                 icon="IC_Delete"
                 radius="full"
