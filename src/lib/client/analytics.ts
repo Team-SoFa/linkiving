@@ -69,6 +69,13 @@ export const trackEvent = (name: string, params?: Record<string, unknown>) => {
   window.gtag('event', name, params ?? {});
 };
 
+export const trackQueryFeedback = (queryId: string, feedbackValue: 'up' | 'down') => {
+  trackEvent('query_feedback', {
+    query_id: queryId,
+    feedback_value: feedbackValue,
+  });
+};
+
 export const withAnalyticsContext = async <T extends object>(
   payload: T
 ): Promise<T & { clientId?: string; source: 'web' }> => {
