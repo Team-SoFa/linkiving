@@ -10,7 +10,7 @@ import CopyButton from '@/components/wrappers/CopyButton';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
 import ReportModal from '@/components/wrappers/ReportModal/ReportModal';
 import { useChatStream } from '@/hooks/server/Chats/useChatStream';
-import { trackEvent } from '@/lib/client/analytics';
+import { trackEvent, trackQueryFeedback } from '@/lib/client/analytics';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
 import type { ChatHistoryMessage } from '@/types/api/chatApi';
@@ -573,10 +573,7 @@ export default function Chat() {
 
         if (reaction === 'up') {
           if (message.queryId) {
-            trackEvent('query_feedback', {
-              query_id: message.queryId,
-              value: 'up',
-            });
+            trackQueryFeedback(message.queryId, 'up');
           }
 
           showToast({
@@ -588,10 +585,7 @@ export default function Chat() {
 
         if (reaction === 'down') {
           if (message.queryId) {
-            trackEvent('query_feedback', {
-              query_id: message.queryId,
-              value: 'down',
-            });
+            trackQueryFeedback(message.queryId, 'down');
           }
 
           showToast({
