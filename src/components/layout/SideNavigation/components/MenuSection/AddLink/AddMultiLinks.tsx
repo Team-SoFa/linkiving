@@ -9,6 +9,7 @@ import TextArea from '@/components/basics/TextArea/TextArea';
 import { useDuplicateLinkMutation } from '@/hooks/useCheckDuplicateLink';
 import { usePostLinkMetaScrape } from '@/hooks/usePostLinkMetaScrape';
 import { usePostLinks } from '@/hooks/usePostLinks';
+import { EMPTY_URL_MESSAGE, INVALID_URL_MESSAGE, normalizeUrlInput } from '@/lib/url/normalizeUrl';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
 import { useQueryClient } from '@tanstack/react-query';
@@ -39,6 +40,7 @@ export default function AddMultiLinks({ onToggle }: AddMultiLinksProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [links, setLinks] = useState<LinkItem[]>([]);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const hasEditedUrlRef = useRef(false);
 
   const duplicateCheck = useDuplicateLinkMutation();
   const metaScrape = usePostLinkMetaScrape();
@@ -47,26 +49,35 @@ export default function AddMultiLinks({ onToggle }: AddMultiLinksProps) {
   const { close } = useModalStore();
 
   const handleUrlChange = (val: string) => {
+    hasEditedUrlRef.current = true;
     setUrlInput(val);
     if (urlError) setUrlError(null);
   };
 
-  const handleAdd = async () => {
-    const trimmed = urlInput.trim();
-    if (!trimmed || isChecking) return;
-
-    let normalizedUrl = '';
-
-    try {
-      const parsed = new URL(trimmed);
-      if (!['http:', 'https:'].includes(parsed.protocol)) {
-        throw new Error('Unsupported protocol');
+  const normalizeCurrentInput = (showEmptyError: boolean) => {
+    const result = normalizeUrlInput(urlInput);
+    if (!result.success) {
+      if (result.reason === 'empty' && !showEmptyError) {
+        setUrlError(null);
+      } else {
+        setUrlError(result.reason === 'empty' ? EMPTY_URL_MESSAGE : INVALID_URL_MESSAGE);
       }
-      normalizedUrl = parsed.toString();
-    } catch {
-      setUrlError('유효하지 않은 링크 주소입니다. URL을 다시 확인해 주세요.');
-      return;
+      return null;
     }
+
+    setUrlInput(result.url);
+    setUrlError(null);
+    return result.url;
+  };
+
+  const handleUrlBlur = () => {
+    normalizeCurrentInput(hasEditedUrlRef.current);
+  };
+
+  const handleAdd = async () => {
+    if (isChecking) return;
+    const normalizedUrl = normalizeCurrentInput(true);
+    if (!normalizedUrl) return;
 
     if (links.some(l => l.url === normalizedUrl)) {
       setUrlError('이미 추가한 주소입니다.');
@@ -99,6 +110,7 @@ export default function AddMultiLinks({ onToggle }: AddMultiLinksProps) {
       },
     ]);
     setUrlInput('');
+    hasEditedUrlRef.current = false;
     inputRef.current?.focus();
 
     try {
@@ -196,6 +208,7 @@ export default function AddMultiLinks({ onToggle }: AddMultiLinksProps) {
               id="url-input"
               placeholder="URL을 입력하고 + 버튼을 누르세요."
               onChange={handleUrlChange}
+              onBlur={handleUrlBlur}
               errorMessage={urlError ?? undefined}
             />
           </div>

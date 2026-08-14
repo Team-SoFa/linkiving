@@ -38,6 +38,9 @@ const AddLinkModal = () => {
 
   const {
     form,
+    urlValue,
+    handleUrlChange,
+    handleUrlBlur,
     trimmedUrl,
     isValidUrl,
     titleValue,
@@ -57,7 +60,7 @@ const AddLinkModal = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
   } = form;
 
   // 중복 감지 시 기존 링크 정보로 title/memo 채우기
@@ -179,7 +182,8 @@ const AddLinkModal = () => {
                     {...field}
                     id="url-input"
                     placeholder="URL을 입력해 주세요."
-                    onChange={field.onChange}
+                    onChange={handleUrlChange}
+                    onBlur={handleUrlBlur}
                     errorMessage={errors.url?.message}
                   />
                 )}
@@ -232,7 +236,7 @@ const AddLinkModal = () => {
               <Button
                 type="submit"
                 label={isSubmitting ? '저장 중...' : isDuplicate ? '새로 덮어쓰기' : '저장하기'}
-                disabled={!isValid || metaLoading || isSubmitting}
+                disabled={!urlValue?.trim() || !titleValue?.trim() || metaLoading || isSubmitting}
                 className="flex-1"
               />
             </div>
