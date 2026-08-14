@@ -15,8 +15,8 @@ export default function HowUseItem({
         <Image src={image} alt={title} fill />
       </div>
       <div className="flex flex-col items-center">
-        <span className="mb-4 text-[28px] font-semibold">{title}</span>
-        <span className="font-body-lg text-center">{description}</span>
+        <span className="mb-4 text-[clamp(20px,6.25vw,28px)] font-semibold">{title}</span>
+        <span className="font-body-lg text-center text-[16px] md:text-[18px]">{description}</span>
       </div>
     </div>
   );

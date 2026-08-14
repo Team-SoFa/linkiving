@@ -21,7 +21,9 @@ export function GoogleLoginButton() {
         height={20}
         className="mr-2 inline-block"
       />
-      <span className="text-[18px] font-semibold">구글 계정으로 시작하기</span>
+      <span className="text-[clamp(14px,4.5vw,18px)] font-semibold whitespace-nowrap">
+        Google 계정으로 시작하기
+      </span>
     </button>
   );
 }

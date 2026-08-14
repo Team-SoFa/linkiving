@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 export default function HeroSection() {
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gray-50">
+    <div className="relative flex min-h-screen w-full max-w-[100vw] items-center justify-start overflow-hidden bg-gray-50 pt-24 pb-12 lg:justify-center lg:py-16">
       <div className="pointer-events-none absolute bottom-0 left-0 z-0 w-screen overflow-hidden">
         <Image
           src="/images/sofa_login_bg_resource.png"
@@ -14,9 +14,9 @@ export default function HeroSection() {
           className="h-full w-full object-cover"
         />
       </div>
-      <div className="relative z-10 mx-auto flex w-full flex-col items-center gap-12 px-6 lg:flex-row lg:items-center lg:justify-center lg:gap-16">
-        <div className="flex w-full flex-col lg:w-[462px] lg:shrink-0">
-          <span className="mb-5 flex flex-col text-[40px] font-semibold">
+      <div className="relative z-10 mx-auto flex w-full max-w-[100vw] min-w-0 flex-col items-center gap-12 px-6 lg:flex-row lg:items-center lg:justify-center lg:gap-16">
+        <div className="flex w-full max-w-full min-w-0 flex-col lg:w-[462px] lg:shrink-0">
+          <span className="mb-5 flex flex-col text-[clamp(32px,10vw,40px)] font-semibold">
             <span>똑똑하게 관리하는</span>
             <span>나만의 북마크 저장소</span>
           </span>
@@ -29,7 +29,7 @@ export default function HeroSection() {
             <GoogleLoginButton />
           </div>
         </div>
-        <div className="w-full lg:max-w-[760px]">
+        <div className="w-full min-w-0 lg:max-w-[760px]">
           <Image
             src="/images/landing-1.png"
             alt="링카이빙 채팅 화면"

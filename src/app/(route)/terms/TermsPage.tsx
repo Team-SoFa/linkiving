@@ -1,8 +1,6 @@
 ﻿'use client';
 
 import IcForward from '@/components/Icons/svgs/ic_forward.svg';
-import IcLandingLogo from '@/components/Icons/svgs/ic_landing_ic_logo.svg';
-import IcLandingTextLogo from '@/components/Icons/svgs/ic_landing_text_logo.svg';
 import Button from '@/components/basics/Button/Button';
 import Checkbox from '@/components/basics/Checkbox/Checkbox';
 import { useTermsAgreementSubmit } from '@/hooks/server/useTermsAgreement';
@@ -81,10 +79,14 @@ const TermsPage = () => {
 
       <section className="border-gray100 relative z-10 flex min-h-[570px] w-full max-w-[520px] flex-col items-center gap-20 rounded-2xl border bg-white p-8 shadow-[0_8px_30px_rgba(17,19,29,0.06)] sm:p-10">
         <div className="flex w-full flex-col items-center gap-[60px]">
-          <div className="flex h-[26.3px] w-40 items-center justify-center gap-2.5">
-            <IcLandingLogo className="h-[26.3px] w-[30px]" aria-label="Linkiving" />
-            <IcLandingTextLogo className="h-[25.03px] w-[120px]" aria-hidden="true" />
-          </div>
+          <Image
+            src="/images/brand/full-logo-beta.svg"
+            alt="Linkiving BETA"
+            width={189}
+            height={25}
+            className="shrink-0"
+            unoptimized
+          />
 
           <div className="flex w-full flex-col gap-10">
             <div className="flex w-full flex-col gap-3">
