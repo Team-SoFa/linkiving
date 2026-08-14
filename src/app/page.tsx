@@ -68,7 +68,7 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <div className="bg-gray50">
+    <div className="bg-gray50 w-full max-w-[100vw] overflow-x-clip">
       <LandingHeader />
       <HeroSection />
       <FeatureSection />

@@ -10,12 +10,14 @@ export default function ExperienceItem({
   content: string;
 }) {
   return (
-    <div className="border-gray50 flex flex-1 flex-col gap-4 rounded-[20px] bg-[linear-gradient(180deg,#F5F6FA_0%,#EAEDFF_100%)] px-10 py-15">
+    <div className="border-gray50 flex flex-1 flex-col gap-4 rounded-[20px] bg-[linear-gradient(180deg,#F5F6FA_0%,#EAEDFF_100%)] px-6 py-10 md:px-10 md:py-15">
       <div className="relative mb-2 h-12 w-12">
         <Image src={image} alt={title} fill />
       </div>
-      <span className="text-[28px] font-semibold">{title}</span>
-      <span className="font-body-lg">{content}</span>
+      <span className="text-[clamp(20px,6.25vw,28px)] font-semibold whitespace-nowrap">
+        {title}
+      </span>
+      <span className="font-body-lg text-[16px] md:text-[18px]">{content}</span>
     </div>
   );
 }

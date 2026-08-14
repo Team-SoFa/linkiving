@@ -1,15 +1,24 @@
+import Divider from '@/components/basics/Divider/Divider';
 import { GoogleLoginButton } from '@/components/wrappers/GoogleLoginButton';
 
 import ExperienceItem from './ExperienceItem';
 import FAQItem from './FAQItem';
 import FeatureCard from './FeatureCard';
 import HowUseItem from './HowUseItem';
+import LandingFooterLogo from './LandingFooterLogo';
+
+const SERVICE_TERMS_URL =
+  'https://linkiving.notion.site/3b1e28654151808499e4c3a8c06d727d?source=copy_link';
+const PRIVACY_POLICY_URL =
+  'https://linkiving.notion.site/v1-0-3b1e2865415180dfab49ea4c733666e5?source=copy_link';
 
 export default function FeatureSection() {
   return (
-    <div className="flex w-full flex-col items-center px-10">
+    <div className="flex w-full flex-col items-center px-6 md:px-10">
       <section className="my-25 w-full max-w-315">
-        <h2 className="mb-10 text-[40px] font-semibold">이런 경험, 있으신가요?</h2>
+        <h2 className="mb-10 text-[clamp(26px,8vw,40px)] font-semibold whitespace-nowrap">
+          이런 경험, 있으신가요?
+        </h2>
         <div className="flex flex-col gap-7.5 lg:flex-row">
           <ExperienceItem
             image="/images/landing_icon_bookmark.png"
@@ -29,7 +38,9 @@ export default function FeatureSection() {
         </div>
       </section>
       <section className="my-25 w-full max-w-315">
-        <h2 className="mb-10 text-[40px] font-semibold">링카이빙과 함께하세요</h2>
+        <h2 className="mb-10 text-[clamp(26px,8vw,40px)] font-semibold whitespace-nowrap">
+          링카이빙과 함께하세요
+        </h2>
         <div className="flex flex-col gap-10">
           <FeatureCard
             index={0}
@@ -76,7 +87,9 @@ export default function FeatureSection() {
         </div>
       </section>
       <section className="my-25 w-full max-w-315 items-center">
-        <h2 className="mb-10 text-[40px] font-semibold">어떻게 사용하나요?</h2>
+        <h2 className="mb-10 text-[clamp(26px,8vw,40px)] font-semibold whitespace-nowrap">
+          어떻게 사용하나요?
+        </h2>
         <div className="flex w-full flex-col justify-between gap-10 lg:flex-row">
           <HowUseItem
             image="/images/landing-extension.png"
@@ -124,7 +137,9 @@ export default function FeatureSection() {
         </div>
       </section>
       <section className="my-30 w-full max-w-315 items-center">
-        <h2 className="mb-10 text-[40px] font-semibold">자주 묻는 질문</h2>
+        <h2 className="mb-10 text-[clamp(26px,8vw,40px)] font-semibold whitespace-nowrap">
+          자주 묻는 질문
+        </h2>
         <ul className="flex flex-col gap-8">
           <FAQItem
             title="Chrome 외의 브라우저에서도 사용할 수 있나요?"
@@ -140,18 +155,44 @@ export default function FeatureSection() {
           />
         </ul>
       </section>
-      <footer className="bg-gray900 mx-10 mt-50 mb-10 flex h-113.5 w-full flex-col items-center justify-between rounded-[20px] p-15">
+      <footer className="bg-gray900 mt-50 mb-10 flex min-h-[556px] w-full flex-col items-center justify-end gap-20 rounded-[20px] p-6 md:p-15">
         <div className="flex w-full max-w-105 flex-col items-center justify-center gap-10">
-          <span className="text-gray50 text-[40px] leading-[146%] font-semibold">
+          <span className="text-gray50 text-center text-[clamp(22px,7vw,32px)] leading-[146%] font-semibold md:text-[40px]">
             나만의 AI 북마크 저장소
             <br />
             지금 바로 시작해보세요.
           </span>
           <GoogleLoginButton />
         </div>
-        <div className="font-body-md text-gray100 flex w-full justify-between">
-          <span>@ 2026 Linkiving all rights reserved</span>
-          <span>E-MAIL | linkivingsofa@gmail.com</span>
+        <div className="flex w-full flex-col gap-15">
+          <div className="flex w-full flex-col items-start justify-between gap-8 md:flex-row md:items-center">
+            <LandingFooterLogo />
+            <nav aria-label="정책 링크" className="flex items-center gap-4 md:gap-10">
+              <a
+                href={SERVICE_TERMS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray100 text-[16px] leading-[150%] font-semibold whitespace-nowrap hover:text-white"
+              >
+                이용약관
+              </a>
+              <a
+                href={PRIVACY_POLICY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray100 text-[16px] leading-[150%] font-semibold whitespace-nowrap hover:text-white"
+              >
+                개인정보처리방침
+              </a>
+            </nav>
+          </div>
+          <div className="flex w-full flex-col gap-3">
+            <Divider width={1} color="gray200" className="hidden md:block" />
+            <div className="font-body-md text-gray400 md:text-gray200 flex w-full flex-col justify-between gap-2 text-[14px] md:flex-row md:text-[16px]">
+              <span>© 2026 Linkiving. All rights reserved.</span>
+              <span>E-MAIL | linkivingsofa@gmail.com</span>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

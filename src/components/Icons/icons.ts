@@ -19,8 +19,6 @@ import IC_Forward from './svgs/ic_forward.svg';
 import IC_Home from './svgs/ic_home.svg';
 import IC_Info from './svgs/ic_info.svg';
 import IC_LandingBackground from './svgs/ic_landing_background.svg';
-import IC_LandingIcLogo from './svgs/ic_landing_ic_logo.svg';
-import IC_LandingTextLogo from './svgs/ic_landing_text_logo.svg';
 import IC_LinkAdd from './svgs/ic_link_add.svg';
 import IC_LinkOpen from './svgs/ic_link_open.svg';
 import IC_Logo from './svgs/ic_logo.svg';
@@ -65,8 +63,6 @@ export const IconMap = {
   IC_Home,
   IC_Info,
   IC_LandingBackground,
-  IC_LandingIcLogo,
-  IC_LandingTextLogo,
   IC_LinkAdd,
   IC_LinkOpen,
   IC_Logo,
