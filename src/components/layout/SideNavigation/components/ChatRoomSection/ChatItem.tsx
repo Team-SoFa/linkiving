@@ -27,7 +27,7 @@ const ChatItem = ({ id, label }: Props) => {
   return (
     <>
       <div
-        className="group bg-btn-tertiary-subtle-onpanel flex h-9 cursor-pointer items-center justify-between rounded-full pr-3 pl-3 transition-colors hover:pr-1"
+        className="group bg-btn-tertiary-subtle-onpanel flex h-9 cursor-pointer items-center justify-between rounded-full pr-1 pl-3 transition-colors"
         onClick={handleItemClick}
         onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -49,7 +49,7 @@ const ChatItem = ({ id, label }: Props) => {
               size="sm"
               icon="IC_MoreVert"
               ariaLabel="채팅방 메뉴 더보기 버튼"
-              className="hidden shrink-0 group-hover:flex"
+              className="pointer-events-none shrink-0 opacity-0 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 aria-expanded:pointer-events-auto aria-expanded:opacity-100"
               onClick={handleButtonClick}
             />
           </PopoverTrigger>
