@@ -6,6 +6,7 @@ export type UrlNormalizationResult =
   | { success: false; reason: 'empty' | 'invalid' };
 
 const PROTOCOL_PATTERN = /^(https?):\/\//i;
+const EXPLICIT_SCHEME_PATTERN = /^[a-z][a-z\d+.-]*:(?!\d)/i;
 
 export function normalizeUrlInput(value: string): UrlNormalizationResult {
   const trimmed = value.trim();
@@ -24,6 +25,9 @@ export function normalizeUrlInput(value: string): UrlNormalizationResult {
     }
     normalized = `${firstProtocol[1].toLowerCase()}://${remainder}`;
   } else {
+    if (EXPLICIT_SCHEME_PATTERN.test(trimmed)) {
+      return { success: false, reason: 'invalid' };
+    }
     normalized = `https://${trimmed}`;
   }
 
