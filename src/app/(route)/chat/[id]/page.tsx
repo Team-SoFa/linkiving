@@ -2,7 +2,7 @@ import Chat from './ChatPage';
 
 export default function page() {
   return (
-    <main>
+    <main className="h-full">
       <Chat />
     </main>
   );
