@@ -38,6 +38,29 @@ test.describe('회원가입 페이지', () => {
 });
 
 test.describe('인증 가드', () => {
+  test('탈퇴 완료 상태 없이 완료 페이지에 접근하면 랜딩으로 이동한다', async ({ page }) => {
+    await page.goto('/account-deleted');
+
+    await expect(page).toHaveURL(/\/(\?.*)?$/);
+  });
+
+  test('탈퇴 완료 페이지는 성공 상태로 한 번만 접근할 수 있다', async ({ page, context }) => {
+    await context.addCookies([
+      {
+        name: 'account_deleted',
+        value: 'true',
+        domain: 'localhost',
+        path: '/',
+      },
+    ]);
+
+    await page.goto('/account-deleted');
+    await expect(page.getByRole('heading', { name: '회원 탈퇴가 완료되었습니다.' })).toBeVisible();
+
+    await page.reload();
+    await expect(page).toHaveURL(/\/(\?.*)?$/);
+  });
+
   test('/home 미인증 접근 시 랜딩으로 리다이렉트된다', async ({ page }) => {
     await page.goto('/home');
 

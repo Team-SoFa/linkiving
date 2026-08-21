@@ -1,5 +1,37 @@
 import { ApiError } from '../errors/ApiError';
 
+let sessionCleanupPromise: Promise<void> | null = null;
+let intentionalSessionTermination = false;
+let deferredInvalidSessionRedirect = false;
+
+export const setIntentionalSessionTermination = (value: boolean) => {
+  intentionalSessionTermination = value;
+
+  if (!value && deferredInvalidSessionRedirect) {
+    deferredInvalidSessionRedirect = false;
+    clearInvalidSessionAndRedirect();
+  }
+};
+
+export const clearInvalidSessionAndRedirect = () => {
+  if (typeof window === 'undefined') return;
+  if (intentionalSessionTermination) {
+    deferredInvalidSessionRedirect = true;
+    return;
+  }
+  if (sessionCleanupPromise) return;
+
+  sessionCleanupPromise = fetch('/api/member/logout', {
+    method: 'POST',
+    credentials: 'same-origin',
+    cache: 'no-store',
+  })
+    .catch(() => undefined)
+    .then(() => {
+      window.location.replace('/');
+    });
+};
+
 /**
  * 클라이언트 API 클라이언트 (인증용)
  * 클라이언트 사이드 API 클라이언트
@@ -34,6 +66,11 @@ export async function clientApiClient<T>(
 
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
+
+      if (res.status === 401 || res.status === 403) {
+        clearInvalidSessionAndRedirect();
+      }
+
       throw new ApiError(
         res.status,
         errorData.error || errorData.message || `Request failed with status ${res.status}`,

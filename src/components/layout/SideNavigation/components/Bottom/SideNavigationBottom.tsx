@@ -1,9 +1,11 @@
 import Button from '@/components/basics/Button/Button';
+import Divider from '@/components/basics/Divider/Divider';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/basics/Popover';
 import Spinner from '@/components/basics/Spinner/Spinner';
 import { useLogout } from '@/hooks/useLogout';
 import { useUserInfo } from '@/hooks/useUserInfo';
 import { useCloseSideNavOnSelect } from '@/hooks/util/useCloseSideNavOnSelect';
+import { useModalStore } from '@/stores/modalStore';
 
 import NavItem from '../NavItem/NavItem';
 
@@ -29,6 +31,7 @@ const SideNavigationBottom = () => {
   const { data: user, isLoading } = useUserInfo();
   const { mutate: handleLogout, isPending: isLoggingOut } = useLogout();
   const closeSideNav = useCloseSideNavOnSelect();
+  const { open } = useModalStore();
   if (isLoading) {
     return (
       <div className="flex shrink-0 items-center justify-center p-2">
@@ -72,6 +75,9 @@ const SideNavigationBottom = () => {
                   }}
                 />
               ))}
+              <div className="py-1">
+                <Divider color="gray200" />
+              </div>
               <Button
                 variant="tertiary_subtle"
                 contextStyle="onPanel"
@@ -88,6 +94,21 @@ const SideNavigationBottom = () => {
                   close();
                 }}
                 disabled={isLoggingOut}
+              />
+              <Button
+                variant="tertiary_subtle"
+                contextStyle="onPanel"
+                label="회원 탈퇴"
+                disabled={isLoggingOut}
+                size="sm"
+                icon="IC_Delete"
+                radius="full"
+                className="w-full justify-start"
+                onClick={() => {
+                  close();
+                  open('ACCOUNT_DELETE');
+                  closeSideNav();
+                }}
               />
             </div>
           )}
