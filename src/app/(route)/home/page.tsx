@@ -13,7 +13,7 @@ export default async function page() {
   console.log('🔥 Server side - Token exists:', !!token);
 
   return (
-    <main>
+    <main className="h-full">
       <Home />
     </main>
   );

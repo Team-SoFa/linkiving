@@ -2,7 +2,7 @@ import AllLink from './AllLink';
 
 export default function page() {
   return (
-    <main>
+    <main className="h-full">
       <AllLink />
     </main>
   );
