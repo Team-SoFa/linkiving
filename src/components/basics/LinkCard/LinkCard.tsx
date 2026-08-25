@@ -63,7 +63,7 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
   return (
     <div
       ref={ref}
-      className="border-gray200 hover:bg-gray50 active:bg-blue50 focus:border-blue500 group relative flex h-[232px] w-[182px] shrink-0 cursor-pointer flex-col overflow-hidden rounded-2xl border transition-colors"
+      className="border-gray200 hover:bg-gray50 active:bg-blue50 focus:border-blue500 group relative flex aspect-[182/232] w-full cursor-pointer flex-col overflow-hidden rounded-2xl border transition-colors"
       tabIndex={0}
       onClick={onClick}
       onKeyDown={handleKeyDown}
@@ -110,12 +110,12 @@ const LinkCard = React.forwardRef<HTMLDivElement, LinkCardProps>(function LinkCa
         />
       )}
 
-      <div className="bg-gray900 relative aspect-94/47 w-full max-w-47 shrink-0">
+      <div className="bg-gray900 relative aspect-94/47 w-full shrink-0">
         <Image
           src={safeImageUrl}
           alt={title}
           fill
-          sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, 25vw"
+          sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
           className="border-gray200 border-b object-cover"
         />
       </div>

@@ -2,7 +2,9 @@
 
 import useEscKeyPress from '@/hooks/util/useEscKeyPress';
 import { useIsMobile } from '@/hooks/util/useIsMobile';
+import { useLinkStore } from '@/stores/linkStore';
 import { useSideNavStore } from '@/stores/sideNavStore';
+import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef } from 'react';
@@ -20,6 +22,7 @@ export default function SideNavigation() {
   const isOpen = useSideNavStore(state => state.isOpen);
   const toggle = useSideNavStore(state => state.toggle);
   const setOpen = useSideNavStore(state => state.setOpen);
+  const isDetailPanelOpen = useLinkStore(state => state.isDetailPanelOpen);
 
   const isMobile = useIsMobile();
   const pathname = usePathname();
@@ -91,7 +94,7 @@ export default function SideNavigation() {
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 200, damping: 24 }}
               // 스크림이 더 이상 어둡지 않으므로 분리감은 elevation 으로 확보한다
-              className="bg-gray50 pointer-events-auto absolute top-0 left-0 flex h-full w-60 flex-col overflow-hidden p-5 shadow-[0_0_24px_rgba(17,19,29,0.16)] outline-none"
+              className="bg-gray50 pointer-events-auto absolute top-0 left-0 flex h-full w-60 flex-col overflow-hidden p-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_0_24px_rgba(17,19,29,0.16)] outline-none"
             >
               <div className={SCROLLER_CLASS}>
                 {/* 플로팅 트리거 자리 */}
@@ -104,8 +107,17 @@ export default function SideNavigation() {
           )}
         </AnimatePresence>
 
-        {/* 트리거는 DOM 상 마지막 = 같은 z 안에서 맨 위. 마운트/언마운트 없이 항상 렌더 */}
-        <div className="pointer-events-auto absolute top-5 left-5">
+        {/*
+         * 트리거는 DOM 상 마지막 = 같은 z 안에서 맨 위. 마운트/언마운트 없이 항상 렌더.
+         * 단 상세 패널이 열리면 화면 전체를 덮으므로 그 위에 겹쳐 보이지 않도록 숨긴다
+         * (언마운트가 아니라 hidden으로 처리해 깜박임을 막는다).
+         */}
+        <div
+          className={clsx(
+            'pointer-events-auto absolute top-[max(1.25rem,env(safe-area-inset-top))] left-5',
+            isDetailPanelOpen && 'hidden'
+          )}
+        >
           <SideNavigationHeader
             ref={triggerRef}
             isOpen={isOpen}

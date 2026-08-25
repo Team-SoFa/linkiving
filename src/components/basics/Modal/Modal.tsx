@@ -14,7 +14,7 @@ import {
   modalOverlayStyle,
 } from './Modal.style';
 
-const FOCUSABLE_SELECTORS = [
+export const FOCUSABLE_SELECTORS = [
   'a[href]',
   'button:not([disabled])',
   'input:not([disabled])',

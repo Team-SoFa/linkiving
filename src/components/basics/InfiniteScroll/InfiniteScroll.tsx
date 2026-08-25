@@ -2,15 +2,53 @@
 
 import { useVirtualizer } from '@tanstack/react-virtual';
 import clsx from 'clsx';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import Spinner from '../Spinner/Spinner';
-import { styles } from './InfiniteScroll.style';
 
-const { root: rootCls, statusRow, loader: loaderCls, end, error } = styles();
+export type ColumnConfig = {
+  /** < 768px */
+  base?: number;
+  /** >= 768px (Tailwind md) */
+  md?: number;
+  /** >= 1024px (Tailwind lg) */
+  lg?: number;
+};
 
-const DEFAULT_COLUMNS = { mobile: 2, desktop: 4 };
-const ROW_ASPECT_RATIO = 1.3; // Estimated aspect ratio for a row of cards (58/47)
+const DEFAULT_COLUMNS: ColumnConfig = { base: 2, md: 3, lg: 4 };
+const ROW_ASPECT_RATIO = 232 / 182; // LinkCard 실제 비율 (aspect-[182/232])
+const GRID_PADDING_X = 8; // 그리드 좌우 px-1 = 4 + 4
+const COLUMN_GAP = 16;
+
+/**
+ * 뷰포트 기준 컬럼 수.
+ * 컨테이너 폭으로 나누면 좌우 여백만큼 항상 작게 잡혀 Tailwind 브레이크포인트와
+ * 어긋나므로(390px 화면에서 컨테이너는 약 270px) matchMedia로 뷰포트를 직접 본다.
+ */
+function useResponsiveColumns({ base = 2, md = 3, lg = 4 }: ColumnConfig) {
+  const [currentColumns, setCurrentColumns] = useState(base);
+
+  useLayoutEffect(() => {
+    const lgQuery = window.matchMedia('(min-width: 1024px)');
+    const mdQuery = window.matchMedia('(min-width: 768px)');
+
+    const resolve = () => {
+      const next = lgQuery.matches ? lg : mdQuery.matches ? md : base;
+      setCurrentColumns(prev => (prev === next ? prev : next));
+    };
+
+    resolve();
+    lgQuery.addEventListener('change', resolve);
+    mdQuery.addEventListener('change', resolve);
+
+    return () => {
+      lgQuery.removeEventListener('change', resolve);
+      mdQuery.removeEventListener('change', resolve);
+    };
+  }, [base, md, lg]);
+
+  return currentColumns;
+}
 
 export type InfiniteScrollProps<T> = Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> & {
   items: T[];
@@ -24,10 +62,7 @@ export type InfiniteScrollProps<T> = Omit<React.HTMLAttributes<HTMLDivElement>, 
   endMessage?: React.ReactNode;
   errorSlot?: (msg: string) => React.ReactNode;
   rowGap?: number;
-  columns?: {
-    mobile?: number;
-    desktop?: number;
-  };
+  columns?: ColumnConfig;
 };
 
 function InfiniteScrollInner<T>(
@@ -50,7 +85,7 @@ function InfiniteScrollInner<T>(
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const [currentColumns, setCurrentColumns] = useState(columns.mobile || 2);
+  const currentColumns = useResponsiveColumns(columns);
   const [containerWidth, setContainerWidth] = useState(0);
   const isFetchingRef = useRef(false);
   const controllerRef = useRef<AbortController | null>(null);
@@ -91,22 +126,19 @@ function InfiniteScrollInner<T>(
     [ref]
   );
 
-  // Update columns based on container width
+  // 행 높이 추정에 쓸 컨테이너 폭만 측정한다 (컬럼 수는 뷰포트 기준으로 따로 계산).
   useEffect(() => {
     const el = scrollContainerRef.current;
     if (!el) return;
 
     const observer = new ResizeObserver(entries => {
       const width = entries[0].contentRect.width;
-      setContainerWidth(width);
-
-      const newCols = width >= 768 ? columns.desktop || 4 : columns.mobile || 2;
-      setCurrentColumns(prev => (prev === newCols ? prev : newCols));
+      setContainerWidth(prev => (prev === width ? prev : width));
     });
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [columns.desktop, columns.mobile]);
+  }, []);
 
   // Group items into rows for grid virtualization
   const rows = useMemo(() => {
@@ -120,8 +152,8 @@ function InfiniteScrollInner<T>(
   const estimateRowSize = useCallback(() => {
     if (!containerWidth) return 300; // 초기 안전값
 
-    const effectiveWidth = containerWidth - 32;
-    const itemWidth = (effectiveWidth - (currentColumns - 1) * 16) / currentColumns;
+    const effectiveWidth = containerWidth - GRID_PADDING_X;
+    const itemWidth = (effectiveWidth - (currentColumns - 1) * COLUMN_GAP) / currentColumns;
 
     return itemWidth * ROW_ASPECT_RATIO + rowGap;
   }, [containerWidth, currentColumns, rowGap]);
@@ -160,7 +192,7 @@ function InfiniteScrollInner<T>(
     <div
       ref={setRefs}
       className={clsx(
-        'scrollbar-hide relative h-full w-full overflow-y-auto contain-strict',
+        'relative h-full w-full overflow-x-hidden overflow-y-auto contain-strict',
         className
       )}
       style={{ WebkitOverflowScrolling: 'touch' }}
@@ -193,9 +225,9 @@ function InfiniteScrollInner<T>(
               style={{
                 display: 'grid',
                 gridTemplateColumns: `repeat(${currentColumns}, minmax(0, 1fr))`,
-                columnGap: '16px', // gap-x-4
-                paddingLeft: '1rem',
-                paddingRight: '1rem',
+                columnGap: `${COLUMN_GAP}px`,
+                paddingLeft: `${GRID_PADDING_X / 2}px`, // px-1
+                paddingRight: `${GRID_PADDING_X / 2}px`,
               }}
             >
               {rows[virtualRow.index]?.map((item, colIndex) => {
@@ -212,23 +244,29 @@ function InfiniteScrollInner<T>(
         ))}
       </div>
 
-      {/* Status Indicators at the bottom of the scroll content */}
-      <div className="flex min-h-20 w-full flex-col items-center justify-center p-6">
-        {isLoading && (loader || <Spinner />)}
+      {/*
+       * Status Indicators at the bottom of the scroll content.
+       * 표시할 내용이 있을 때만 렌더한다 — 무조건 렌더하면 min-h-20 + p-6 만큼(약 104px)
+       * 리스트 아래에 빈 블록이 항상 남는다.
+       */}
+      {(isLoading || errorMessage || (!hasMore && items.length > 0)) && (
+        <div className="flex min-h-20 w-full flex-col items-center justify-center p-6">
+          {isLoading && (loader || <Spinner />)}
 
-        {!hasMore && items.length > 0 && (
-          <div className="text-sm text-gray-400 italic">
-            {endMessage || '모든 콘텐츠를 불러왔습니다.'}
-          </div>
-        )}
+          {!hasMore && items.length > 0 && (
+            <div className="text-sm text-gray-400 italic">
+              {endMessage || '모든 콘텐츠를 불러왔습니다.'}
+            </div>
+          )}
 
-        {errorMessage &&
-          (errorSlot ? (
-            errorSlot(errorMessage)
-          ) : (
-            <div className="text-sm font-medium text-red-500">{errorMessage}</div>
-          ))}
-      </div>
+          {errorMessage &&
+            (errorSlot ? (
+              errorSlot(errorMessage)
+            ) : (
+              <div className="text-sm font-medium text-red-500">{errorMessage}</div>
+            ))}
+        </div>
+      )}
     </div>
   );
 }

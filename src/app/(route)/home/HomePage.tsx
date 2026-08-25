@@ -19,8 +19,8 @@ export default function Home() {
   // 로딩중 화면
   if (creating || redirecting) {
     return (
-      <div className="relative flex h-full w-full justify-center">
-        <div className="relative flex h-full w-full max-w-[816px] flex-1 flex-col px-4">
+      <div className="relative flex h-full w-full flex-col items-center">
+        <div className="relative flex w-full max-w-[816px] flex-1 flex-col px-4">
           <div className="absolute top-15 right-4 max-w-[70%]">
             <span className="bg-blue50 block rounded-2xl px-4 py-3 whitespace-pre-wrap">
               {pendingQuestion}
@@ -41,8 +41,8 @@ export default function Home() {
           </div>
           {error && <p className="absolute top-0 left-0 text-red-500">문제가 발생했습니다.</p>}
         </div>
-        <div className="absolute bottom-0 left-0 z-10 mb-15 flex w-full justify-center px-4">
-          <div className="w-full max-w-[816px] shrink-0">
+        <div className="z-10 w-full shrink-0 bg-white px-4 pt-2 pb-[max(env(safe-area-inset-bottom),0.75rem)] xl:pb-15">
+          <div className="mx-auto w-full max-w-[816px]">
             <ChatQueryBox onSubmit={() => {}} disabled />
           </div>
         </div>
