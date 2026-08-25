@@ -11,6 +11,7 @@ import type { NextRequest } from 'next/server';
 
 const publicRoutes = ['/', '/signup'];
 const TERMS_ROUTE = '/terms';
+const ACCOUNT_DELETED_ROUTE = '/account-deleted';
 const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 const AUTH_REFRESH_ENDPOINT = process.env.AUTH_REFRESH_ENDPOINT ?? '/v1/auth/reissue';
 const DEV_BYPASS_LOGIN =
@@ -59,6 +60,23 @@ export async function middleware(req: NextRequest) {
   const refreshToken = req.cookies.get(COOKIES_KEYS.REFRESH_TOKEN)?.value;
   const { pathname } = req.nextUrl;
   const isTermsRoute = pathname === TERMS_ROUTE;
+  const isAccountDeletedRoute = pathname === ACCOUNT_DELETED_ROUTE;
+
+  if (isAccountDeletedRoute) {
+    const completed = req.cookies.get(COOKIES_KEYS.ACCOUNT_DELETED)?.value === 'true';
+
+    if (!completed) {
+      return NextResponse.redirect(new URL(token ? '/home' : '/', req.url));
+    }
+
+    const response = NextResponse.next();
+    response.cookies.set(COOKIES_KEYS.ACCOUNT_DELETED, '', {
+      path: '/',
+      expires: new Date(0),
+      sameSite: 'lax',
+    });
+    return response;
+  }
 
   if (DEV_BYPASS_LOGIN) {
     if (publicRoutes.includes(pathname)) {

@@ -7,6 +7,7 @@ export const MODAL_TYPE = {
   REPORT: 'REPORT',
   DELETE_CHAT: 'DELETE_CHAT',
   DELETE_LINK: 'DELETE_LINK',
+  ACCOUNT_DELETE: 'ACCOUNT_DELETE',
 } as const;
 
 export type ModalType = keyof typeof MODAL_TYPE | null;
@@ -16,7 +17,8 @@ type ModalState =
   | { type: 'RE_SUMMARY'; props: { linkId: EntityId } }
   | { type: 'REPORT'; props?: Record<string, unknown> }
   | { type: 'DELETE_CHAT'; props: { chatId: EntityId; title: string } }
-  | { type: 'DELETE_LINK'; props: { linkIds: EntityId[] } };
+  | { type: 'DELETE_LINK'; props: { linkIds: EntityId[] } }
+  | { type: 'ACCOUNT_DELETE'; props?: Record<string, never> };
 
 type NonNullModalState = Exclude<ModalState, { type: null }>;
 type ModalProps<T extends NonNullModalState['type']> = Extract<
