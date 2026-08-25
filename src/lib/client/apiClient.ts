@@ -67,7 +67,7 @@ export async function clientApiClient<T>(
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
 
-      if (res.status === 401 || res.status === 403) {
+      if (res.status === 401) {
         clearInvalidSessionAndRedirect();
       }
 

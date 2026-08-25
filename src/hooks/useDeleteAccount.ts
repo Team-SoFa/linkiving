@@ -12,9 +12,17 @@ export function useDeleteAccount() {
   const closeModal = useModalStore(state => state.close);
 
   return useMutation({
-    mutationFn: (deleteReason: MemberDeleteReason) => deleteAccount(deleteReason),
-    onSuccess: () => {
+    mutationFn: async (deleteReason: MemberDeleteReason) => {
       setIntentionalSessionTermination(true);
+
+      try {
+        await deleteAccount(deleteReason);
+      } catch (error) {
+        setIntentionalSessionTermination(false);
+        throw error;
+      }
+    },
+    onSuccess: () => {
       deleteCookieUtil(COOKIES_KEYS.ACCESS_TOKEN);
       deleteCookieUtil(COOKIES_KEYS.REFRESH_TOKEN);
       deleteCookieUtil(COOKIES_KEYS.USER_INFO);

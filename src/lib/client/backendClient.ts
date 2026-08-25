@@ -29,7 +29,7 @@ export async function backendApiClient<T>(endpoint: string, options: RequestInit
     },
   });
 
-  if (res.status === 401 || res.status === 403) {
+  if (res.status === 401) {
     clearInvalidSessionAndRedirect();
     const errorData = await res.json().catch(() => ({}));
     const err = new BackendApiError(
