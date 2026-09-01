@@ -26,7 +26,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           persist-credentials: false
+
+      - name: Verify tag commit is on main
+        shell: bash
+        run: |
+          if ! git merge-base --is-ancestor "${GITHUB_SHA}" origin/main; then
+            echo "Release tag ${TAG_NAME} must point to a commit on main." >&2
+            exit 1
+          fi
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -51,17 +60,31 @@ jobs:
       - name: Build production artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Deploy production to Vercel
+      - name: Deploy staged production to Vercel
         id: deploy
         shell: bash
         run: |
-          deployment_url="$(vercel deploy --prebuilt --archive=tgz --prod --token=${{ secrets.VERCEL_TOKEN }})"
+          deployment_url="$(vercel deploy --prebuilt --archive=tgz --prod --skip-domain --token=${{ secrets.VERCEL_TOKEN }})"
           echo "deployment_url=${deployment_url}" >> "$GITHUB_OUTPUT"
           {
-            echo "Production release deployed."
+            echo "Staged production release deployed."
             echo
             echo "- Tag: ${TAG_NAME}"
             echo "- URL: ${deployment_url}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Promote deployment to production
+        shell: bash
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment_url }}
+        run: |
+          vercel promote "${DEPLOYMENT_URL}" --yes --timeout=5m --token=${{ secrets.VERCEL_TOKEN }}
+          vercel inspect "${DEPLOYMENT_URL}" --token=${{ secrets.VERCEL_TOKEN }}
+          {
+            echo
+            echo "Production release promoted."
+            echo
+            echo "- URL: ${DEPLOYMENT_URL}"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build release notes from changelog
