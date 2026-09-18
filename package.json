@@ -69,7 +69,7 @@
     "@types/sockjs-client": "^1.5.4",
     "@typescript-eslint/eslint-plugin": "^8.70.0",
     "@typescript-eslint/parser": "^8.70.0",
-    "@vitest/browser": "^3.2.7",
+    "@vitest/browser-playwright": "^4.1.11",
     "eslint": "^9.32.0",
     "eslint-config-next": "15.3.0",
     "eslint-config-prettier": "^10.1.8",
@@ -89,7 +89,7 @@
     "typescript": "^5",
     "vite": "^7.3.6",
     "vite-plugin-svgr": "^4.5.0",
-    "vitest": "^3.2.7"
+    "vitest": "^4.1.11"
   },
   "eslintConfig": {
     "extends": [
