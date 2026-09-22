@@ -52,7 +52,7 @@ export default function ReSummaryModal({ linkId }: ReSummaryProps) {
         <span className="font-title-md">요약 비교</span>
         {isLoading && (
           <div className="text-gray500 mb-63.5">
-            <ProgressNotification animated={isLoading} />
+            <ProgressNotification label="요약 재생성 중..." animated={isLoading} />
           </div>
         )}
         {error && (

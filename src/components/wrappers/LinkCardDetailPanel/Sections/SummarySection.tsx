@@ -180,7 +180,7 @@ export default function SummarySection({ linkId, summary, summaryState }: Summar
   };
 
   const renderActions = () => {
-    if (summaryState === 'error') {
+    if (!shouldShowSummary || summaryState === 'writing') {
       return null;
     }
 
