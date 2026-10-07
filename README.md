@@ -21,7 +21,7 @@
 
 ### 1. 필수 요구사항
 
-- Node.js **>= 18.18.0** (또는 >= 20.x)
+- Node.js **22.x** (CI와 동일)
 - pnpm (별도 설치 필요)
 
 ### 2. 클론 & 설치
@@ -61,7 +61,10 @@ pnpm run start
 - `pnpm run start` – 프로덕션 서버 실행
 - `pnpm run lint` – ESLint 실행
 - `pnpm run format` – Prettier 포맷 실행
-- `pnpm run lint:staged` – lint-staged로 변경된 파일 린트 및 포맷
+- `pnpm exec lint-staged` – 변경 파일 린트 및 포맷
+- `pnpm verify` – 포맷·린트·타입·단위 테스트·빌드·브라우저 smoke
+
+기여와 검증 환경은 [CONTRIBUTING.md](CONTRIBUTING.md)를 따릅니다.
 
 ## 📁 디렉터리 구조
 

@@ -16,7 +16,11 @@
     "chromatic": "node scripts/run-chromatic.js",
     "test:unit": "vitest run --config vitest.unit.config.ts",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "lint:check": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "verify": "pnpm format:check && pnpm lint:check && pnpm typecheck && pnpm test:unit && pnpm build && pnpm test:e2e"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [

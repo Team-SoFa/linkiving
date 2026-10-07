@@ -79,18 +79,34 @@ test.describe('인증 가드', () => {
     await expect(page).toHaveURL(/\/(\?.*)?$/);
   });
 
-  test('로그인 상태에서 랜딩 접근 시 /home으로 리다이렉트된다', async ({ page, context }) => {
+  test('만료되지 않은 토큰으로 랜딩 접근 시 /home으로 리다이렉트된다', async ({ context }) => {
+    // 프론트 라우팅만 검사한다. 실제 서명 검증과 로그인 API는 이 smoke의 범위가 아니다.
+    const payload = Buffer.from(
+      JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600 })
+    ).toString('base64url');
     await context.addCookies([
       {
         name: 'accessToken',
-        value: 'fake-token-for-redirect-test',
+        value: `e30.${payload}.test-signature`,
         domain: 'localhost',
         path: '/',
       },
     ]);
 
-    await page.goto('/');
-
-    await expect(page).toHaveURL('/home');
+    // 후속 페이지의 실제 API 요청 없이 middleware의 응답을 직접 확인한다.
+    const response = await context.request.get('/', { maxRedirects: 0 });
+    expect(response.status()).toBe(307);
+    expect(new URL(response.headers().location, response.url()).pathname).toBe('/home');
   });
+
+  for (const token of ['malformed-token', 'e30.eyJleHAiOjF9.test-signature']) {
+    test(`유효하지 않은 토큰은 랜딩에 머문다: ${token}`, async ({ page, context }) => {
+      await context.addCookies([
+        { name: 'accessToken', value: token, domain: 'localhost', path: '/' },
+      ]);
+      await page.goto('/');
+      await expect(page).toHaveURL('/');
+      await expect(page.getByText('나만의 북마크 저장소')).toBeVisible();
+    });
+  }
 });
