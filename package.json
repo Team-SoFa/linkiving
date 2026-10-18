@@ -15,6 +15,7 @@
     "format": "prettier --plugin=@trivago/prettier-plugin-sort-imports --config .prettierrc --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "chromatic": "node scripts/run-chromatic.js",
     "test:unit": "vitest run --config vitest.unit.config.ts",
+    "test:browser": "vitest run --config vitest.browser.config.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },

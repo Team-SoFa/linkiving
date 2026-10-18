@@ -12,6 +12,8 @@ import { AddLinkForm } from './hooks/useAddLinkForm';
 interface Props {
   control: Control<AddLinkForm>;
   errors: FieldErrors<AddLinkForm>;
+  hasEditedTitle: boolean;
+  onTitleChange: (value: string) => void;
   metaLoading: boolean;
   isValidUrl: boolean;
   shouldDisableDetails: boolean;
@@ -21,6 +23,8 @@ interface Props {
 export default function LinkThumbnailTitleSection({
   control,
   errors,
+  hasEditedTitle,
+  onTitleChange,
   metaLoading,
   isValidUrl,
   shouldDisableDetails,
@@ -65,15 +69,19 @@ export default function LinkThumbnailTitleSection({
                 maxHeightLines={2}
                 showMax={isTitleFocused}
                 onFocus={() => setIsTitleFocused(true)}
+                onBlur={() => {
+                  setIsTitleFocused(false);
+                  field.onBlur();
+                }}
                 maxLength={MAX_TITLE_LENGTH}
                 isLoading={metaLoading && isValidUrl}
                 disabled={shouldDisableDetails}
                 value={field.value ?? ''}
-                onChange={e => field.onChange(e)}
+                onChange={e => onTitleChange(e.target.value)}
               />
             )}
           />
-          {errors.title && !shouldDisableDetails && (
+          {hasEditedTitle && !isTitleFocused && errors.title && !shouldDisableDetails && (
             <span className="text-red500 text-xs">{errors.title.message as string}</span>
           )}
         </div>
