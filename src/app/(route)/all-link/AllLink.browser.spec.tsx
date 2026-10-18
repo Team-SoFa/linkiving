@@ -150,4 +150,65 @@ describe('전체 링크 선택 요약 반영', () => {
     expect(useModalStore.getState().modal.type).toBe('RE_SUMMARY');
     expect(mocks.toast).toHaveBeenCalledOnce();
   });
+
+  it('완료 이벤트 뒤 재조회가 실패해도 빈 목록과 상세에 완료 요약을 표시한다', async () => {
+    await act(async () => {
+      client.setQueryData(['link', original.id], {
+        ...original,
+        summary: '',
+        summaryStatus: 'generating',
+      });
+      client.setQueryData(['links', { size: 3 }], page(''));
+      client.setQueryData(['links', 'infinite', undefined, 20], {
+        pages: [
+          { ...page(''), content: [{ ...original, summary: '', summaryStatus: 'generating' }] },
+        ],
+        pageParams: [null],
+      });
+    });
+    mocks.fetchLink.mockRejectedValue(new Error('조회 실패'));
+    mocks.fetchLinks.mockRejectedValue(new Error('조회 실패'));
+    const socket = mocks.socket.mock.lastCall![0] as Parameters<typeof useSummaryStatusSocket>[0];
+    await act(async () =>
+      socket.onEvent({ linkId: original.id, status: 'ready', summary: '처음 완료된 요약' })
+    );
+    await act(async () => {
+      await vi.waitFor(() =>
+        expect(client.getQueryState(['link', original.id])?.status).toBe('error')
+      );
+    });
+    expect(container.querySelector('[data-testid="link-card"]')?.textContent).toBe(
+      '처음 완료된 요약'
+    );
+    expect(container.querySelector('[data-testid="detail"]')?.textContent).toBe('처음 완료된 요약');
+    expect(
+      client.getQueryData<ReturnType<typeof page>>(['links', { size: 3 }])?.content[0].summary
+    ).toBe('처음 완료된 요약');
+  });
+
+  it('선택 저장 후 늦게 온 이전 완료 이벤트와 재조회 실패가 새 요약을 되돌리지 않는다', async () => {
+    mocks.select.mockImplementation(async () => {
+      mocks.fetchLink.mockResolvedValue({ ...original, summary: '선택한 새 요약' });
+      mocks.fetchLinks.mockResolvedValue(page('선택한 새 요약'));
+      return { content: '선택한 새 요약' };
+    });
+    await act(async () => {
+      await select.mutateAsync({ id: original.id, summary: '선택한 새 요약', format: 'CONCISE' });
+    });
+    mocks.fetchLink.mockRejectedValue(new Error('조회 실패'));
+    mocks.fetchLinks.mockRejectedValue(new Error('조회 실패'));
+    const socket = mocks.socket.mock.lastCall![0] as Parameters<typeof useSummaryStatusSocket>[0];
+    await act(async () =>
+      socket.onEvent({ linkId: original.id, status: 'ready', summary: '이전 요약' })
+    );
+    await act(async () => {
+      await vi.waitFor(() =>
+        expect(client.getQueryState(['link', original.id])?.status).toBe('error')
+      );
+    });
+    expect(container.querySelector('[data-testid="link-card"]')?.textContent).toBe(
+      '선택한 새 요약'
+    );
+    expect(container.querySelector('[data-testid="detail"]')?.textContent).toBe('선택한 새 요약');
+  });
 });
