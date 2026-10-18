@@ -4,7 +4,7 @@ import Button from '@/components/basics/Button/Button';
 import Modal from '@/components/basics/Modal/Modal';
 import { useDeleteLink } from '@/hooks/useDeleteLink';
 import { getSafeUrl } from '@/hooks/util/getSafeUrl';
-import { trackEvent } from '@/lib/client/analytics';
+import { trackLinkEvent } from '@/lib/client/analytics';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
 import type { EntityId } from '@/types/id';
@@ -14,6 +14,7 @@ import Anchor from '../../Anchor/Anchor';
 
 interface DeleteLinkItem {
   id: EntityId;
+  analyticsId?: string;
   title: string;
   url: string;
   createdAt?: string;
@@ -41,8 +42,7 @@ const DeleteLinkModal = ({ links, onSuccess }: DeleteLinkModalProps) => {
       if (succeeded.length > 0) {
         succeeded.forEach(link => {
           const daysSinceSave = getDaysSinceSave(link.createdAt);
-          trackEvent('link_delete', {
-            link_id: link.id,
+          trackLinkEvent('link_delete', link.analyticsId, {
             ...(daysSinceSave === undefined ? {} : { days_since_save: daysSinceSave }),
           });
         });

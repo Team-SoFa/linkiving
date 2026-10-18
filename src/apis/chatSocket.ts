@@ -23,6 +23,7 @@ type Callback = () => void;
 
 export type ChatSocketLink = {
   linkId: EntityId;
+  analyticsId?: string;
   title: string;
   url: string;
   imageUrl: string | null;
@@ -93,7 +94,7 @@ const toLinksOrNull = (value: unknown): ChatSocketLink[] | null => {
   if (!Array.isArray(value)) return null;
 
   return value
-    .map(item => {
+    .map((item): ChatSocketLink | null => {
       if (!item || typeof item !== 'object') return null;
       const link = item as Record<string, unknown>;
       const linkId = toEntityIdOrNull(link.linkId) ?? toEntityIdOrNull(link.id);
@@ -102,6 +103,7 @@ const toLinksOrNull = (value: unknown): ChatSocketLink[] | null => {
       if (linkId === null || !title || !url) return null;
       return {
         linkId,
+        analyticsId: typeof link.analyticsId === 'string' ? link.analyticsId : undefined,
         title,
         url,
         imageUrl: typeof link.imageUrl === 'string' ? link.imageUrl : null,

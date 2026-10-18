@@ -18,6 +18,7 @@ export type SummaryState = 'idle' | 'loading' | 'writing' | 'error' | 'ready';
 
 interface LinkCardDetailPanelProps {
   id: EntityId;
+  analyticsId?: string;
   url: string;
   title: string;
   summary: string;
@@ -30,6 +31,7 @@ interface LinkCardDetailPanelProps {
 
 const LinkCardDetailPanel = ({
   id,
+  analyticsId,
   url,
   title,
   summary,
@@ -78,7 +80,12 @@ const LinkCardDetailPanel = ({
         {/* Memo */}
         <MemoSection linkId={id} memo={memo} />
       </DetailPanelShell>
-      {modal.type === 'RE_SUMMARY' && <ReSummaryModal linkId={modal.props.linkId} />}
+      {modal.type === 'RE_SUMMARY' && (
+        <ReSummaryModal
+          linkId={modal.props.linkId}
+          analyticsId={modal.props.linkId === id ? analyticsId : undefined}
+        />
+      )}
     </>
   );
 };

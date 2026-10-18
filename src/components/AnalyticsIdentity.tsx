@@ -8,8 +8,8 @@ export default function AnalyticsIdentity() {
   const { data: user } = useUserInfo();
 
   useEffect(() => {
-    setGaUserId(user?.id);
-  }, [user?.id]);
+    setGaUserId(user?.analyticsId);
+  }, [user?.analyticsId]);
 
   return null;
 }

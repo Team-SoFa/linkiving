@@ -11,6 +11,7 @@ export interface LinkSummaryState {
 
 export interface Link extends LinkSummaryState {
   id: EntityId;
+  analyticsId?: string;
   url: string;
   title: string;
   summary: string;

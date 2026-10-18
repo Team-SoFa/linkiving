@@ -111,3 +111,7 @@ Vercel (Project Settings → Environment Variables):
 
 - Production/Preview에 `NEXT_PUBLIC_BASE_API_URL`, `NEXT_PUBLIC_WS_BASE_URL`, `NEXT_PUBLIC_API_TOKEN`을 추가해 빌드/런타임에서 사용합니다.
 - 운영 GA4 계측은 Production에만 `NEXT_PUBLIC_ANALYTICS_ENABLED=true`와 `NEXT_PUBLIC_GA_MEASUREMENT_ID`를 설정합니다. 로컬과 Preview는 기본적으로 계측하지 않습니다.
+
+### GA 분석 ID
+
+서버 `analyticsId`(DB ID의 10진 문자열)를 회원 `user_id`와 링크 `link_id`에 사용합니다. 화면용 `id`는 경로·API 요청에만 사용합니다. 백엔드 PR Team-SoFa/linkiving-core#336을 먼저 배포해야 식별자 연결이 완성됩니다. 구버전 응답에서는 분석 ID를 생략하며 Hashids로 대체하지 않습니다. 확장 설치 ID와 웹 브라우저의 `client_id`는 서로 다를 수 있고, 회원 연결에는 `user_id`를 사용합니다.

@@ -19,6 +19,7 @@ export type SummaryStatusResponse = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FA
 
 export interface LinkRes {
   id: EntityId;
+  analyticsId?: string;
   url: string;
   title: string;
   summary?: { id: EntityId; content: string } | string;

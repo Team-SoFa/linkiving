@@ -854,6 +854,7 @@ export default function AllLink() {
             ) : selectedLinkDetail ? (
               <LinkCardDetailPanel
                 id={selectedLinkDetail.id}
+                analyticsId={selectedLinkDetail.analyticsId}
                 url={selectedLinkDetail.url}
                 title={selectedLinkDetail.title}
                 summary={selectedSummaryText}
@@ -878,7 +879,13 @@ export default function AllLink() {
         <DeleteLinkModal
           links={links
             .filter(l => modal.props.linkIds.includes(l.id))
-            .map(l => ({ id: l.id, title: l.title, url: l.url, createdAt: l.createdAt }))}
+            .map(l => ({
+              id: l.id,
+              analyticsId: l.analyticsId,
+              title: l.title,
+              url: l.url,
+              createdAt: l.createdAt,
+            }))}
           onSuccess={succeededIds => {
             setSelectedIds(prev => {
               const next = new Set(prev);

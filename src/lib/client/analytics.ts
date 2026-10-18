@@ -62,13 +62,17 @@ export const getGaClientId = (timeoutMs = GA_CLIENT_ID_TIMEOUT_MS): Promise<stri
   });
 };
 
+// IDs are decimal strings supplied by the API, never the route's Hashids.
+export const toAnalyticsId = (value: unknown): string | undefined =>
+  typeof value === 'string' && /^[1-9]\d*$/.test(value) ? value : undefined;
+
 export const setGaUserId = (userId: string | null | undefined) => {
   if (!IS_GA_ENABLED) return;
   if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
 
   const gtag = window.gtag;
   gtag('set', {
-    user_id: userId ?? null,
+    user_id: toAnalyticsId(userId) ?? null,
   });
 };
 
@@ -77,6 +81,15 @@ export const trackEvent = (name: string, params?: Record<string, unknown>) => {
   if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
 
   window.gtag('event', name, params ?? {});
+};
+
+export const trackLinkEvent = (
+  name: 'summary_regenerate' | 'link_delete' | 'query_result_click',
+  analyticsId: string | undefined,
+  params?: Record<string, unknown>
+) => {
+  const linkId = toAnalyticsId(analyticsId);
+  trackEvent(name, { ...params, ...(linkId ? { link_id: linkId } : {}) });
 };
 
 export const trackQueryFeedback = (queryId: string, feedbackValue: 'up' | 'down') => {

@@ -30,6 +30,7 @@ export interface ChatMessageChunk {
 
 export interface ChatHistoryLink {
   id: EntityId;
+  analyticsId?: string;
   url: string;
   title: string;
   imageUrl?: string | null;
