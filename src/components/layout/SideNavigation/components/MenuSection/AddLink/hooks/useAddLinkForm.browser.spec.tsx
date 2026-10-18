@@ -1,24 +1,38 @@
+import type { Link } from '@/types/link';
 import { StrictMode, act } from 'react';
 import { type Root, createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useAddLinkForm } from './useAddLinkForm';
 import { useDuplicateCheck } from './useDuplicateCheck';
+import { useDuplicateLinkPrefill } from './useDuplicateLinkPrefill';
 
-const mocks = vi.hoisted(() => ({ scrape: vi.fn(), duplicate: vi.fn(), toast: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  scrape: vi.fn(),
+  duplicate: vi.fn(),
+  fetchLink: vi.fn(),
+  toast: vi.fn(),
+}));
 vi.mock('@/hooks/usePostLinkMetaScrape', () => ({
   usePostLinkMetaScrape: () => ({ mutateAsync: mocks.scrape, status: 'idle', reset: vi.fn() }),
 }));
 vi.mock('@/hooks/useCheckDuplicateLink', () => ({
   useDuplicateLinkMutation: () => ({ mutate: mocks.duplicate }),
 }));
-vi.mock('@/apis/linkApi', () => ({ fetchLink: vi.fn() }));
+vi.mock('@/apis/linkApi', () => ({ fetchLink: mocks.fetchLink }));
 vi.mock('@/stores/toastStore', () => ({ showToast: mocks.toast }));
 
 let form: ReturnType<typeof useAddLinkForm>;
 function FormHarness() {
   form = useAddLinkForm();
-  useDuplicateCheck(form.trimmedUrl, form.isValidUrl);
+  const duplicate = useDuplicateCheck(form.trimmedUrl, form.isValidUrl);
+  useDuplicateLinkPrefill(
+    form.form,
+    duplicate.isDuplicate,
+    duplicate.duplicateLinkData,
+    form.metaLoading,
+    form.hasEditedTitle
+  );
   return (
     <>
       <textarea
@@ -79,6 +93,7 @@ describe('웹 링크 입력 QA', () => {
     vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
     mocks.scrape.mockReset().mockResolvedValue(metadata());
     mocks.duplicate.mockReset();
+    mocks.fetchLink.mockReset();
     mocks.toast.mockReset();
     vi.spyOn(console, 'error').mockImplementation(() => {});
     container = document.createElement('div');
@@ -183,5 +198,82 @@ describe('웹 링크 입력 QA', () => {
     expect(form.titleValue).toBe('');
     expect(form.metaData).toBeNull();
     expect(mocks.toast).not.toHaveBeenCalled();
+  });
+
+  it('다른 URL의 수집 대기 중 이전 URL로 돌아와도 로딩을 완료한다', async () => {
+    await paste('example.com');
+    await advance();
+    expect(form.titleValue).toBe('자동 제목');
+    input('url-input').select();
+    await paste('naver.com');
+    await advance(100);
+    input('url-input').select();
+    await paste('example.com');
+    await advance();
+    expect(form.metaLoading).toBe(false);
+    expect(form.shouldDisableDetails).toBe(false);
+    expect(form.titleValue).toBe('자동 제목');
+    expect(mocks.scrape.mock.calls.map(([url]) => url)).toEqual([
+      'https://example.com',
+      'https://example.com',
+    ]);
+  });
+
+  it('늦은 중복 상세 응답도 사용자가 지운 제목은 유지하고 메모만 채운다', async () => {
+    let resolve!: (link: Link) => void;
+    mocks.fetchLink.mockReturnValueOnce(
+      new Promise<Link>(done => {
+        resolve = done;
+      })
+    );
+    mocks.duplicate.mockImplementation((_url, options) => {
+      void options.onSuccess({ exists: true, linkId: 'existing' });
+    });
+    await paste('example.com');
+    await advance();
+    await type('title-input', '직접 입력');
+    await type('title-input', '');
+    expect(form.form.formState.dirtyFields.title).toBeUndefined();
+    await act(async () =>
+      resolve({
+        id: 'existing',
+        url: 'https://example.com',
+        title: '기존 제목',
+        memo: '기존 메모',
+        summary: '',
+        createdAt: '',
+        updatedAt: '',
+      })
+    );
+    expect(form.titleValue).toBe('');
+    expect(form.memoValue).toBe('기존 메모');
+  });
+
+  it('메모를 수정했어도 편집하지 않은 제목은 기존 링크에서 채운다', async () => {
+    let resolve!: (link: Link) => void;
+    mocks.fetchLink.mockReturnValueOnce(
+      new Promise<Link>(done => {
+        resolve = done;
+      })
+    );
+    mocks.duplicate.mockImplementation((_url, options) => {
+      void options.onSuccess({ exists: true, linkId: 'existing' });
+    });
+    await paste('example.com');
+    await advance();
+    await type('memo-input', '직접 작성한 메모');
+    await act(async () =>
+      resolve({
+        id: 'existing',
+        url: 'https://example.com',
+        title: '기존 제목',
+        memo: '기존 메모',
+        summary: '',
+        createdAt: '',
+        updatedAt: '',
+      })
+    );
+    expect(form.titleValue).toBe('기존 제목');
+    expect(form.memoValue).toBe('직접 작성한 메모');
   });
 });
