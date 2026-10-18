@@ -53,3 +53,42 @@ describe('trackQueryFeedback', () => {
     expect(gtag).not.toHaveBeenCalled();
   });
 });
+
+describe('trackFeedbackFormOpen', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it('채팅 답변 제보에 해당 질의 ID를 연결한다', async () => {
+    const gtag = vi.fn();
+    vi.stubGlobal('window', { gtag });
+    const { trackFeedbackFormOpen } = await loadAnalytics();
+    trackFeedbackFormOpen('chat_answer_more', 'query-of-this-answer');
+    expect(gtag).toHaveBeenCalledExactlyOnceWith('event', 'feedback_form_open', {
+      entry_point: 'chat_answer_more',
+      app_query_id: 'query-of-this-answer',
+    });
+  });
+
+  it('질의 ID가 없는 과거 답변에는 임의 ID를 넣지 않는다', async () => {
+    const gtag = vi.fn();
+    vi.stubGlobal('window', { gtag });
+    const { trackFeedbackFormOpen } = await loadAnalytics();
+    trackFeedbackFormOpen('chat_answer_more', null);
+    expect(gtag).toHaveBeenCalledExactlyOnceWith('event', 'feedback_form_open', {
+      entry_point: 'chat_answer_more',
+    });
+  });
+
+  it('프로필 경로에는 다른 질의의 ID가 섞이지 않는다', async () => {
+    const gtag = vi.fn();
+    vi.stubGlobal('window', { gtag });
+    const { trackFeedbackFormOpen } = await loadAnalytics();
+    trackFeedbackFormOpen('profile_menu', 'previous-query');
+    expect(gtag).toHaveBeenCalledExactlyOnceWith('event', 'feedback_form_open', {
+      entry_point: 'profile_menu',
+    });
+  });
+});

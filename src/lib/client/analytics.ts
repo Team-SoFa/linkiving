@@ -86,6 +86,16 @@ export const trackQueryFeedback = (queryId: string, feedbackValue: 'up' | 'down'
   });
 };
 
+export const trackFeedbackFormOpen = (
+  entryPoint: 'chat_answer_more' | 'profile_menu',
+  queryId?: string | null
+) => {
+  trackEvent('feedback_form_open', {
+    entry_point: entryPoint,
+    ...(entryPoint === 'chat_answer_more' && queryId ? { app_query_id: queryId } : {}),
+  });
+};
+
 export const withAnalyticsContext = async <T extends object>(
   payload: T
 ): Promise<T & { clientId?: string; source: 'web' }> => {
