@@ -42,13 +42,15 @@ const AddLinkModal = () => {
     urlValue,
     handleUrlChange,
     handleUrlBlur,
+    handleUrlPaste,
+    handleTitleChange,
+    hasEditedTitle,
     trimmedUrl,
     isValidUrl,
     titleValue,
     memoValue,
     metaData,
     metaLoading,
-    metaErrorMessage,
     shouldDisableDetails,
     previewImageUrl,
   } = useAddLinkForm();
@@ -234,16 +236,18 @@ const AddLinkModal = () => {
                     placeholder="URL을 입력해 주세요."
                     onChange={handleUrlChange}
                     onBlur={handleUrlBlur}
+                    onPaste={handleUrlPaste}
                     errorMessage={errors.url?.message}
                   />
                 )}
               />
-              {metaErrorMessage && <span className="text-red500 text-xs">{metaErrorMessage}</span>}
             </div>
             <div className="flex flex-col gap-1">
               <LinkThumbnailTitleSection
                 control={control}
                 errors={errors}
+                hasEditedTitle={hasEditedTitle}
+                onTitleChange={handleTitleChange}
                 metaLoading={metaLoading}
                 isValidUrl={isValidUrl}
                 shouldDisableDetails={shouldDisableDetails}
