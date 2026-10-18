@@ -44,7 +44,6 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
   const [metaLoading, setMetaLoading] = useState(false);
   const [metaErrorMessage, setMetaErrorMessage] = useState<string | null>(null);
   const [metaErrorUrl, setMetaErrorUrl] = useState<string | null>(null);
-  const lastScrapedUrl = useRef<string | null>(null);
   const metaRequestId = useRef(0);
   const titlePath = 'title' as Path<T>;
   const memoPath = 'memo' as Path<T>;
@@ -85,11 +84,8 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
       if (!dirtyMemoRef.current && !skipAutoFillRef.current) {
         setValue(memoPath, '' as PathValue<T, typeof memoPath>, { shouldValidate: true });
       }
-      lastScrapedUrl.current = null;
       return;
     }
-
-    if (url === lastScrapedUrl.current) return;
 
     if (metaData !== null) {
       setMetaData(null);
@@ -110,7 +106,6 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
       setMetaLoading(true);
     }
     const timeoutId = setTimeout(() => {
-      lastScrapedUrl.current = url;
       metaScrapeRef.current
         .mutateAsync(url)
         .then(data => {

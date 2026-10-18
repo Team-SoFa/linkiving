@@ -15,7 +15,7 @@ import type { Link } from '@/types/link';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Controller } from 'react-hook-form';
 
 import AddLinkUrlInput from './AddLinkUrlInput';
@@ -25,6 +25,7 @@ import LinkThumbnailTitleSection from './LinkThumbnailTitleSection';
 import { useAddLinkForm } from './hooks/useAddLinkForm';
 import { useCreateLinkError } from './hooks/useCreateLinkError';
 import { useDuplicateCheck } from './hooks/useDuplicateCheck';
+import { useDuplicateLinkPrefill } from './hooks/useDuplicateLinkPrefill';
 
 const AddLinkModal = () => {
   const { close } = useModalStore();
@@ -66,20 +67,7 @@ const AddLinkModal = () => {
     formState: { errors },
   } = form;
 
-  // 중복 감지 시 기존 링크 정보로 title/memo 채우기
-  useEffect(() => {
-    if (!isDuplicate || !duplicateLinkData || metaLoading) return;
-    const { title, memo } = form.formState.dirtyFields;
-    if (title || memo) return;
-    form.setValue('title', duplicateLinkData.title, {
-      shouldValidate: true,
-      shouldDirty: false,
-    });
-    form.setValue('memo', duplicateLinkData.memo ?? '', {
-      shouldValidate: true,
-      shouldDirty: false,
-    });
-  }, [isDuplicate, duplicateLinkData, metaLoading, form]);
+  useDuplicateLinkPrefill(form, isDuplicate, duplicateLinkData, metaLoading, hasEditedTitle);
 
   const handleCreateSuccess = useCallback(
     (createdLink: { id: EntityId }) => {
