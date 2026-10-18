@@ -1,11 +1,11 @@
 import { selectNewSummary } from '@/apis/summary';
 import { FetchError } from '@/hooks/util/api/error/errors';
+import { updateSelectedSummary } from '@/lib/query/updateSelectedSummary';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
-import type { LinkListViewData, LinkSummaryFormat } from '@/types/api/linkApi';
+import type { LinkSummaryFormat } from '@/types/api/linkApi';
 import type { EntityId } from '@/types/id';
-import type { Link } from '@/types/link';
-import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 type Params = {
   id: EntityId;
@@ -20,39 +20,7 @@ export default function useSelectSummary() {
   return useMutation({
     mutationFn: (params: Params) => selectNewSummary(params),
     onSuccess: async (data, variables) => {
-      queryClient.setQueryData<Link>(['link', variables.id], prev =>
-        prev
-          ? {
-              ...prev,
-              summary: data.content,
-              summaryStatus: 'ready',
-              summaryErrorMessage: undefined,
-              summaryProgress: undefined,
-            }
-          : prev
-      );
-
-      queryClient.setQueriesData<InfiniteData<LinkListViewData>>({ queryKey: ['links'] }, prev => {
-        if (!prev) return prev;
-
-        return {
-          ...prev,
-          pages: prev.pages.map(page => ({
-            ...page,
-            content: page.content.map(link =>
-              link.id === variables.id
-                ? {
-                    ...link,
-                    summary: data.content,
-                    summaryStatus: 'ready',
-                    summaryErrorMessage: undefined,
-                    summaryProgress: undefined,
-                  }
-                : link
-            ),
-          })),
-        };
-      });
+      await updateSelectedSummary(queryClient, variables.id, data.content);
 
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['links'] }),

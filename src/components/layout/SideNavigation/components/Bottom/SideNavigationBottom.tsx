@@ -5,6 +5,7 @@ import Spinner from '@/components/basics/Spinner/Spinner';
 import { useLogout } from '@/hooks/useLogout';
 import { useUserInfo } from '@/hooks/useUserInfo';
 import { useCloseSideNavOnSelect } from '@/hooks/util/useCloseSideNavOnSelect';
+import { trackFeedbackFormOpen } from '@/lib/client/analytics';
 import { useModalStore } from '@/stores/modalStore';
 
 import NavItem from '../NavItem/NavItem';
@@ -24,6 +25,7 @@ const PROFILE_MENU_LINKS = [
     label: '문의 및 오류 보고',
     icon: 'IC_Chat',
     href: 'https://forms.gle/1YmRQDVVtA2FkmQe6',
+    isFeedback: true,
   },
 ] as const;
 
@@ -58,23 +60,28 @@ const SideNavigationBottom = () => {
         <PopoverContent popoverKey="user">
           {close => (
             <div className="flex min-w-52 flex-col gap-2 p-3">
-              {PROFILE_MENU_LINKS.map(({ label, icon, href }) => (
-                <Button
-                  key={href}
-                  variant="tertiary_subtle"
-                  contextStyle="onPanel"
-                  label={label}
-                  size="sm"
-                  icon={icon}
-                  radius="full"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    window.open(href, '_blank', 'noopener,noreferrer');
-                    close();
-                    closeSideNav();
-                  }}
-                />
-              ))}
+              {PROFILE_MENU_LINKS.map(item => {
+                const { label, icon, href } = item;
+                return (
+                  <Button
+                    key={href}
+                    variant="tertiary_subtle"
+                    contextStyle="onPanel"
+                    label={label}
+                    size="sm"
+                    icon={icon}
+                    radius="full"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      window.open(href, '_blank', 'noopener,noreferrer');
+                      if ('isFeedback' in item && item.isFeedback)
+                        trackFeedbackFormOpen('profile_menu');
+                      close();
+                      closeSideNav();
+                    }}
+                  />
+                );
+              })}
               <div className="py-1">
                 <Divider color="gray200" />
               </div>

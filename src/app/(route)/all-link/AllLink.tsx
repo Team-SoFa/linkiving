@@ -36,7 +36,6 @@ import {
 type SummaryStatusInfo = {
   status: LinkSummaryStatus;
   progress?: number;
-  summary?: string;
   errorMessage?: string;
 };
 
@@ -67,9 +66,10 @@ const resolveLinkSummaryStatus = (
   link: Link,
   statusInfo?: SummaryStatusInfo
 ): LinkSummaryStatus | undefined => {
-  const summaryText = statusInfo?.summary ?? link.summary ?? '';
+  const summaryText = link.summary ?? '';
   const errorMessage = statusInfo?.errorMessage ?? link.summaryErrorMessage;
 
+  if (link.summaryStatus === 'ready' && hasSummaryText(summaryText)) return 'ready';
   if (statusInfo?.status) return statusInfo.status;
   if (link.summaryStatus !== undefined) return link.summaryStatus;
   if (typeof errorMessage === 'string' && errorMessage.trim()) return 'failed';
@@ -82,7 +82,7 @@ const shouldHydrateMissingSummaryStatus = (link: Link, statusInfo?: SummaryStatu
   if (statusInfo?.status) return false;
   if (link.summaryStatus !== undefined) return false;
 
-  const summaryText = statusInfo?.summary ?? link.summary ?? '';
+  const summaryText = link.summary ?? '';
   const errorMessage = statusInfo?.errorMessage ?? link.summaryErrorMessage;
 
   if (hasSummaryText(summaryText)) return false;
@@ -289,7 +289,6 @@ export default function AllLink() {
           [event.linkId]: {
             status: event.status,
             progress: event.progress ?? previous?.progress,
-            summary: event.summary ?? previous?.summary,
             errorMessage: event.errorMessage ?? previous?.errorMessage,
           },
         };
@@ -365,7 +364,6 @@ export default function AllLink() {
           linkId: EntityId;
           data: NonNullable<Awaited<ReturnType<typeof fetchLinkSummaryStatus>>>;
           status: LinkSummaryStatus;
-          summaryText: string;
         }> = [];
 
         for (const result of results) {
@@ -382,7 +380,6 @@ export default function AllLink() {
             summaryUpdates.push({
               linkId: result.linkId,
               data: result.data,
-              summaryText,
               status,
             });
             continue;
@@ -414,12 +411,11 @@ export default function AllLink() {
           let changed = false;
           const next = { ...prev };
 
-          for (const { linkId, data, status, summaryText } of summaryUpdates) {
+          for (const { linkId, data, status } of summaryUpdates) {
             const previous = prev[linkId];
             const merged: SummaryStatusInfo = {
               status,
               progress: typeof data.progress === 'number' ? data.progress : previous?.progress,
-              summary: summaryText || previous?.summary,
               errorMessage:
                 typeof data.errorMessage === 'string' ? data.errorMessage : previous?.errorMessage,
             };
@@ -427,7 +423,6 @@ export default function AllLink() {
             if (
               previous?.status === merged.status &&
               previous?.progress === merged.progress &&
-              previous?.summary === merged.summary &&
               previous?.errorMessage === merged.errorMessage
             ) {
               continue;
@@ -478,7 +473,7 @@ export default function AllLink() {
         if (exhaustedGeneratingLinkIdsRef.current.has(link.id)) continue;
 
         const statusInfo = statusSnapshot[link.id];
-        const summaryText = statusInfo?.summary ?? link.summary ?? '';
+        const summaryText = link.summary ?? '';
         if (hasSummaryText(summaryText)) {
           generatingPollAttemptsRef.current.delete(link.id);
           generatingPollSnapshotsRef.current.delete(link.id);
@@ -534,7 +529,6 @@ export default function AllLink() {
           linkId: EntityId;
           data: NonNullable<Awaited<ReturnType<typeof fetchLinkSummaryStatus>>>;
           status: LinkSummaryStatus;
-          summaryText: string;
         }> = [];
 
         for (const result of results) {
@@ -556,7 +550,6 @@ export default function AllLink() {
             summaryUpdates.push({
               linkId: result.linkId,
               data: result.data,
-              summaryText,
               status,
             });
             continue;
@@ -626,12 +619,11 @@ export default function AllLink() {
           let changed = false;
           const next = { ...prev };
 
-          for (const { linkId, data, status, summaryText } of summaryUpdates) {
+          for (const { linkId, data, status } of summaryUpdates) {
             const previous = prev[linkId];
             const merged: SummaryStatusInfo = {
               status,
               progress: typeof data.progress === 'number' ? data.progress : previous?.progress,
-              summary: summaryText || previous?.summary,
               errorMessage:
                 typeof data.errorMessage === 'string' ? data.errorMessage : previous?.errorMessage,
             };
@@ -639,7 +631,6 @@ export default function AllLink() {
             if (
               previous?.status === merged.status &&
               previous?.progress === merged.progress &&
-              previous?.summary === merged.summary &&
               previous?.errorMessage === merged.errorMessage
             ) {
               continue;
@@ -752,7 +743,7 @@ export default function AllLink() {
       const statusInfo = summaryStatusByLinkId[link.id];
 
       const summaryStatus = resolveLinkSummaryStatus(link, statusInfo) ?? 'idle';
-      const summaryText = statusInfo?.summary ?? link.summary ?? '';
+      const summaryText = link.summary ?? '';
 
       return (
         <LinkCardItem
@@ -773,7 +764,7 @@ export default function AllLink() {
   const selectedStatusInfo = selectedLinkDetail
     ? summaryStatusByLinkId[selectedLinkDetail.id]
     : undefined;
-  const selectedSummaryText = selectedStatusInfo?.summary ?? selectedLinkDetail?.summary ?? '';
+  const selectedSummaryText = selectedLinkDetail?.summary ?? '';
   const selectedSummaryStatus = selectedLinkDetail
     ? (resolveLinkSummaryStatus(selectedLinkDetail, selectedStatusInfo) ?? 'idle')
     : 'idle';

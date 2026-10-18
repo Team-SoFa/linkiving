@@ -10,8 +10,9 @@ import CopyButton from '@/components/wrappers/CopyButton';
 import LinkCardDetailPanel from '@/components/wrappers/LinkCardDetailPanel/LinkCardDetailPanel';
 import ReportModal from '@/components/wrappers/ReportModal/ReportModal';
 import { useChatStream } from '@/hooks/server/Chats/useChatStream';
+import { useGetLink } from '@/hooks/useGetLink';
 import useKeyboardInset from '@/hooks/util/useKeyboardInset';
-import { trackEvent, trackQueryFeedback } from '@/lib/client/analytics';
+import { trackEvent, trackFeedbackFormOpen, trackQueryFeedback } from '@/lib/client/analytics';
 import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
@@ -102,6 +103,22 @@ export default function Chat() {
   const [isAwaitingResponse, setIsAwaitingResponse] = useState(false);
   const [streamError, setStreamError] = useState<string | null>(null);
   const [selectedLink, setSelectedLink] = useState<ChatSocketLink | null>(null);
+  const { data: selectedLinkDetail } = useGetLink(selectedLink?.linkId ?? null);
+
+  useEffect(() => {
+    if (!selectedLinkDetail) return;
+    setMessages(previous =>
+      previous.map(message => ({
+        ...message,
+        links: message.links?.map(link =>
+          link.linkId === selectedLinkDetail.id
+            ? { ...link, summary: selectedLinkDetail.summary }
+            : link
+        ),
+      }))
+    );
+  }, [selectedLinkDetail]);
+
   const setDetailPanelOpen = useLinkStore(state => state.setDetailPanelOpen);
 
   // 모바일에서 상세 패널이 화면 전체를 덮으므로, 사이드네비 트리거를 숨기도록 전역에 알린다.
@@ -632,12 +649,13 @@ export default function Chat() {
     });
   }, []);
 
-  const handleReport = useCallback(() => {
-    trackEvent('feedback_form_open', {
-      entry_point: 'chat_answer_more',
-    });
-    openModal('REPORT');
-  }, [openModal]);
+  const handleReport = useCallback(
+    (message: ChatMessage) => {
+      trackFeedbackFormOpen('chat_answer_more', message.queryId);
+      openModal('REPORT');
+    },
+    [openModal]
+  );
 
   const handleResultClick = useCallback(
     (message: ChatMessage, link: ChatSocketLink, resultRank: number) => {
@@ -762,7 +780,7 @@ export default function Chat() {
                                       void handleReactionChange(message, reaction)
                                     }
                                     onRegenerate={handleRegenerate}
-                                    onReport={handleReport}
+                                    onReport={() => handleReport(message)}
                                   />
                                 </div>
                               )}
@@ -831,7 +849,7 @@ export default function Chat() {
             id={selectedLink.linkId}
             url={selectedLink.url}
             title={selectedLink.title}
-            summary={selectedLink.summary ?? ''}
+            summary={selectedLinkDetail?.summary ?? selectedLink.summary ?? ''}
             imageUrl={selectedLink.imageUrl ?? undefined}
             onClose={() => setSelectedLink(null)}
           />
