@@ -17,6 +17,7 @@ import { useGetLink } from '@/hooks/useGetLink';
 import useLinkCount from '@/hooks/useGetLinksCount';
 import { useSummaryStatusSocket } from '@/hooks/useSummaryStatusSocket';
 import { ApiError } from '@/lib/errors/ApiError';
+import { fillMissingSummaryFromEvent } from '@/lib/query/updateSelectedSummary';
 import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
 import type { EntityId } from '@/types/id';
@@ -304,12 +305,21 @@ export default function AllLink() {
 
         processingLinkIdsRef.current.delete(event.linkId);
 
-        if (wasProcessing || isVisibleLink) {
-          void refetch();
-        }
-
-        if (selectedLinkIdRef.current === event.linkId) {
-          void refetchSelectedLink();
+        const refresh = () => {
+          if (wasProcessing || isVisibleLink) {
+            void refetch();
+          }
+          if (selectedLinkIdRef.current === event.linkId) {
+            void refetchSelectedLink();
+          }
+        };
+        if (event.status === 'ready' && event.summary?.trim()) {
+          void fillMissingSummaryFromEvent(queryClient, event.linkId, event.summary).then(
+            refresh,
+            refresh
+          );
+        } else {
+          refresh();
         }
       }
     },
@@ -836,7 +846,7 @@ export default function AllLink() {
               <DetailPanelShell onClose={handleClosePanel} centered>
                 <Spinner size={36} />
               </DetailPanelShell>
-            ) : isSelectedLinkError ? (
+            ) : isSelectedLinkError && !selectedLinkDetail ? (
               <DetailPanelShell onClose={handleClosePanel} centered>
                 <p>상세 정보를 불러오지 못했습니다.</p>
                 <Button onClick={() => refetchSelectedLink()} label="다시 시도" />
