@@ -12,7 +12,7 @@ import ReportModal from '@/components/wrappers/ReportModal/ReportModal';
 import { useChatStream } from '@/hooks/server/Chats/useChatStream';
 import { useGetLink } from '@/hooks/useGetLink';
 import useKeyboardInset from '@/hooks/util/useKeyboardInset';
-import { trackEvent, trackFeedbackFormOpen, trackQueryFeedback } from '@/lib/client/analytics';
+import { trackFeedbackFormOpen, trackLinkEvent, trackQueryFeedback } from '@/lib/client/analytics';
 import { useLinkStore } from '@/stores/linkStore';
 import { useModalStore } from '@/stores/modalStore';
 import { showToast } from '@/stores/toastStore';
@@ -44,6 +44,7 @@ const toLinks = (links: ChatHistoryMessage['links']): ChatSocketLink[] | null =>
   if (!links || links.length === 0) return null;
   return links.map(link => ({
     linkId: link.id,
+    analyticsId: link.analyticsId,
     title: link.title,
     url: link.url,
     imageUrl: link.imageUrl ?? null,
@@ -660,7 +661,7 @@ export default function Chat() {
   const handleResultClick = useCallback(
     (message: ChatMessage, link: ChatSocketLink, resultRank: number) => {
       if (message.queryId) {
-        trackEvent('query_result_click', {
+        trackLinkEvent('query_result_click', link.analyticsId, {
           app_query_id: message.queryId,
           result_rank: resultRank,
         });
@@ -847,6 +848,7 @@ export default function Chat() {
         <aside className="xl:border-gray200 xl:h-full xl:w-130 xl:shrink-0 xl:border-l">
           <LinkCardDetailPanel
             id={selectedLink.linkId}
+            analyticsId={selectedLinkDetail?.analyticsId ?? selectedLink.analyticsId}
             url={selectedLink.url}
             title={selectedLink.title}
             summary={selectedLinkDetail?.summary ?? selectedLink.summary ?? ''}

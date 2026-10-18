@@ -89,6 +89,7 @@ function buildQuery(params?: LinkListParams) {
 
 type LinkSource = {
   id?: EntityId;
+  analyticsId?: string;
   url?: string;
   title?: string;
   summary?: { id: EntityId; content: string } | string | null;
@@ -113,6 +114,7 @@ const normalizeLink = (data: LinkSource): Link => {
 
   return {
     id: data.id ?? '',
+    analyticsId: data.analyticsId,
     url: data.url ?? '',
     title: data.title ?? '',
     summary,
