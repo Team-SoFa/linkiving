@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [v0.1.4] - 26.10.19
+
 ### Fixed
 
 - 웹 GA 사용자·링크 식별자를 서버의 DB ID 문자열 `analyticsId`로 통일합니다. 재요약·삭제·질의 결과 클릭에 적용하며, 구버전 API에는 화면용 Hashids를 대신 전송하지 않습니다. 백엔드 분석 ID 응답을 먼저 배포해야 합니다.
@@ -68,7 +70,8 @@
 - 채팅 목록을 확인하고 이전 대화를 다시 열 수 있습니다.
 - 회원가입 후 개인 보관함처럼 서비스를 사용할 수 있습니다.
 
-[Unreleased]: https://github.com/Team-SoFa/linkiving/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/Team-SoFa/linkiving/compare/v0.1.4...HEAD
+[v0.1.4]: https://github.com/Team-SoFa/linkiving/compare/v0.1.3...v0.1.4
 [v0.1.3]: https://github.com/Team-SoFa/linkiving/compare/v0.1.2...v0.1.3
 [v0.1.2]: https://github.com/Team-SoFa/linkiving/compare/v0.1.1...v0.1.2
 [v0.1.1]: https://github.com/Team-SoFa/linkiving/compare/v0.1.0...v0.1.1
